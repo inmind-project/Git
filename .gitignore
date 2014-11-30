@@ -58,9 +58,9 @@ StreamAudioServer.ra
 *.Cache
 *.user
 
-ASRMicrosoftCpp\ASRMicrosoftCpp\Debug
-Sandbox\MySpeech\Debug
-Sandbox\StreamWithRec\Debug
-Sandbox\WindowsSTT\WindowsSTT\bin
-Sandbox\WindowsSTT\WindowsSTT\obj
-StreamAudioServer\Debug
+ASRMicrosoftCpp/ASRMicrosoftCpp/Debug/
+Sandbox/MySpeech/Debug/
+Sandbox/StreamWithRec/StreamWithRec/Debug/
+Sandbox/WindowsSTT/WindowsSTT/bin/
+Sandbox/WindowsSTT/WindowsSTT/obj/
+StreamAudioServer/StreamAudioServer/Debug/
