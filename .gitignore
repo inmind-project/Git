@@ -41,3 +41,26 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+*.filters
+*.log
+*.obj
+*.pch
+*.lastbuildstate
+*.tlog
+*.idb
+*.pdb
+*.ipch
+*.htm
+*.exe
+*.ilk
+StreamAudioServer.ra
+*.Cache
+*.user
+
+ASRMicrosoftCpp\ASRMicrosoftCpp\Debug
+Sandbox\MySpeech\Debug
+Sandbox\StreamWithRec\Debug
+Sandbox\WindowsSTT\WindowsSTT\bin
+Sandbox\WindowsSTT\WindowsSTT\obj
+StreamAudioServer\Debug
