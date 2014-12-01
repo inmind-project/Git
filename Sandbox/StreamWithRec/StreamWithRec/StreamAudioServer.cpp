@@ -6,7 +6,7 @@
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	//PlaySoundA("C:\\InMind\\temp\\downtown.wav", NULL, SND_FILENAME | SND_SYNC);
+	//PlaySoundA("C:\\InMind\\temp\\fromClient.wav", NULL, SND_FILENAME | SND_SYNC);
 
 	RunStreamingServer(argc, argv);
 
