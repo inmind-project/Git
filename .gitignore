@@ -64,3 +64,4 @@ Sandbox/StreamWithRec/StreamWithRec/Debug/
 Sandbox/WindowsSTT/WindowsSTT/bin/
 Sandbox/WindowsSTT/WindowsSTT/obj/
 StreamAudioServer/StreamAudioServer/Debug/
+*.opensdf

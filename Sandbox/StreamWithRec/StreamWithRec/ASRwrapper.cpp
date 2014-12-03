@@ -68,48 +68,66 @@ HRESULT CASRwrapper::InitSpeech(std::wstring sPathToFile, IStream * pMemStream)
 
 	if (!sPathToFile.empty() || pMemStream != NULL)
 	{
-			CComPtr<ISpStream> cpInputStream;
-			// Create basic SAPI stream object
-			// NOTE: The helper SpBindToFile can be used to perform the following operations
-			hr = cpInputStream.CoCreateInstance(CLSID_SpStream);
-			// Check hr
+		CComPtr<ISpStream> cpInputStream;
+		// Create basic SAPI stream object
+		// NOTE: The helper SpBindToFile can be used to perform the following operations
+		hr = cpInputStream.CoCreateInstance(CLSID_SpStream);
 
-			CSpStreamFormat sInputFormat;
-			// generate WaveFormatEx structure, assuming the wav format is 22kHz, 16-bit, Stereo
-			hr = sInputFormat.AssignFormat(SPSF_22kHz16BitMono);
-			// Check hr
+		CSpStreamFormat sInputFormat;
+		// generate WaveFormatEx structure, assuming the wav format is 44kHz, 16-bit, Mono
+		if (SUCCEEDED(hr))
+		{
+			hr = sInputFormat.AssignFormat(SPSF_44kHz16BitMono);// SPSF_22kHz16BitMono);
+		}
 
-			if (pMemStream != NULL)
+		if (pMemStream != NULL)
+		{
+			if (SUCCEEDED(hr))
 			{
 				hr = cpInputStream->SetBaseStream(pMemStream, SPDFID_WaveFormatEx, sInputFormat.WaveFormatExPtr());
 			}
-			else
+		}
+		else
+		{
+			if (SUCCEEDED(hr))
 			{
-
 				//   for read-only access, since it will only be access by the SR engine
 				hr = cpInputStream->BindToFile(sPathToFile.c_str(),
 					SPFM_OPEN_READONLY,
 					&(sInputFormat.FormatId()),
 					sInputFormat.WaveFormatExPtr(),
 					SPFEI_ALL_EVENTS);
-				// Check hr
 			}
+		}
+
+		if (SUCCEEDED(hr))
+		{
 			// connect wav input to recognizer
 			// SAPI will negotiate mismatched engine/input audio formats using system audio codecs, so second parameter is not important - use default of TRUE
 			hr = cpRecoEngine->SetInput(cpInputStream, TRUE);
-			// Check hr
-
 		}
-		else //connect to mic
-		{
-			// create default audio object
-			CComPtr<ISpAudio> cpAudio;
-			hr = SpCreateDefaultObjectFromCategoryId(SPCAT_AUDIOIN, &cpAudio);
 
-			// set the input for the engine
+	}
+	else //connect to mic
+	{
+		// create default audio object
+		CComPtr<ISpAudio> cpAudio;
+		if (SUCCEEDED(hr))
+		{
+			hr = SpCreateDefaultObjectFromCategoryId(SPCAT_AUDIOIN, &cpAudio);
+		}
+
+		// set the input for the engine
+		if (SUCCEEDED(hr))
+		{
 			hr = cpRecoEngine->SetInput(cpAudio, TRUE);
+		}
+
+		if (SUCCEEDED(hr))
+		{
 			hr = cpRecoEngine->SetRecoState(SPRST_ACTIVE);
 		}
+	}
 
 
 	if (FAILED(hr))

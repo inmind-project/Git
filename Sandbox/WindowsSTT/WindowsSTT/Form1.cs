@@ -41,6 +41,30 @@ namespace WindowsSTT
             }
 
         }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            SpeechRecognitionEngine recognizer = new SpeechRecognitionEngine();
+            Grammar dictationGrammar = new DictationGrammar();
+            recognizer.LoadGrammar(dictationGrammar);
+            try
+            {
+                button3.Text = "Recognizing";
+                recognizer.SetInputToWaveFile("c:\\InMind\\temp\\fromClient.wav");
+
+                RecognitionResult result = recognizer.Recognize();
+                button3.Text = result.Text;
+            }
+            catch (InvalidOperationException exception)
+            {
+                button3.Text = String.Format("Could not recognize input from default aduio device. Is a microphone or sound card available?\r\n{0} - {1}.", exception.Source, exception.Message);
+            }
+            finally
+            {
+                recognizer.UnloadAllGrammars();
+            }
+        }
+
         private bool isRecording = false;
         [DllImport("winmm.dll", EntryPoint = "mciSendStringA", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
         private static extern int mciSendString(string lpstrCommand, string lpstrReturnString, int uReturnLength, int hwndCallback);
@@ -65,5 +89,6 @@ namespace WindowsSTT
                 isRecording = false;
             }
         }
+
     }
 }

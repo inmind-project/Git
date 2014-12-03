@@ -4,6 +4,8 @@
 #include "ASRwrapper.h"
 using namespace std;
 
+#define WAV_HEADER_SIZE (44)
+
 int RunStreamingServer(int argc, _TCHAR* argv[])
 {
 	WSADATA w;							/* Used to open windows connection */
@@ -17,6 +19,8 @@ int RunStreamingServer(int argc, _TCHAR* argv[])
 	char buffer[BUFFER_SIZE];			/* Where to store received data */
 	struct hostent *hp;					/* Information about this computer */
 	char host_name[256];				/* Name of the server */
+
+	int maxItterationsBeforeDecode = 1001;
 
 	/* Interpret command line */
 	if (argc == 2)
@@ -52,7 +56,7 @@ int RunStreamingServer(int argc, _TCHAR* argv[])
 	}
 
 	/* Open a datagram socket */
-	sd = socket(AF_INET, SOCK_DGRAM, 0);
+	sd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (sd == INVALID_SOCKET)
 	{
 		fprintf(stderr, "Could not create socket.\n");
@@ -115,79 +119,80 @@ int RunStreamingServer(int argc, _TCHAR* argv[])
 
 	printf("Press CTRL + C to quit\n");
 
+	//add a timeout to the socket
+	int iTimeout = 1000; //one second
+	setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&iTimeout, sizeof(iTimeout));
 	
 	HRESULT hr;
 	CComPtr<IStream> pMemStream;
 	HGLOBAL hGlobal = GlobalAlloc(GMEM_MOVEABLE, sizeof(pMemStream));
 	hr = ::CreateStreamOnHGlobal(hGlobal, true, &pMemStream);
 	
+
+	char* fullBuffer = (char*)malloc(BUFFER_SIZE * maxItterationsBeforeDecode + WAV_HEADER_SIZE);
+	memset(fullBuffer, 0, BUFFER_SIZE * maxItterationsBeforeDecode + WAV_HEADER_SIZE);
+
 	int i = 0;
-	int buffOffset = 44;
-	char tmpBuffer[BUFFER_SIZE * 50 + 44];
-	memset(tmpBuffer, 0, BUFFER_SIZE * 50 + 44);
+	int buffOffset = WAV_HEADER_SIZE;
 	/* Loop and get data from clients */
 	while (1)
 	{
-
+		memset(buffer, 0, BUFFER_SIZE);
 		client_length = (int)sizeof(struct sockaddr_in);
 
 		/* Receive bytes from client */
 		bytes_received = recvfrom(sd, buffer, BUFFER_SIZE, 0, (struct sockaddr *)&client, &client_length);
+		int lastError = 0;
+		if (bytes_received == SOCKET_ERROR)
+		{
+			lastError = WSAGetLastError();
+			if (lastError == WSAETIMEDOUT)
+			{
+				bytes_received = 0;
+				if (i==0)
+					continue;
+			}
+		}
 		wcout << L"i=" << i << L". Received:" << bytes_received << endl;
-		_snprintf(tmpBuffer + buffOffset, bytes_received, "%s", buffer);
+
+		memcpy(fullBuffer + buffOffset, buffer, bytes_received);
 		buffOffset += bytes_received;
 		if (bytes_received < 0)
 		{
-			fprintf(stderr, "Could not receive datagram.\n");
+			fprintf(stderr, "Could not receive datagram.\n Error:%d", lastError);
 			closesocket(sd);
 			WSACleanup();
 			exit(0);
 		}
-		ULONG cbWritten;
-		pMemStream->Write(buffer, sizeof(buffer), &cbWritten);
+		//ULONG cbWritten;
+		//pMemStream->Write(buffer, bytes_received*sizeof(char), &cbWritten);
 		//wcout << L"i=" << i << L". Written" << cbWritten << endl;
 		i++;
-		if (i == 50)
+		if (i == maxItterationsBeforeDecode || bytes_received == 0)//&& buffOffset > 44) // no need since if i==0 we continue above.
 		{
+
+			
+			//add a header
+			WriteWavHeader(fullBuffer, 44100, false);
+			//pMemStream->Read(fullBuffer + 44, buffOffset*sizeof(char)-44, &cbWritten);
+			CloseWav(fullBuffer, false, buffOffset);
+			WriteToFile(fullBuffer, "c:\\InMind\\temp\\fromClient.wav", buffOffset);
+			PlaySoundA(fullBuffer, NULL, SND_MEMORY | SND_SYNC);
 			LARGE_INTEGER zero;
 			zero.LowPart = 0;
 			zero.HighPart = 0;
 			pMemStream->Seek(zero, STREAM_SEEK_SET, NULL);
-			//PlaySound();
-			
-			//add a header
-			WriteWavHeader(tmpBuffer, 44100, false);
-			//pMemStream->Read(tmpBuffer + 44, BUFFER_SIZE*50*sizeof(char), &cbWritten);
-			CloseWav(tmpBuffer, false, buffOffset);
-			WriteToFile(tmpBuffer, "c:\\InMind\\temp\\fromClient.wav", buffOffset);
-			//PlaySoundA(tmpBuffer, NULL, SND_MEMORY | SND_SYNC);
-			//for (UINT j = 0; j < cbWritten; j++)
-			//{
-			//	if (tmpBuffer[j] != '\0')
-			//		cout << tmpBuffer[j];
-			//}
-			//DecodeFromMem(pMemStream);
+			ULONG cbWritten;
+			pMemStream->Write(fullBuffer, buffOffset*sizeof(char), &cbWritten);
 			pMemStream->Seek(zero, STREAM_SEEK_SET, NULL);
+			DecodeFromMem(pMemStream);
+			pMemStream->Revert();// Seek(zero, STREAM_SEEK_SET, NULL);
 			i = 0;
-			buffOffset = 44;
+			buffOffset = WAV_HEADER_SIZE;
 		}
-
-		///* Check for time request */
-		//if (strcmp(buffer, "GET TIME\r\n") == 0)
-		//{
-		//	/* Get current time */
-		//	current_time = time(NULL);
-
-		//	/* Send data back */
-		//	if (sendto(sd, (char *)&current_time, (int)sizeof(current_time), 0, (struct sockaddr *)&client, client_length) != (int)sizeof(current_time))
-		//	{
-		//		fprintf(stderr, "Error sending datagram.\n");
-		//		closesocket(sd);
-		//		WSACleanup();
-		//		exit(0);
-		//	}
-		//}
+		//	sendto(sd, (char *)&current_time, (int)sizeof(current_time), 0, (struct sockaddr *)&client, client_length)/* Send data back */
 	}
+	free(fullBuffer);
 	closesocket(sd);
 	WSACleanup();
 	return 0;
@@ -203,9 +208,11 @@ int DecodeFromMem(IStream * pMemStream)
 {
 
 	CASRwrapper asrEngine;
-	std::wstring sPathToFile = L"";// CarnegieMellon.wav";
-	asrEngine.InitSpeech(sPathToFile, pMemStream);
+	std::wstring sPathToFile = L"";// C:\\InMind\\temp\\CarnegieMellonUniversity.wav";// L"c:\\InMind\\temp\\fromClient.wav";//L"C:\\InMind\\temp\\Downtown.wav";
+	asrEngine.InitSpeech(sPathToFile, NULL);//pMemStream);
 
+
+	//TODO: must be done in a thread!!!! can't block the server!!!
 		asrEngine.Listen();
 		HANDLE handleEvent = asrEngine.GetNotifyHandle();
 		HANDLE handles[1];
@@ -232,7 +239,10 @@ int WriteFileOrCharArr(const char* st, int bytes, void* writeTo, bool isFile, in
 		if (bytes == 1)
 			*((char*)writeTo + offset) = *st;
 		else
-			ret = _snprintf(((char*)writeTo + offset), bytes, "%s", st);
+		{
+			//ret = _snprintf(((char*)writeTo + offset), bytes, "%s", st);
+			memcpy(((char*)writeTo + offset), st,bytes);
+		}
 	}
 	return ret;
 }
@@ -273,6 +283,7 @@ static void PutNum(long num, void *writeTo, int endianness, int bytes, bool isFi
 // SampleRate defaults to 8000
 void WriteWavHeader(void *writeTo, int SampleRate, bool isFile)
 {
+	int bitsPerSample = 16;
 	int writtenAccumulated = 0;
 	if (writeTo != NULL){
 		/* quick and dirty */
@@ -290,11 +301,11 @@ void WriteWavHeader(void *writeTo, int SampleRate, bool isFile)
 		writtenAccumulated += 2;
 		PutNum(SampleRate, writeTo, 0, 4, isFile, writtenAccumulated);             /* 24-27 */ // our sampling rate is 8000
 		writtenAccumulated += 4;
-		PutNum(SampleRate * 1 * 8, writeTo, 0, 4, isFile, writtenAccumulated);         /* 28-31 */ //ByteRate == SampleRate * NumChannels * BitsPerSample/8
+		PutNum(SampleRate * 1 * bitsPerSample/8 /*Amos: fixed*/, writeTo, 0, 4, isFile, writtenAccumulated);         /* 28-31 */ //ByteRate == SampleRate * NumChannels * BitsPerSample/8
 		writtenAccumulated += 4;
-		PutNum(1 * 2, writeTo, 0, 2, isFile, writtenAccumulated);                 /* 32-33 */ // block align == NumChannels * BitsPerSample/8
+		PutNum(1 * bitsPerSample/8, writeTo, 0, 2, isFile, writtenAccumulated);                 /* 32-33 */ // block align == NumChannels * BitsPerSample/8
 		writtenAccumulated += 2;
-		PutNum(16, writeTo, 0, 2, isFile, writtenAccumulated);                /* 34-35 */
+		PutNum(bitsPerSample, writeTo, 0, 2, isFile, writtenAccumulated);                /* 34-35 */
 		writtenAccumulated += 2;
 		WriteFileOrCharArr("data", 4, writeTo, isFile, writtenAccumulated); /* 36-39 */
 		writtenAccumulated += 4;
@@ -323,7 +334,7 @@ void CloseWav(void *writeTo, bool isFile, int totLengthBytes)
 		PutNum(totLengthBytes - 8, writeTo, 0, 4, isFile, 4);  // We write ChunkSize
 		if (isFile)
 			fseek((FILE*)writeTo, 40, SEEK_SET);
-		PutNum(totLengthBytes - 44, writeTo, 0, 4, isFile, 40);  // We write SubchunkSize2
+		PutNum(totLengthBytes - WAV_HEADER_SIZE, writeTo, 0, 4, isFile, 40);  // We write SubchunkSize2
 		if (isFile)
 			fclose((FILE*)writeTo);
 	}
@@ -332,7 +343,7 @@ void CloseWav(void *writeTo, bool isFile, int totLengthBytes)
 
 void WriteToFile(char* data, char* filePath, int dataBytes)
 {
-	FILE* f = fopen(filePath, "w");
+	FILE* f = fopen(filePath, "wb");
 	fwrite(data, sizeof(char), dataBytes, f);
 	fclose(f);
 
