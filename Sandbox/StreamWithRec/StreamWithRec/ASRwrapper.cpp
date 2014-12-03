@@ -20,6 +20,7 @@ CASRwrapper::~CASRwrapper()
 	::CoUninitialize();
 }
 
+//Speech Initialization is done here
 HRESULT CASRwrapper::InitSpeech(std::wstring sPathToFile, IStream * pMemStream)
 {
 	HRESULT hr = S_OK;
@@ -69,15 +70,18 @@ HRESULT CASRwrapper::InitSpeech(std::wstring sPathToFile, IStream * pMemStream)
 	if (!sPathToFile.empty() || pMemStream != NULL)
 	{
 		CComPtr<ISpStream> cpInputStream;
-		// Create basic SAPI stream object
-		// NOTE: The helper SpBindToFile can be used to perform the following operations
-		hr = cpInputStream.CoCreateInstance(CLSID_SpStream);
+		if (SUCCEEDED(hr))
+		{
+			// Create basic SAPI stream object
+			// NOTE: The helper SpBindToFile can be used to perform the following operations
+			hr = cpInputStream.CoCreateInstance(CLSID_SpStream);
+		}
 
 		CSpStreamFormat sInputFormat;
 		// generate WaveFormatEx structure, assuming the wav format is 44kHz, 16-bit, Mono
 		if (SUCCEEDED(hr))
 		{
-			hr = sInputFormat.AssignFormat(SPSF_44kHz16BitMono);// SPSF_22kHz16BitMono);
+			hr = sInputFormat.AssignFormat(SPSF_44kHz16BitMono);
 		}
 
 		if (pMemStream != NULL)
@@ -139,7 +143,7 @@ HRESULT CASRwrapper::InitSpeech(std::wstring sPathToFile, IStream * pMemStream)
 	return hr;
 }
 
-//Speech Initialization is done here
+//Start listening to mic, file or mem
 HRESULT CASRwrapper::Listen()
 {
 

@@ -77,7 +77,7 @@ HRESULT CASRwrapper::InitSpeech(std::wstring sPathToFile)
 
 		CSpStreamFormat sInputFormat;
 		// generate WaveFormatEx structure, assuming the wav format is 22kHz, 16-bit, Stereo
-		hr = sInputFormat.AssignFormat(SPSF_22kHz16BitMono);
+		hr = sInputFormat.AssignFormat(SPSF_44kHz16BitMono);
 		// Check hr
 
 		//   for read-only access, since it will only be access by the SR engine

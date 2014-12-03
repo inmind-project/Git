@@ -22,6 +22,13 @@ int RunStreamingServer(int argc, _TCHAR* argv[])
 
 	int maxItterationsBeforeDecode = 1001;
 
+	ULARGE_INTEGER UZERO;
+	UZERO.LowPart = 0;
+	UZERO.HighPart = 0;
+	LARGE_INTEGER ZERO;
+	ZERO.LowPart = 0;
+	ZERO.HighPart = 0;
+
 	/* Interpret command line */
 	if (argc == 2)
 	{
@@ -120,7 +127,7 @@ int RunStreamingServer(int argc, _TCHAR* argv[])
 	printf("Press CTRL + C to quit\n");
 
 	//add a timeout to the socket
-	int iTimeout = 1000; //one second
+	int iTimeout = 500; //half a second
 	setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&iTimeout, sizeof(iTimeout));
 	
 	HRESULT hr;
@@ -154,6 +161,11 @@ int RunStreamingServer(int argc, _TCHAR* argv[])
 			}
 		}
 		wcout << L"i=" << i << L". Received:" << bytes_received << endl;
+		//if (i < 80) //DEBUG: in order to reduce begining noise - move wait to client.
+		//{//DEBUG
+		//	i++;//DEBUG
+		//	continue;//DEBUG
+		//}//DEBUG
 
 		memcpy(fullBuffer + buffOffset, buffer, bytes_received);
 		buffOffset += bytes_received;
@@ -172,23 +184,22 @@ int RunStreamingServer(int argc, _TCHAR* argv[])
 		{
 
 			
-			//add a header
+			//add a header //seems to work with no header as well.
 			WriteWavHeader(fullBuffer, 44100, false);
-			//pMemStream->Read(fullBuffer + 44, buffOffset*sizeof(char)-44, &cbWritten);
 			CloseWav(fullBuffer, false, buffOffset);
-			WriteToFile(fullBuffer, "c:\\InMind\\temp\\fromClient.wav", buffOffset);
-			PlaySoundA(fullBuffer, NULL, SND_MEMORY | SND_SYNC);
-			LARGE_INTEGER zero;
-			zero.LowPart = 0;
-			zero.HighPart = 0;
-			pMemStream->Seek(zero, STREAM_SEEK_SET, NULL);
+			WriteToFile(fullBuffer, "c:\\InMind\\temp\\fromClient.wav", buffOffset); //TODO: save files in a better place!
+			//PlaySoundA(fullBuffer, NULL, SND_MEMORY | SND_SYNC);
+
+			pMemStream->SetSize(UZERO);// deleting old stream
 			ULONG cbWritten;
-			pMemStream->Write(fullBuffer, buffOffset*sizeof(char), &cbWritten);
-			pMemStream->Seek(zero, STREAM_SEEK_SET, NULL);
+			//recognition does not require WAV header
+			pMemStream->Write(fullBuffer + WAV_HEADER_SIZE, (buffOffset - WAV_HEADER_SIZE)*sizeof(char), &cbWritten);
+			pMemStream->Seek(ZERO, STREAM_SEEK_SET, NULL);
 			DecodeFromMem(pMemStream);
-			pMemStream->Revert();// Seek(zero, STREAM_SEEK_SET, NULL);
+			pMemStream->Seek(ZERO, STREAM_SEEK_SET, NULL);
 			i = 0;
 			buffOffset = WAV_HEADER_SIZE;
+			memset(fullBuffer, 0, BUFFER_SIZE * maxItterationsBeforeDecode + WAV_HEADER_SIZE);
 		}
 		//	sendto(sd, (char *)&current_time, (int)sizeof(current_time), 0, (struct sockaddr *)&client, client_length)/* Send data back */
 	}
@@ -208,11 +219,11 @@ int DecodeFromMem(IStream * pMemStream)
 {
 
 	CASRwrapper asrEngine;
-	std::wstring sPathToFile = L"";// C:\\InMind\\temp\\CarnegieMellonUniversity.wav";// L"c:\\InMind\\temp\\fromClient.wav";//L"C:\\InMind\\temp\\Downtown.wav";
-	asrEngine.InitSpeech(sPathToFile, NULL);//pMemStream);
-
-
-	//TODO: must be done in a thread!!!! can't block the server!!!
+	std::wstring sPathToFile = L"";// C:\\InMind\\temp\\fromClient.wav";// L"c:\\InMind\\temp\\fromClient.wav";//L"C:\\InMind\\temp\\Downtown.wav";
+	HRESULT hr = asrEngine.InitSpeech(sPathToFile, pMemStream);
+	if (SUCCEEDED(hr))
+	{
+		//TODO: must be done in a thread!!!! can't block the server!!!
 		asrEngine.Listen();
 		HANDLE handleEvent = asrEngine.GetNotifyHandle();
 		HANDLE handles[1];
@@ -224,6 +235,9 @@ int DecodeFromMem(IStream * pMemStream)
 		wcout << speechRes << endl;
 		//Sleep(100000);
 		//system("PAUSE");
+	}
+	else
+		wcout << "ERROR!" << endl;
 	return 0;
 }
 

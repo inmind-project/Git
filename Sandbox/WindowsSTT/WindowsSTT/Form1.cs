@@ -74,8 +74,10 @@ namespace WindowsSTT
             {
 
                 mciSendString("open new Type waveaudio Alias recsound", "", 0, 0);
-                string command = "set capture time format ms bitspersample 16 channels 1 samplespersec 16000 alignment 4";
-                mciSendString(command, "", 0, 0);
+                //string command = "set capture time format ms bitspersample 16 channels 1 samplespersec 16000 alignment 4";
+                //var ret = mciSendString("set recsound bitspersample 16", "", 0, 0); doesn't work :(
+                //ret = mciSendString("set recsound samplespersec 44100", "", 0, 0);
+                //ret = mciSendString("set recsound channels 1", "", 0, 0);
 
                 mciSendString("record recsound", "", 0, 0);
                 button2.Text = "Stop Recording...";

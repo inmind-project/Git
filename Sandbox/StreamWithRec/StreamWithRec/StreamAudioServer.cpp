@@ -9,6 +9,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	//PlaySoundA("C:\\InMind\\temp\\fromClient.wav", NULL, SND_FILENAME | SND_SYNC);
 
 	RunStreamingServer(argc, argv);
+	//DecodeFromMem(NULL);
 
 	return 0;
 }
