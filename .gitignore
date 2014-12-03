@@ -58,10 +58,21 @@ StreamAudioServer.ra
 *.Cache
 *.user
 
+StreamWithRec/StreamWithRec/Debug/
 ASRMicrosoftCpp/ASRMicrosoftCpp/Debug/
+StreamAudioServer/StreamAudioServer/Debug/
 Sandbox/MySpeech/Debug/
-Sandbox/StreamWithRec/StreamWithRec/Debug/
 Sandbox/WindowsSTT/WindowsSTT/bin/
 Sandbox/WindowsSTT/WindowsSTT/obj/
-StreamAudioServer/StreamAudioServer/Debug/
+EclipseWorkspace/.metadata/
+EclipseWorkspace/appcompat_v7/
+EclipseWorkspace/InMindAgent/bin/
+EclipseWorkspace/InMindAgent/gen/
+EclipseWorkspace/StreamAudioClient/bin/
+EclipseWorkspace/StreamAudioServer/bin/
+
+
+
 *.opensdf
+*.prefs
+*.jar
