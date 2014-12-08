@@ -10,7 +10,7 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 
 	CASRwrapper asrEngine;
-	std::wstring sPathToFile = L"C:\\InMind\\temp\\fromClient.wav";
+	std::wstring sPathToFile = L"C:\\InMind\\temp\\fromClient5.wav";
 	asrEngine.InitSpeech(sPathToFile);
 	while (1)
 	{

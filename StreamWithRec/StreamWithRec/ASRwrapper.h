@@ -48,4 +48,3 @@ public:
 
 	static void __stdcall SpRecCallback(WPARAM wParam, LPARAM lParam);
 };
-

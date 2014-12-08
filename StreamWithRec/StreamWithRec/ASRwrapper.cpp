@@ -44,7 +44,7 @@ HRESULT CASRwrapper::InitSpeech(std::wstring sPathToFile, IStream * pMemStream)
 	if (SUCCEEDED(hr))
 	{
 		// This specifies which of the recognition events are going 
-		//to trigger notifications.Here, all we are interested in 
+		//to trigger notifications. Here, all we are interested in 
 		//is the beginning and ends of sounds, as well as
 		// when the engine has recognized something
 		//using ISpRecoContext

@@ -70,6 +70,12 @@ EclipseWorkspace/InMindAgent/bin/
 EclipseWorkspace/InMindAgent/gen/
 EclipseWorkspace/StreamAudioClient/bin/
 EclipseWorkspace/StreamAudioServer/bin/
+EclipseWorkspace/VoiceRec/bin
+EclipseWorkspace/VoiceRec/gen
+EclipseWorkspace/TCPClient
+EclipseWorkspace/JAVATCPServer
+EclipseWorkspace/TempSandbox
+
 
 
 

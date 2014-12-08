@@ -50,7 +50,7 @@ namespace WindowsSTT
             try
             {
                 button3.Text = "Recognizing";
-                recognizer.SetInputToWaveFile("c:\\InMind\\temp\\fromClient.wav");
+                recognizer.SetInputToWaveFile("c:\\InMind\\temp\\fromClient3.wav");
 
                 RecognitionResult result = recognizer.Recognize();
                 button3.Text = result.Text;

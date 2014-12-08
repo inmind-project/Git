@@ -2,23 +2,25 @@
 #include "stdafx.h"
 #include "StreamServer.h"
 #include "ASRwrapper.h"
+#include <inttypes.h>
 using namespace std;
 
 #define WAV_HEADER_SIZE (44)
 
-int RunStreamingServer(int argc, _TCHAR* argv[])
+wstring RunStreamingServer(int port_number)
 {
+	wstring retText;
 	WSADATA w;							/* Used to open windows connection */
-	unsigned short port_number;			/* Port number to use */
-	int a1, a2, a3, a4;					/* Components of address in xxx.xxx.xxx.xxx form */
 	int client_length;					/* Length of client struct */
 	int bytes_received;					/* Bytes received from client */
-	SOCKET sd;							/* Socket descriptor of server */
-	struct sockaddr_in server;			/* Information about the server */
+	SOCKET listenSocket = INVALID_SOCKET;							/* Socket descriptor of server */
 	struct sockaddr_in client;			/* Information about the client */
+	int iResult = 0;
+
+	struct addrinfo *paddrInformation = NULL;
+	struct addrinfo hints;
+
 	char buffer[BUFFER_SIZE];			/* Where to store received data */
-	struct hostent *hp;					/* Information about this computer */
-	char host_name[256];				/* Name of the server */
 
 	int maxItterationsBeforeDecode = 1001;
 
@@ -29,31 +31,7 @@ int RunStreamingServer(int argc, _TCHAR* argv[])
 	ZERO.LowPart = 0;
 	ZERO.HighPart = 0;
 
-	/* Interpret command line */
-	if (argc == 2)
-	{
-		/* Use local address */
-		if (swscanf_s(argv[1], L"%u", &port_number) != 1)
-		{
-			usage();
-		}
-	}
-	else if (argc == 3)
-	{
-		/* Copy address */
-		if (swscanf_s(argv[1], L"%d.%d.%d.%d", &a1, &a2, &a3, &a4) != 4)
-		{
-			usage();
-		}
-		if (swscanf_s(argv[2], L"%u", &port_number) != 1)
-		{
-			usage();
-		}
-	}
-	else
-	{
-		usage();
-	}
+
 
 	/* Open windows connection */
 	if (WSAStartup(0x0101, &w) != 0)
@@ -62,73 +40,49 @@ int RunStreamingServer(int argc, _TCHAR* argv[])
 		exit(0);
 	}
 
+
+	ZeroMemory(&hints, sizeof(hints));
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_DGRAM;
+	hints.ai_protocol = IPPROTO_UDP;
+	hints.ai_flags = AI_PASSIVE;
+
+	char szPortNum[MAX_PORT_LENGTH];
+	_itoa_s(port_number, szPortNum, MAX_PORT_LENGTH, 10);
+	// Resolve the server address and port
+	iResult = getaddrinfo(NULL, szPortNum, &hints, &paddrInformation);
+	if (iResult != 0) {
+		printf("getaddrinfo failed with error: %d\n", iResult);
+		WSACleanup();
+		return retText;
+	}
+
 	/* Open a datagram socket */
-	sd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (sd == INVALID_SOCKET)
+	listenSocket = socket(paddrInformation->ai_family, paddrInformation->ai_socktype, paddrInformation->ai_protocol);
+	if (listenSocket == INVALID_SOCKET)
 	{
 		fprintf(stderr, "Could not create socket.\n");
 		WSACleanup();
-		exit(0);
+		return retText;
 	}
 
-	/* Clear out server struct */
-	memset((void *)&server, '\0', sizeof(struct sockaddr_in));
-
-	/* Set family and port */
-	server.sin_family = AF_INET;
-	server.sin_port = htons(port_number);
-
-	/* Set address automatically if desired */
-	if (argc == 2)
-	{
-		/* Get host name of this computer */
-		gethostname(host_name, sizeof(host_name));
-		hp = gethostbyname(host_name);
-
-		/* Check for NULL pointer */
-		if (hp == NULL)
-		{
-			fprintf(stderr, "Could not get host name.\n");
-			closesocket(sd);
-			WSACleanup();
-			exit(0);
-		}
-
-		/* Assign the address */
-		server.sin_addr.S_un.S_un_b.s_b1 = hp->h_addr_list[0][0];
-		server.sin_addr.S_un.S_un_b.s_b2 = hp->h_addr_list[0][1];
-		server.sin_addr.S_un.S_un_b.s_b3 = hp->h_addr_list[0][2];
-		server.sin_addr.S_un.S_un_b.s_b4 = hp->h_addr_list[0][3];
-	}
-	/* Otherwise assign it manually */
-	else
-	{
-		server.sin_addr.S_un.S_un_b.s_b1 = (unsigned char)a1;
-		server.sin_addr.S_un.S_un_b.s_b2 = (unsigned char)a2;
-		server.sin_addr.S_un.S_un_b.s_b3 = (unsigned char)a3;
-		server.sin_addr.S_un.S_un_b.s_b4 = (unsigned char)a4;
-	}
 
 	/* Bind address to socket */
-	if (bind(sd, (struct sockaddr *)&server, sizeof(struct sockaddr_in)) == -1)
+	iResult = bind(listenSocket, paddrInformation->ai_addr, (int)paddrInformation->ai_addrlen);
+	if (iResult == SOCKET_ERROR) 
 	{
-		fprintf(stderr, "Could not bind name to socket.\n");
-		closesocket(sd);
+		printf("bind failed with error: %d\n", WSAGetLastError());
+		freeaddrinfo(paddrInformation);
+		closesocket(listenSocket);
 		WSACleanup();
-		exit(0);
+		return retText;
 	}
 
-	/* Print out server information */
-	printf("Server running on %u.%u.%u.%u\n", (unsigned char)server.sin_addr.S_un.S_un_b.s_b1,
-		(unsigned char)server.sin_addr.S_un.S_un_b.s_b2,
-		(unsigned char)server.sin_addr.S_un.S_un_b.s_b3,
-		(unsigned char)server.sin_addr.S_un.S_un_b.s_b4);
-
-	printf("Press CTRL + C to quit\n");
+	printf("UDP Connection opened.\n");
 
 	//add a timeout to the socket
 	int iTimeout = 500; //half a second
-	setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&iTimeout, sizeof(iTimeout));
+	setsockopt(listenSocket, SOL_SOCKET, SO_RCVTIMEO, (const char *)&iTimeout, sizeof(iTimeout));
 	
 	HRESULT hr;
 	CComPtr<IStream> pMemStream;
@@ -141,14 +95,14 @@ int RunStreamingServer(int argc, _TCHAR* argv[])
 
 	int i = 0;
 	int buffOffset = WAV_HEADER_SIZE;
-	/* Loop and get data from clients */
-	while (1)
+	/* get data from clients */
+	while (i < maxItterationsBeforeDecode)
 	{
 		memset(buffer, 0, BUFFER_SIZE);
 		client_length = (int)sizeof(struct sockaddr_in);
 
 		/* Receive bytes from client */
-		bytes_received = recvfrom(sd, buffer, BUFFER_SIZE, 0, (struct sockaddr *)&client, &client_length);
+		bytes_received = recvfrom(listenSocket, buffer, BUFFER_SIZE, 0, (struct sockaddr *)&client, &client_length);
 		int lastError = 0;
 		if (bytes_received == SOCKET_ERROR)
 		{
@@ -172,9 +126,9 @@ int RunStreamingServer(int argc, _TCHAR* argv[])
 		if (bytes_received < 0)
 		{
 			fprintf(stderr, "Could not receive datagram.\n Error:%d", lastError);
-			closesocket(sd);
+			closesocket(listenSocket);
 			WSACleanup();
-			exit(0);
+			return retText;
 		}
 		//ULONG cbWritten;
 		//pMemStream->Write(buffer, bytes_received*sizeof(char), &cbWritten);
@@ -184,42 +138,42 @@ int RunStreamingServer(int argc, _TCHAR* argv[])
 		{
 
 			
-			//add a header //seems to work with no header as well.
+			//add a header for saved file
 			WriteWavHeader(fullBuffer, 44100, false);
 			CloseWav(fullBuffer, false, buffOffset);
+			// It turns out that by reducing the amplitude, SAPI does so much better (no idea why!)
+			ReduceAmplitude(fullBuffer + WAV_HEADER_SIZE, buffOffset - WAV_HEADER_SIZE, 0.2);
 			WriteToFile(fullBuffer, "c:\\InMind\\temp\\fromClient.wav", buffOffset); //TODO: save files in a better place!
 			//PlaySoundA(fullBuffer, NULL, SND_MEMORY | SND_SYNC);
 
 			pMemStream->SetSize(UZERO);// deleting old stream
 			ULONG cbWritten;
 			//recognition does not require WAV header
+			
 			pMemStream->Write(fullBuffer + WAV_HEADER_SIZE, (buffOffset - WAV_HEADER_SIZE)*sizeof(char), &cbWritten);
 			pMemStream->Seek(ZERO, STREAM_SEEK_SET, NULL);
-			DecodeFromMem(pMemStream);
+			retText=DecodeFromMem(pMemStream);
 			pMemStream->Seek(ZERO, STREAM_SEEK_SET, NULL);
-			i = 0;
-			buffOffset = WAV_HEADER_SIZE;
-			memset(fullBuffer, 0, BUFFER_SIZE * maxItterationsBeforeDecode + WAV_HEADER_SIZE);
+			break;
+
+			//i = 0;
+			//buffOffset = WAV_HEADER_SIZE;
+			//memset(fullBuffer, 0, BUFFER_SIZE * maxItterationsBeforeDecode + WAV_HEADER_SIZE);
 		}
 		//	sendto(sd, (char *)&current_time, (int)sizeof(current_time), 0, (struct sockaddr *)&client, client_length)/* Send data back */
 	}
 	free(fullBuffer);
-	closesocket(sd);
+	closesocket(listenSocket);
 	WSACleanup();
-	return 0;
+	return retText;
 }
 
-void usage(void)
+wstring DecodeFromMem(IStream * pMemStream)
 {
-	fprintf(stderr, "timeserv [server_address] port\n");
-	exit(0);
-}
-
-int DecodeFromMem(IStream * pMemStream)
-{
+	wstring speechRes;
 
 	CASRwrapper asrEngine;
-	std::wstring sPathToFile = L"";// C:\\InMind\\temp\\fromClient.wav";// L"c:\\InMind\\temp\\fromClient.wav";//L"C:\\InMind\\temp\\Downtown.wav";
+	wstring sPathToFile = L"";// C:\\InMind\\temp\\fromClient.wav";// L"c:\\InMind\\temp\\fromClient.wav";//L"C:\\InMind\\temp\\Downtown.wav";
 	HRESULT hr = asrEngine.InitSpeech(sPathToFile, pMemStream);
 	if (SUCCEEDED(hr))
 	{
@@ -230,7 +184,6 @@ int DecodeFromMem(IStream * pMemStream)
 		handles[0] = handleEvent;
 		DWORD maxWait = 3000;
 		DWORD waitRes = WaitForMultipleObjects(1, handles, FALSE, maxWait);
-		std::wstring speechRes;
 		if (waitRes == WAIT_OBJECT_0)
 		{
 			asrEngine.GetText(speechRes);
@@ -246,8 +199,11 @@ int DecodeFromMem(IStream * pMemStream)
 	}
 	else
 		wcout << "ERROR!" << endl;
-	return 0;
+	return speechRes;
 }
+
+///TODO: Move all these to utils file
+
 
 
 // returns -1 if fails. Works on both FILE* and char*. offset is used only in char*.
@@ -369,4 +325,11 @@ void WriteToFile(char* data, char* filePath, int dataBytes)
 	fwrite(data, sizeof(char), dataBytes, f);
 	fclose(f);
 
+}
+
+void ReduceAmplitude(char* buffer, int length, double reduceTo)
+{
+	int16_t* sample = (int16_t*)buffer;
+	for (int i = 0; i < length / (sizeof(int16_t) / sizeof(char)); i++)
+		sample[i] = sample[i] * reduceTo;
 }
