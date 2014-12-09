@@ -10,7 +10,7 @@ using namespace std;
 
 int HighLevelServer(int port_number)
 {
-	string defaultMessageSeperator = ";";
+	string defaultMessageSeperator = "^";
 	string defaultMessageEnd = "\n";
 
 	WSADATA wsaData;
@@ -123,7 +123,7 @@ int HighLevelServer(int port_number)
 		//} while (iResult > 0);
 
 
-		std::string portMessage = "UDP" + defaultMessageSeperator + std::to_string(DEFAULT_AUDIO_PORT) + defaultMessageEnd; //TODO: better use xml format
+		std::string portMessage = "ConnectUDP" + defaultMessageSeperator + std::to_string(DEFAULT_AUDIO_PORT) + defaultMessageEnd; //TODO: better use xml format
 		iSendResult = send(ClientSocket, portMessage.c_str(), portMessage.length(), 0);
 
 		if (iSendResult == portMessage.length())
@@ -132,9 +132,37 @@ int HighLevelServer(int port_number)
 
 			std::string textFromAudio(wtextFromAudio.begin(), wtextFromAudio.end()); //converting from wstring to string
 
-			string textMessage = "You said: " + textFromAudio + defaultMessageEnd; //TODO: better use xml format
-			iSendResult = send(ClientSocket, textMessage.c_str(), textMessage.length(), 0);
-			printf("Sent: %s\n", textFromAudio.c_str());
+			if (textFromAudio.find("news") != string::npos) //TODO: integrate all this into Olympus
+			{
+				string textMessage = "Say" + defaultMessageSeperator + "Here is your news!" + defaultMessageEnd; //TODO: better use xml format
+				iSendResult = send(ClientSocket, textMessage.c_str(), textMessage.length(), 0);
+				printf("Sent: %s\n", textMessage.c_str());
+				string launchMessage = "Launch" + defaultMessageSeperator + "com.yahoo.inmind.reader" + defaultMessageEnd; //"com.yahoo.inmind.reader/com.yahoo.inmind.reader.ReaderMainActivity"
+				iSendResult = send(ClientSocket, launchMessage.c_str(), launchMessage.length(), 0);
+				printf("Sent: %s\n", launchMessage.c_str());
+			} 
+			else if (textFromAudio.find("calculator") != string::npos)
+			{
+				string textMessage = "Say" + defaultMessageSeperator + "Enjoy the calculator!" + defaultMessageEnd; //TODO: better use xml format
+				iSendResult = send(ClientSocket, textMessage.c_str(), textMessage.length(), 0);
+				printf("Sent: %s\n", textMessage.c_str());
+				string launchMessage = "Launch" + defaultMessageSeperator + "com.android.calculator2" + defaultMessageEnd; //"com.android.calculator2/com.android.calculator2.Calculator"
+				iSendResult = send(ClientSocket, launchMessage.c_str(), launchMessage.length(), 0);
+				printf("Sent: %s\n", launchMessage.c_str());
+			}
+			else if (textFromAudio.find("hello") != string::npos)
+			{
+				string textMessage = "Say" + defaultMessageSeperator + "Hello, how are you today?" + defaultMessageEnd; //TODO: better use xml format
+				iSendResult = send(ClientSocket, textMessage.c_str(), textMessage.length(), 0);
+				printf("Sent: %s\n", textMessage.c_str());
+			}
+			else
+			{
+				string textMessage = "Say" + defaultMessageSeperator + "You said: " + textFromAudio + defaultMessageEnd; //TODO: better use xml format
+				iSendResult = send(ClientSocket, textMessage.c_str(), textMessage.length(), 0);
+				printf("Sent: %s\n", textFromAudio.c_str());
+			}
+
 		}
 
 		//Sleep(1000);

@@ -1,5 +1,6 @@
 package com.inMind.inMindAgent;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,12 +18,12 @@ import android.widget.Toast;
 public class MainActivity extends ActionBarActivity {
 
 	TTScontroller ttsCont;
-	ServerConnector serverConnector;
+	LogicController logicController;
 	
 	private Button startButton,stopButton;
 
 
-	private Handler toasterHandler, talkHandler;
+	private Handler toasterHandler, talkHandler, launchHandler; //TODO: should these all be combined to one handler?
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,9 +53,32 @@ public class MainActivity extends ActionBarActivity {
 				return false;
 			}
 		});
+		
+		launchHandler = new Handler(new Handler.Callback() {
+
+			@Override
+			public boolean handleMessage(Message msg) {
+				if(msg.arg1==1)
+				{
+					//Pattern p = Pattern.compile("(.*)/(.*)");
+					//Matcher m = p.matcher(msg.obj.toString());
+					//m.find();
+				    
+					Intent i = getApplicationContext().getPackageManager().getLaunchIntentForPackage(msg.obj.toString());//m.group(1));
+					getApplicationContext().startActivity(i);
+					
+					//Intent myIntent = new Intent();
+//					//myIntent.setClassName("com.android.calculator2","com.android.calculator2.Calculator");
+					//myIntent.setClassName(m.group(1),m.group(2));
+	//				//myIntent.putExtra("com.android.samples.SpecialValue", "Hello, Joe!"); // key/value pair, where key needs current package prefix.
+					//startActivity(myIntent);       
+				}
+				return false;
+			}
+		});
 
 		ttsCont = new TTScontroller(getApplicationContext());
-		serverConnector = new ServerConnector(toasterHandler, talkHandler);
+		logicController = new LogicController(toasterHandler, talkHandler, launchHandler);
 
 		startButton = (Button) findViewById(R.id.button_rec);
 		stopButton = (Button) findViewById(R.id.button_stop);
@@ -107,7 +131,7 @@ public class MainActivity extends ActionBarActivity {
 		public void onClick(View arg0) {
 			Log.d("Main", "Stop Clicked");
 			//audioStreamer.stopStreaming();
-			serverConnector.stopStreaming();
+			logicController.stopStreaming();
 		}
 
 	};
@@ -118,7 +142,7 @@ public class MainActivity extends ActionBarActivity {
 		public void onClick(View arg0) {
 			Log.d("Main", "Start Clicked");
 			//audioStreamer.startStreaming();
-			serverConnector.ConnectToServer();
+			logicController.ConnectToServer();
 		}
 
 	};

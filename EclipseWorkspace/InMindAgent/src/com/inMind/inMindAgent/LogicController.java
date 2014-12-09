@@ -13,8 +13,9 @@ import android.util.Log;
  * It first connects to the server (via TCP), authentication etc.
  * Then receives a port number and connects to it via UDP to stream the audio.
  */
-public class ServerConnector {
+public class LogicController {
 
+	static final String messageSeperator = "\\^";
 
 	TCPClient tcpClient;
 	AudioStreamer audioStreamer;
@@ -25,16 +26,16 @@ public class ServerConnector {
 	int udpIpPort;
 
 	private enum StateSM {Initialized, ConnectedToTCP, StreamingAudio, Stopped };
-	StateSM stateOfSM; //TODO: protect from multithread access!!!!!
 
-	private Handler toasterHandler; //TODO: this is for debug only! all this should move to the UI and handled with call-backs!!!
-	private Handler talkHandler;//TODO: same with this, should be in high level controller. shouldn't be here!
+	private Handler toasterHandler; 
+	private Handler talkHandler;
+	private Handler launchHandler;
 
-	public ServerConnector(Handler toasterHandler, Handler talkHandler)
-	{		
+	public LogicController(Handler toasterHandler, Handler talkHandler, Handler launchHandler)
+	{
 		this.toasterHandler = toasterHandler;	
-		stateOfSM = StateSM.Initialized;
 		this.talkHandler = talkHandler;
+		this.launchHandler = launchHandler;
 	}
 
 	public void ConnectToServer()
@@ -43,7 +44,6 @@ public class ServerConnector {
 		{
 			tcpClient.closeConnection();
 			tcpClient = null;
-			stateOfSM = StateSM.Initialized;
 		}
 		// connect to the server
 		new connectTask().execute("");
@@ -56,7 +56,6 @@ public class ServerConnector {
 		{
 			tcpClient.closeConnection();
 			tcpClient = null;
-			stateOfSM = StateSM.Initialized;
 		}
 	}
 
@@ -78,42 +77,54 @@ public class ServerConnector {
 
 	private void openAudioStream()
 	{
-		stateOfSM = StateSM.StreamingAudio;
 		audioStreamer = new AudioStreamer(udpIpAddr,udpIpPort,toasterHandler);
 		audioStreamer.startStreaming(); //TODO: must be async!!!
 	}
 
-	private void smDealWithMessage(String message)
+	private void dealWithMessage(String message)
 	{
 		Log.d("ServerConnector", "Dealing with message:" + message);
-		if (stateOfSM ==  StateSM.ConnectedToTCP)
+		Pattern p = Pattern.compile("(\\p{Alpha}*)"+messageSeperator+"(.*)");
+		Matcher m = p.matcher(message);
+		boolean found = m.find();
+		Log.d("ServerConnector", "found:" + found);
+		if (found)
 		{
-			udpIpPort = 0;
-			try	{
-				udpIpAddr = tcpIpAddr;
-				Pattern p = Pattern.compile("(\\p{Alpha}*);(\\d+)");
-				Matcher m = p.matcher(message);
-				boolean found = m.find();
-				Log.d("ServerConnector", "found:" + found);
-				//String protocol = m.group(1);
-				udpIpPort = Integer.parseInt(m.group(2));
-				Log.d("ServerConnector", "Got port:" + udpIpPort);
-			} catch (Exception e)
+			if (m.group(1).equalsIgnoreCase("ConnectUDP"))
 			{
-				Log.e("ServerConnector", "Error parsing message from server...");
+				udpIpPort = 0;
+				try	{
+					udpIpAddr = tcpIpAddr;
+					Log.d("ServerConnector", "found:" + found);
+					//String protocol = m.group(1);
+					udpIpPort = Integer.parseInt(m.group(2));
+					Log.d("ServerConnector", "Got port:" + udpIpPort);
+				} catch (Exception e)
+				{
+					Log.e("ServerConnector", "Error parsing message from server...");
+				}
+				if (udpIpPort > 0)
+					openAudioStream();
 			}
-			if (udpIpPort > 0)
-				openAudioStream();
-		}
-		else if (stateOfSM ==  StateSM.StreamingAudio)
-		{
-			//TODO: should send back to controller and from there to TTS!!!
-			Message msgTalk = new Message();
-			msgTalk.arg1 = 1;
-			msgTalk.obj = message;
-			talkHandler.sendMessage(msgTalk);
+			else if (m.group(1).equalsIgnoreCase("Say"))
+			{
+				Log.d("ServerConnector", "saying:" + m.group(2));
+				Message msgTalk = new Message();
+				msgTalk.arg1 = 1;
+				msgTalk.obj = m.group(2).trim();
+				talkHandler.sendMessage(msgTalk);
+			}
+			else if (m.group(1).equalsIgnoreCase("Launch"))
+			{
+				Message msgLaunch = new Message();
+				msgLaunch.arg1 = 1;
+				msgLaunch.obj = m.group(2).trim();
+				launchHandler.sendMessage(msgLaunch);					
+			}
+
 		}
 	}
+
 
 
 	public class connectTask extends AsyncTask<String,String,TCPClient> {
@@ -121,14 +132,12 @@ public class ServerConnector {
 		@Override
 		protected TCPClient doInBackground(String... message) {
 
-			stateOfSM = StateSM.ConnectedToTCP;
-
 			//we create a TCPClient object and
 			tcpClient = new TCPClient(tcpIpAddr, tcpIpPort, new TCPClient.OnMessageReceived() {
 				@Override
 				//here the messageReceived method is implemented
 				public void messageReceived(String message) {
-					smDealWithMessage(message); //TODO: make sure that runs on original thread. (avoid multithread unsafe access).
+					dealWithMessage(message); //TODO: make sure that runs on original thread. (avoid multithread unsafe access).
 					//publishProgress(message);//this method calls the onProgressUpdate
 				}
 			});

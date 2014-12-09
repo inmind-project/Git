@@ -39,6 +39,6 @@
             android:layout_height="wrap_content"
             android:layout_above="@+id/button_stop"
             android:layout_alignLeft="@+id/text_to_talk"
-            android:text="Record" />
+            android:text="Start" />
 
 </RelativeLayout>
