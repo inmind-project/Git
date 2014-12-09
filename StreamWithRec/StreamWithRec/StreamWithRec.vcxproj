@@ -86,6 +86,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="StreamServer.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ASRwrapper.cpp" />
@@ -96,6 +97,7 @@
     </ClCompile>
     <ClCompile Include="StreamAudioServer.cpp" />
     <ClCompile Include="StreamServer.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="StreamAudioServer.rc" />

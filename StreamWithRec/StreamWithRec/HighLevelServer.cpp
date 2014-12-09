@@ -128,7 +128,7 @@ int HighLevelServer(int port_number)
 
 		if (iSendResult == portMessage.length())
 		{
-			std::wstring wtextFromAudio = RunStreamingServer(DEFAULT_AUDIO_PORT);
+			std::wstring wtextFromAudio = RunStreamingServer(DEFAULT_AUDIO_PORT);//TODO: should use a seperate thread for multi-users.
 
 			std::string textFromAudio(wtextFromAudio.begin(), wtextFromAudio.end()); //converting from wstring to string
 

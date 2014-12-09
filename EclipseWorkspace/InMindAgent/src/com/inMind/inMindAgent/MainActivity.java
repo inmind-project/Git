@@ -1,6 +1,9 @@
 package com.inMind.inMindAgent;
 
 import android.content.Intent;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -37,6 +40,13 @@ public class MainActivity extends ActionBarActivity {
 				if(msg.arg1==1)
 				{
 					Toast.makeText(getApplicationContext(), msg.obj.toString(), Toast.LENGTH_SHORT).show();        
+				}
+				else if (msg.arg1 ==2)
+				{
+					Log.d("Main", "Playing notification");
+				    Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+				    Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+				    r.play();
 				}
 				return false;
 			}

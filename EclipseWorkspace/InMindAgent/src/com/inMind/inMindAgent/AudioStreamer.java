@@ -87,23 +87,27 @@ public class AudioStreamer {
 
 					recorder.startRecording();
 
-					//Added to remove initial noise which Android (or at least Nexus 5) seems to have at the beginning.
-					Message msgWait = new Message();
-					msgWait.arg1 = 1;
-					msgWait.obj = "Wait!";
-					toasterHandler.sendMessage(msgWait);
-
-					Thread.sleep(1600);
+					//Added to remove initial noise which Android (or at least Nexus 5) seems to have at the beginning. //can try using noise removal algorithms instead, look at Audacity.
+//					Message msgWait = new Message();
+//					msgWait.arg1 = 1;
+//					msgWait.obj = "Wait!";
+//					toasterHandler.sendMessage(msgWait);
+//
+//					Thread.sleep(1600);
 
 					Message msgTalk = new Message();
 					msgTalk.arg1 = 1;
 					msgTalk.obj = "Talk!";
 					toasterHandler.sendMessage(msgTalk);
+					//Message msgPlayTone = new Message();
+					//msgPlayTone.arg1 = 2;					
+					//toasterHandler.sendMessage(msgPlayTone);
 
-					Thread.sleep(300);
-					//couldn't find a better way to clear buffer.
-					byte[] tmpbuffer = new byte[minBufSize*1000];
-					recorder.read(tmpbuffer, 0, minBufSize*1000);
+//					Thread.sleep(300);
+//					//couldn't find a better way to clear buffer.
+//					byte[] tmpbuffer = new byte[minBufSize*1000];
+//					recorder.read(tmpbuffer, 0, minBufSize*1000);
+//					tmpbuffer=null;
 
 					while(status == true) {
 
@@ -127,10 +131,10 @@ public class AudioStreamer {
 				} catch (IOException e) {
 					e.printStackTrace();
 					Log.e("VS", "IOException");
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-					Log.e("VS", "InterruptedException");
-				} 
+				} //catch (InterruptedException e) {
+					//e.printStackTrace();
+					//Log.e("VS", "InterruptedException");
+				//} 
 
 			}
 
