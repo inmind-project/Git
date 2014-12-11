@@ -20,7 +20,11 @@ int _tmain(int argc, _TCHAR* argv[])
 		handles[0] = handleEvent;
 		WaitForMultipleObjects(1, handles, FALSE, INFINITE);
 		std::wstring speechRes;
-		asrEngine.GetText(speechRes);
+		float firstConfidence;
+		const int requestedAlternates = 50;
+		std::wstring alternates[requestedAlternates];
+		float confidences[requestedAlternates];
+		asrEngine.GetText(speechRes, &firstConfidence, requestedAlternates, alternates, confidences);
 		asrEngine.StopListenning();
 		wcout << speechRes << endl;
 		//Sleep(100000);

@@ -43,7 +43,7 @@ public:
 
 	HRESULT Listen();
 	HRESULT CASRwrapper::StopListenning();
-	void GetText(std::wstring& speechRes);
+	void CASRwrapper::GetText(std::wstring& speechRes, float* pconfidence = NULL, int requestedAlternates = 0, std::wstring alternates[] = NULL, float alternatesConfidence[] = NULL);
 	HANDLE GetNotifyHandle();
 
 	static void __stdcall SpRecCallback(WPARAM wParam, LPARAM lParam);

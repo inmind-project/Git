@@ -176,7 +176,7 @@ HANDLE CASRwrapper::GetNotifyHandle()
 }
 
 
-void CASRwrapper::GetText(std::wstring& speechRes)
+void CASRwrapper::GetText(std::wstring& speechRes, float* pconfidence, int requestedAlternates, std::wstring alternates[], float alternatesConfidence[])
 {
 	//HRESULT hr = CoCreateInstance(CLSID_SpVoice, NULL, CLSCTX_ALL, IID_ISpVoice, (void **)&m_pVoice);
 	//hr = m_pVoice->Speak(speechRes, 0, NULL);
@@ -193,7 +193,13 @@ void CASRwrapper::GetText(std::wstring& speechRes)
 	// Warning hr equal S_FALSE if everything is OK 
 	// but eventCount < requestedEventCount
 	if (!(hr == S_OK || hr == S_FALSE)) {
-		;
+		return;
+	}
+
+	if (eventCount > 1)
+	{
+		speechRes.assign(L"More than one event!");
+		return;
 	}
 
 	ISpRecoResult* recoResult;
@@ -202,5 +208,59 @@ void CASRwrapper::GetText(std::wstring& speechRes)
 	wchar_t* text;
 	hr = recoResult->GetText(SP_GETWHOLEPHRASE, SP_GETWHOLEPHRASE, FALSE, &text, NULL);
 	speechRes.assign(text);
+	//if (confidence != NULL)
+	//*confidence = recoResult->->pElements->SREngineConfidence;;
 	CoTaskMemFree(text);
+
+	if (requestedAlternates == 0 && pconfidence == NULL)
+		return;
+
+
+	const USHORT MAX_ALTERNATES = 100;
+	if (requestedAlternates > MAX_ALTERNATES)
+		requestedAlternates = MAX_ALTERNATES;
+	if (requestedAlternates == 0) //in case asked for confidence. i.e., pconfidence!=NULL
+		requestedAlternates = 1;
+	CComPtr<ISpPhraseAlt> pcpPhraseAlt[MAX_ALTERNATES];
+	SPPHRASE* pPhrase;
+	std::string betterResult;
+	float ConfidenceMax = 0.0;
+	ULONG ulCount;
+	//std::list<std::string> lWordsRec;
+
+	// Retrieve information about the recognized phrase
+	hr = recoResult->GetPhrase(&pPhrase);
+	if (SUCCEEDED(hr))
+	{
+		// Retrieve a list of alternative phrases related to the recognized phrase
+		hr = recoResult->GetAlternates(pPhrase->Rule.ulFirstElement,
+			pPhrase->Rule.ulCountOfElements,
+			requestedAlternates,
+			(ISpPhraseAlt**)pcpPhraseAlt,
+			&ulCount);
+	}
+	if (SUCCEEDED(hr))
+	{
+		// Browse the list of alternative phrases in order of highest likelyhood with the original phrase
+		for (unsigned int i = 0; i < ulCount; i++)
+		{
+			SPPHRASE* pPhraseAlt;
+			CSpDynamicString pwszAlternate;
+
+			// Retrieve information about the current alternative phrase
+			pcpPhraseAlt[i]->GetPhrase(&pPhraseAlt);
+
+			// Get the phrase's entire text string
+			hr = pcpPhraseAlt[i]->GetText(SP_GETWHOLEPHRASE, SP_GETWHOLEPHRASE, TRUE, &pwszAlternate, NULL);
+			if (SUCCEEDED(hr))
+			{
+				if (i == 1 && pconfidence != NULL)
+					*pconfidence = pPhraseAlt->pElements->SREngineConfidence;
+				if (alternatesConfidence != NULL)
+					alternatesConfidence[i] = pPhraseAlt->pElements->SREngineConfidence;
+				if (alternates != NULL)
+					alternates[i] = pwszAlternate.Copy(); // .CopyToChar();
+			}
+		}
+	}
 }
