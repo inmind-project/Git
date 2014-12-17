@@ -82,3 +82,5 @@ EclipseWorkspace/TempSandbox
 *.opensdf
 *.prefs
 *.jar
+googleASR.txt
+*.suo
