@@ -1,0 +1,5 @@
+pattern,use reflectors,Say,Command,side effect,change state,module file
+I want (.*),yes,"( ""What would it mean to you if you got %1?"",",,,,
+"    """"Why do you want %1?"""",",,,,,,
+"    """"What would you do if you got %1?"""",",,,,,,
+"    """"If you got %1, then what would you do?"""")""",,,,,,
