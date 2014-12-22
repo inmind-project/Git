@@ -7,7 +7,10 @@ import java.io.FileOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketTimeoutException;
-import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 class StreamAudioServer {
 
@@ -17,19 +20,22 @@ class StreamAudioServer {
     //static boolean status = true;
     //static int port = 50005;
     //static int sampleRate = 44100;
-    static URI filePath = URI.create("file:///C:/InMind/temp/fromJava.raw");//"C:\\InMind\\temp\\fromJava.raw"; //TODO: each connection should have a new file
+    static Path folderPath = Paths.get("..\\UserData");//c:\\InMind\\Git\\UserData");//TODO: fix to relative Paths.get("..\\..\\..\\..\\..\\..\\UserData");
+    static String fileStart = "InputAt";
     static int timeout = 1000;
 
     static DataLine.Info dataLineInfo;
     static SourceDataLine sourceDataLine;
 
-    public static URI runServer(int udpPort) {
+    public static Path runServer(int udpPort) {
 
-        URI fileWithRaw = null;
+        Path fileWithRaw = null;
 
         try {
 
-            delIfExists();
+                Path filePath = Paths.get(folderPath.toString(), fileStart+(new SimpleDateFormat("ddMMyy-hhmmss.SSS").format(new Date()))+".raw");
+
+            delIfExists(filePath);
 
             DatagramSocket serverSocket = new DatagramSocket(udpPort);
 
@@ -69,7 +75,7 @@ class StreamAudioServer {
                 }
 
                 System.out.println("Received Packet!" + receivePacket.getLength());
-                toFile(receivePacket.getData(), receivePacket.getLength());
+                toFile(receivePacket.getData(), receivePacket.getLength(),filePath);
                 // ais = new AudioInputStream(baiss, format,
                 // receivePacket.getLength());
                 // toSpeaker(receivePacket.getData());
@@ -96,10 +102,10 @@ class StreamAudioServer {
         }
     }
 
-    public static void toFile(byte soundbytes[], int soundlength) {
+    public static void toFile(byte soundbytes[], int soundlength,Path filePath) {
         FileOutputStream out;
         try {
-            out = new FileOutputStream(new File(filePath), true);
+            out = new FileOutputStream(filePath.toFile(), true);
             byte[] toWrite = new byte[soundlength];
             System.arraycopy(soundbytes, 0, toWrite, 0, soundlength);
             out.write(toWrite);
@@ -110,10 +116,10 @@ class StreamAudioServer {
         }
     }
 
-    public static void delIfExists() {
+    public static void delIfExists(Path filePath) {
         try {
             // Delete if tempFile exists
-            File fileTemp = new File(filePath);
+            File fileTemp = filePath.toFile();
             if (fileTemp.exists()) {
                 fileTemp.delete();
             }

@@ -67,6 +67,7 @@ public class LogicController {
 
 	public void changeInitIpAddr(String newIpAddr)
 	{
+		closeConnection();
 		tcpIpAddr = newIpAddr;	
 	}
 

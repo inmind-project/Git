@@ -8,7 +8,6 @@ public class Main {
         logic.runServer();
 
 
-        //freeze...
         while (true)
             try {
                 Thread.sleep(1000);

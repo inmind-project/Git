@@ -6,10 +6,10 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 /**
  * Created by Amos on 16-Dec-14.
@@ -22,7 +22,7 @@ public class ASR {
     /**
      * Send post to google
      */
-    static public AsrRes getGoogleASR(URI audioFile){
+    static public AsrRes getGoogleASR(Path audioFile){
         AsrRes res = new AsrRes();
         res.confidence = 0;
         res.text = "";
@@ -42,7 +42,7 @@ public class ASR {
             // Send post request
             con.setDoOutput(true);
             DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.write(Files.readAllBytes(Paths.get(audioFile)));
+            wr.write(Files.readAllBytes(audioFile));
             wr.flush();
             wr.close();
 
@@ -61,6 +61,10 @@ public class ASR {
             in.close();
 
             System.out.println("Google response: "+ response.toString());
+            PrintWriter pw = new PrintWriter(audioFile.toString()+".txt");
+            pw.print(response.toString());
+            pw.flush();
+            pw.close();
             //remove first empty result (13 chars): {"result":[]}
             JSONObject jsonObj = new JSONObject(response.toString().substring(13));
             JSONObject bestRes = jsonObj.getJSONArray("result").getJSONObject(0).getJSONArray("alternative").getJSONObject(0);

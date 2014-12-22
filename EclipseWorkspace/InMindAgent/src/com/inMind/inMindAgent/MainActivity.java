@@ -120,6 +120,16 @@ public class MainActivity extends ActionBarActivity {
 		if (id == R.id.action_settings) {
 			return true;
 		}
+		if (id == R.id.action_toDesk) {
+			if (logicController != null)
+				logicController.changeInitIpAddr("128.2.213.163");			
+			return true;
+		}
+		if (id == R.id.action_toLap) {
+			if (logicController != null)
+				logicController.changeInitIpAddr("128.2.209.220");			
+			return true;
+		}
 		return super.onOptionsItemSelected(item);
 	}
 

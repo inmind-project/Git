@@ -75,7 +75,7 @@ public class TCPClient {
  
                 }
  
-                Log.e("RESPONSE FROM SERVER", "S: Received Message: '" + serverMessage + "'");
+                Log.d("RESPONSE FROM SERVER", "S: Received Message: '" + serverMessage + "'");
  
             } catch (Exception e) {
  

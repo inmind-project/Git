@@ -3,7 +3,8 @@ package com.InMind;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -33,13 +34,13 @@ public class InMindLogic {
         List<String> response = new LinkedList<String>();
 
 
-        URI filePath = URI.create("file:///C:/InMind/git/Configurations/logic.csv");
+        Path filePath = Paths.get("..\\Configurations\\logic.csv");//URI filePath = URI.create("file:///C:/InMind/git/Configurations/logic.csv");
         String line = "";
         String cvsSplitBy = ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
         BufferedReader bufferedReader = null;
 
         try{
-            bufferedReader = new BufferedReader(new FileReader(new File(filePath)));
+            bufferedReader = new BufferedReader(new FileReader(new File(filePath.toString())));
 
             while ((line = bufferedReader.readLine()) != null) {
 
@@ -76,14 +77,14 @@ public class InMindLogic {
 
     private static String reflect(String text) {
 
-        URI filePath = URI.create("file:///C:/InMind/git/Configurations/reflection.csv");
+        Path filePath = Paths.get("..\\Configurations\\reflection.csv"); //URI filePath = URI.create("file:///C:/InMind/git/Configurations/reflection.csv");
         String line = "";
         String cvsSplitBy = ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
         BufferedReader bufferedReader = null;
         String alreadyReplaced = "~";
 
         try {
-            bufferedReader = new BufferedReader(new FileReader(new File(filePath)));
+            bufferedReader = new BufferedReader(new FileReader(new File(filePath.toString())));
 
             while ((line = bufferedReader.readLine()) != null) {
 
@@ -116,7 +117,7 @@ public class InMindLogic {
             if (message.equals("Client Connected")) {
                 tcpServer.sendMessage("ConnectUDP^" + udpDefaultPort);
 
-                URI obtainedFile = StreamAudioServer.runServer(udpDefaultPort);
+                Path obtainedFile = StreamAudioServer.runServer(udpDefaultPort);
 
                 ASR.AsrRes asrRes = ASR.getGoogleASR(obtainedFile);
 
