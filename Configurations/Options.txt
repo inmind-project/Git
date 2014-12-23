@@ -1,2 +1,10 @@
 %1 - group #1
 %r1 - group #1 with reflection, e.g. I am -> you are, You're -> I'm etc.
+
+pattern - pattern in sentence
+
+
+state=finish - finish what you are doing and then clear dialog and reset back to top level.
+state=return - clear dialog and reset back to top level and find a new match for current sentence.
+callfun=     - call the given function with all information in dialog
+

@@ -1,0 +1,2 @@
+pattern,fileName
+(.*) bus,mybus.csv

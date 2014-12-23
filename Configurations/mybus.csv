@@ -1,0 +1,7 @@
+conditions,pattern,Say,Set
+"state=""start"";rapport=""high""",.*,"Well, you'll first need to tell me where you are leaving from?","state=""get_source"""
+"state=""start""",.*,Where would you like to leave from?,"state=""get_source"""
+,goodbye|exit|quit,Goodbye!,"state=""finish"""
+"state=""get_source""",(.*),Where are you going?,"state=""get_target"";source=""%1"""
+"state=""get_target""",(.*),"Just a minute, let me look that up for you.","state=""finish"";target=""%1"";callfun=""getBusInfo"""
+,.*,,"state=""return"""
