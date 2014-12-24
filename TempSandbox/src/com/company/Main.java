@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -15,6 +17,54 @@ public class Main {
 
     public static void main(String[] args) {
 
+        isSilentButDidTalk("C:\\InMind\\git\\UserData\\InputAt231214-122558.982.raw");
+        //reflection();
+        //String format = (new SimpleDateFormat("File-ddMMyy-hhmmss.SSS.raw")).format(new Date());
+        //int a = 5;
+        //regexify();
+    }
+
+    private static boolean isSilentButDidTalk(String fileName)
+    {
+        int silentLengthNeeded = 500;
+        int sampleRate = 44100;
+        int considerSilent = 1500;
+        int considerSpeech = 3000;
+
+        int silentSampleLength = 0;
+        int talkSampleLength = 0;
+        try
+        {
+            byte[] asByte = Files.readAllBytes(Paths.get(fileName));
+            //short[] asShort = new short[asByte.length/2];
+            for (int i = 0; 2*i < asByte.length; i++)
+            {
+                short sample = (short) (asByte[2*i+1] << 8 | asByte[2*i]); //little endian 16bit
+                if (Math.abs(sample) < considerSilent)
+                    silentSampleLength++;
+                else
+                {
+                    silentSampleLength = 0;
+                    if (Math.abs(sample) > considerSpeech)
+                    {
+                        talkSampleLength++;
+                    }
+                }
+            }
+            double silentLength = silentSampleLength/(double)sampleRate;
+            if (silentLength*1000 > silentLengthNeeded && talkSampleLength > sampleRate / 100)
+                return true;
+
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return false;
+
+    }
+
+    private static void reflection()
+    {
         Method method = null;
         try {
             Package pack = Main.class.getPackage();
@@ -29,9 +79,6 @@ public class Main {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        //String format = (new SimpleDateFormat("File-ddMMyy-hhmmss.SSS.raw")).format(new Date());
-        //int a = 5;
-        //regexify();
     }
 
     public static void regexify() {

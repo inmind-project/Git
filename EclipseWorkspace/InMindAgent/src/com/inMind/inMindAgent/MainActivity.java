@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 
@@ -23,7 +24,8 @@ public class MainActivity extends ActionBarActivity {
 	TTScontroller ttsCont;
 	LogicController logicController;
 	
-	private Button startButton,stopButton;
+	private ImageButton startButton;
+	private Button stopButton;
 
 
 	private Handler toasterHandler, talkHandler, launchHandler; //TODO: should these all be combined to one handler?
@@ -90,7 +92,7 @@ public class MainActivity extends ActionBarActivity {
 		ttsCont = new TTScontroller(getApplicationContext());
 		logicController = new LogicController(toasterHandler, talkHandler, launchHandler);
 
-		startButton = (Button) findViewById(R.id.button_rec);
+		startButton = (ImageButton) findViewById(R.id.button_rec);
 		stopButton = (Button) findViewById(R.id.button_stop);
 
 		startButton.setOnClickListener(startListener);

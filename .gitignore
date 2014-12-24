@@ -86,3 +86,4 @@ InMindServer/out
 *.jar
 googleASR.txt
 *.suo
+*.class

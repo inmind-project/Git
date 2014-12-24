@@ -1,5 +1,7 @@
 package InMind.Server;
 
+import InMind.Consts;
+
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.SourceDataLine;
 import java.io.File;
@@ -7,11 +9,13 @@ import java.io.FileOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketTimeoutException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+// This class is in-charge of receiving the audio stream from the user (via UDP).
 class StreamAudioServer
 {
 
@@ -21,9 +25,9 @@ class StreamAudioServer
     //static boolean status = true;
     //static int port = 50005;
     //static int sampleRate = 44100;
-    static Path folderPath = Paths.get("..\\UserData");//c:\\Server\\Git\\UserData");//TODO: fix to relative Paths.get("..\\..\\..\\..\\..\\..\\UserData");
-    static String fileStart = "InputAt";
-    static int timeout = 1000;
+    static final Path folderPath = Paths.get("..\\UserData");//c:\\Server\\Git\\UserData");//TODO: fix to relative Paths.get("..\\..\\..\\..\\..\\..\\UserData");
+    static final String fileStart = "InputAt";
+    static final int timeout = 1000;
 
     static DataLine.Info dataLineInfo;
     static SourceDataLine sourceDataLine;
@@ -82,6 +86,8 @@ class StreamAudioServer
 
                 System.out.println("Received Packet!" + receivePacket.getLength());
                 toFile(receivePacket.getData(), receivePacket.getLength(), filePath);
+                if (isSilentButDidTalk(filePath))
+                    break;
                 // ais = new AudioInputStream(baiss, format,
                 // receivePacket.getLength());
                 // toSpeaker(receivePacket.getData());
@@ -98,6 +104,45 @@ class StreamAudioServer
             System.out.println("StreamAudio: Error");
         }
         return fileWithRaw;
+    }
+
+    private static boolean isSilentButDidTalk(Path filePath)
+    {
+        int silentLengthNeeded = 500;  //in milliseconds
+        int considerSilent = 1500;  //TODO: may want to use mean squared error or other smart approaches.
+        int considerSpeech = 3000;
+        int minimalTalk = Consts.sampleRate / 1000; //require at least 0.001 sec of speech
+
+        int silentSampleLength = 0;
+        int talkSampleLength = 0;
+        try
+        {
+            byte[] asByte = Files.readAllBytes(filePath);
+            //short[] asShort = new short[asByte.length/2];
+            for (int i = 0; 2*i < asByte.length; i++)
+            {
+                short sample = (short) (asByte[2*i+1] << 8 | asByte[2*i]); //little endian 16bit
+                if (Math.abs(sample) < considerSilent)
+                    silentSampleLength++;
+                else
+                {
+                    silentSampleLength = 0;
+                    if (Math.abs(sample) > considerSpeech)
+                    {
+                        talkSampleLength++;
+                    }
+                }
+            }
+            double silentLength = silentSampleLength/(double) Consts.sampleRate;
+            if (silentLength*1000 > silentLengthNeeded && talkSampleLength > minimalTalk)
+                return true;
+
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return false;
+
     }
 
     public static void toSpeaker(byte soundbytes[], int soundlength)

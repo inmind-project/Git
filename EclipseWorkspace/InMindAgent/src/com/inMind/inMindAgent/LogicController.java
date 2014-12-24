@@ -91,7 +91,15 @@ public class LogicController {
 		Log.d("ServerConnector", "found:" + found);
 		if (found)
 		{
-			if (m.group(1).equalsIgnoreCase("ConnectUDP"))
+			if (m.group(1).equalsIgnoreCase("StopUDP"))
+			{
+				stopStreaming();
+				Message msgToast = new Message();
+				msgToast.arg1 = 1;
+				msgToast.obj = "Wait...";
+				toasterHandler.sendMessage(msgToast);
+			}				
+			else if (m.group(1).equalsIgnoreCase("ConnectUDP"))
 			{
 				udpIpPort = 0;
 				try	{

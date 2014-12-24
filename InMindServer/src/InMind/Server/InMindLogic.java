@@ -46,6 +46,8 @@ public class InMindLogic
 
                 Path obtainedFile = StreamAudioServer.runServer(udpDefaultPort);
 
+                tcpServer.sendMessage("StopUDP^");
+
                 ASR.AsrRes asrRes = ASR.getGoogleASR(obtainedFile);
 
                 System.out.println(asrRes.text);

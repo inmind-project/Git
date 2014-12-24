@@ -1,5 +1,6 @@
 package InMind.Server;
 
+import InMind.Consts;
 import org.json.JSONObject;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -45,7 +46,7 @@ public class ASR
             // add reuqest header
             con.setRequestMethod("POST");
             con.setRequestProperty("User-Agent", USER_AGENT);
-            con.setRequestProperty("Content-Type", "audio/l16; rate=44100");
+            con.setRequestProperty("Content-Type", "audio/l16; rate="+ Consts.sampleRate);
             //con.setRequestProperty("AcceptEncoding", "");
 
             // Send post request
