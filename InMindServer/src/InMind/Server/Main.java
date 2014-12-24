@@ -1,17 +1,21 @@
-package com.InMind;
+package InMind.Server;
 
-public class Main {
+public class Main
+{
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
 
         InMindLogic logic = new InMindLogic();
         logic.runServer();
 
 
         while (true)
-            try {
+            try
+            {
                 Thread.sleep(1000);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException e)
+            {
                 e.printStackTrace();
             }
 

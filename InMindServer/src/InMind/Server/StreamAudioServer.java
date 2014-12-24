@@ -1,4 +1,4 @@
-package com.InMind;
+package InMind.Server;
 
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.SourceDataLine;
@@ -12,7 +12,8 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-class StreamAudioServer {
+class StreamAudioServer
+{
 
     //AudioInputStream audioInputStream;
     // static AudioInputStream ais;
@@ -20,20 +21,22 @@ class StreamAudioServer {
     //static boolean status = true;
     //static int port = 50005;
     //static int sampleRate = 44100;
-    static Path folderPath = Paths.get("..\\UserData");//c:\\InMind\\Git\\UserData");//TODO: fix to relative Paths.get("..\\..\\..\\..\\..\\..\\UserData");
+    static Path folderPath = Paths.get("..\\UserData");//c:\\Server\\Git\\UserData");//TODO: fix to relative Paths.get("..\\..\\..\\..\\..\\..\\UserData");
     static String fileStart = "InputAt";
     static int timeout = 1000;
 
     static DataLine.Info dataLineInfo;
     static SourceDataLine sourceDataLine;
 
-    public static Path runServer(int udpPort) {
+    public static Path runServer(int udpPort)
+    {
 
         Path fileWithRaw = null;
 
-        try {
+        try
+        {
 
-                Path filePath = Paths.get(folderPath.toString(), fileStart+(new SimpleDateFormat("ddMMyy-hhmmss.SSS").format(new Date()))+".raw");
+            Path filePath = Paths.get(folderPath.toString(), fileStart + (new SimpleDateFormat("ddMMyy-hhmmss.SSS").format(new Date())) + ".raw");
 
             delIfExists(filePath);
 
@@ -65,17 +68,20 @@ class StreamAudioServer {
             // ByteArrayInputStream baiss = new
             // ByteArrayInputStream(receivePacket.getData());
 
-            while (true) {
+            while (true)
+            {
                 System.out.println("Waiting!");
-                try {
+                try
+                {
                     serverSocket.receive(receivePacket);
-                } catch (SocketTimeoutException ex) {
+                } catch (SocketTimeoutException ex)
+                {
                     System.out.println("Time out!");
                     break;
                 }
 
                 System.out.println("Received Packet!" + receivePacket.getLength());
-                toFile(receivePacket.getData(), receivePacket.getLength(),filePath);
+                toFile(receivePacket.getData(), receivePacket.getLength(), filePath);
                 // ais = new AudioInputStream(baiss, format,
                 // receivePacket.getLength());
                 // toSpeaker(receivePacket.getData());
@@ -86,44 +92,55 @@ class StreamAudioServer {
 
             fileWithRaw = filePath;
 
-        } catch (Exception ex) {
+        } catch (Exception ex)
+        {
             fileWithRaw = null;
             System.out.println("StreamAudio: Error");
         }
         return fileWithRaw;
     }
 
-    public static void toSpeaker(byte soundbytes[], int soundlength) {
-        try {
+    public static void toSpeaker(byte soundbytes[], int soundlength)
+    {
+        try
+        {
             sourceDataLine.write(soundbytes, 0, soundlength);
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             System.out.println("Not working in speakers...");
             e.printStackTrace();
         }
     }
 
-    public static void toFile(byte soundbytes[], int soundlength,Path filePath) {
+    public static void toFile(byte soundbytes[], int soundlength, Path filePath)
+    {
         FileOutputStream out;
-        try {
+        try
+        {
             out = new FileOutputStream(filePath.toFile(), true);
             byte[] toWrite = new byte[soundlength];
             System.arraycopy(soundbytes, 0, toWrite, 0, soundlength);
             out.write(toWrite);
             out.close();
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
-    public static void delIfExists(Path filePath) {
-        try {
+    public static void delIfExists(Path filePath)
+    {
+        try
+        {
             // Delete if tempFile exists
             File fileTemp = filePath.toFile();
-            if (fileTemp.exists()) {
+            if (fileTemp.exists())
+            {
                 fileTemp.delete();
             }
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             // if any error occurs
             e.printStackTrace();
         }

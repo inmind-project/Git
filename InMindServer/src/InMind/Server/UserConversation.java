@@ -1,4 +1,6 @@
-package com.InMind;
+package InMind.Server;
+
+import InMind.DialogFunctions.FunctionInvoker;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,7 +17,8 @@ import java.util.regex.Pattern;
 /**
  * Created by User on 23-Dec-14.
  */
-public class UserConversation {
+public class UserConversation
+{
 
 
     static final String cvsSplitBy = ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
@@ -23,13 +26,14 @@ public class UserConversation {
     static final String commandChar = "^";
     static final String conditionsAndSetChar = ";";
     static final String condAndSetEqual = "=";
+    static final String cstExtension = "csv";
 
     static final String stateName = "state";
     static final String callFunName = "callfun";
 
 
-    String dialogFile = "";
-    Map<String,Object> fullInfo;
+    String dialogFileBase = "";
+    Map<String, Object> fullInfo;
 
     public UserConversation()
     {
@@ -40,25 +44,37 @@ public class UserConversation {
 
     public void dealWithMessage(ASR.AsrRes asrRes, InMindLogic.MessageReceiver.MessageSender messageSender)
     {
-        List<String> sendToUser = new LinkedList<String>();
+        List<String> forUser = new LinkedList<String>();
 
-        if (dialogFile.isEmpty()) {
-            dialogFile = findDialogFile(asrRes.text);
-            if (!dialogFile.isEmpty()) {
+        if (dialogFileBase.isEmpty())
+        {
+            dialogFileBase = findDialogFile(asrRes.text);
+            if (!dialogFileBase.isEmpty())
+            {
                 fullInfo.put(stateName, "start");
                 //TODO: may also want to load information from DB. maybe add a "required" field to dialogIndex file
             }
         }
 
-        if (dialogFile.isEmpty()) {
+        if (dialogFileBase.isEmpty())
+        {
 
-            sendToUser = getResponse(asrRes.text);
-        }
-        else
+            forUser = getResponse(asrRes.text);
+            sendToUser(messageSender, forUser);
+        } else
         {
             String toSay = executeDialogFile(asrRes.text);
             if (!toSay.isEmpty())
-                sendToUser.add(toSay);
+                forUser.add(toSay);
+
+            sendToUser(messageSender, forUser);
+
+            //check if need to call a function (callfun)
+            if (fullInfo.containsKey(callFunName) && !fullInfo.get(callFunName).toString().isEmpty())
+            {
+                List<String> toSend = FunctionInvoker.toInvoke(dialogFileBase, fullInfo.get(callFunName).toString(), fullInfo, "n/a"); //TODO: add userId
+                sendToUser(messageSender, toSend);
+            }
 
             if (fullInfo.get(stateName).equals("return"))
             {
@@ -74,15 +90,23 @@ public class UserConversation {
 
         }
 
-        for (String command : sendToUser) {
-
-            if (!command.isEmpty())
-                messageSender.sendMessage(command);//"Say^You Said:" + asrRes.text);
-        }
-
     }
 
-    private String executeDialogFile(String userSentence) {
+    private void sendToUser(InMindLogic.MessageReceiver.MessageSender messageSender, List<String> forUser)
+    {
+        if (forUser != null)
+        {
+            for (String command : forUser)
+            {
+
+                if (!command.isEmpty())
+                    messageSender.sendMessage(command);//"Say^You Said:" + asrRes.text);
+            }
+        }
+    }
+
+    private String executeDialogFile(String userSentence)
+    {
         String commandSay = "";
         String toSay = "";
 
@@ -93,20 +117,22 @@ public class UserConversation {
         final int csvSet = 3;
 
 
-        Path filePath = Paths.get(basePath,dialogFile);//URI filePath = URI.create("file:///C:/InMind/git/Configurations/logic.csv");
+        Path filePath = Paths.get(basePath, dialogFileBase + "." + cstExtension);//Is there a more elegant way to add the extension?
         String line = "";
         BufferedReader bufferedReader = null;
 
-        try{
+        try
+        {
             bufferedReader = new BufferedReader(new FileReader(new File(filePath.toString())));
 
             //line = bufferedReader.readLine(); //ignore first line
-            while ((line = bufferedReader.readLine()) != null) {
+            while ((line = bufferedReader.readLine()) != null)
+            {
                 if (line.isEmpty())
                     continue;
 
                 // use comma as separator
-                String[] row = line.split(cvsSplitBy,-1);
+                String[] row = line.split(cvsSplitBy, -1);
                 boolean matchesConditions = true;
                 if (!row[csvConditions].isEmpty())
                 {
@@ -119,7 +145,7 @@ public class UserConversation {
                             continue;
                         Object requiredVal;
                         if (varVal[1].startsWith("\"") && varVal[1].endsWith("\"")) //if is surrounded by quotes, this is a string, remove quotes.
-                            requiredVal = new String(varVal[1].substring(1,varVal[1].length()-1));
+                            requiredVal = new String(varVal[1].substring(1, varVal[1].length() - 1));
                         else
                             requiredVal = new Double(varVal[1]);
                         Object storedVal = fullInfo.get(varVal[0]);
@@ -131,10 +157,12 @@ public class UserConversation {
                     }
                 }
 
-                if (matchesConditions) {
+                if (matchesConditions)
+                {
                     Pattern p = Pattern.compile((row[csvPattern]), Pattern.CASE_INSENSITIVE);
                     Matcher m = p.matcher(userSentence);
-                    if (m.matches()) {
+                    if (m.matches())
+                    {
                         //retFile= row[csvFile];
                         toSay = refactorSentenceToSay(row[csvSay], m);
 
@@ -147,11 +175,11 @@ public class UserConversation {
                                 continue;
                             Object setTo;
                             if (varVal[1].startsWith("\"") && varVal[1].endsWith("\"")) //if is surrounded by quotes, this is a string, remove quotes.
-                                setTo = new String(varVal[1].substring(1,varVal[1].length()-1));
+                                setTo = refactorSentenceToSay(varVal[1], m); //new String(varVal[1].substring(1,varVal[1].length()-1));
                             else
                                 setTo = new Double(varVal[1]); //TODO: may be referring to itself or other variables!
-                            fullInfo.put(varVal[0],setTo);
-                            //TODO: check if is callfun!!!
+                            fullInfo.put(varVal[0], setTo);
+
                         }
 
                         break;
@@ -160,7 +188,8 @@ public class UserConversation {
 
             }
 
-        }catch (Exception ex) {
+        } catch (Exception ex)
+        {
             System.out.println("UserConversation: error in dialog file");
         }
 
@@ -170,36 +199,42 @@ public class UserConversation {
         return commandSay;
     }
 
-    private void clearDialog() {
-        dialogFile = "";
+    private void clearDialog()
+    {
+        dialogFileBase = "";
         fullInfo.clear();
-        fullInfo.put(stateName,"");
+        fullInfo.put(stateName, "");
     }
 
-    private String findDialogFile(String userSentence) {
+    private String findDialogFile(String userSentence)
+    {
         final int csvPattern = 0;
         final int csvFile = 1;
         String retFile = "";
 
 
-        Path filePath = Paths.get(basePath,"dialogIndex.csv");//URI filePath = URI.create("file:///C:/InMind/git/Configurations/logic.csv");
+        Path filePath = Paths.get(basePath, "dialogIndex.csv");//URI filePath = URI.create("file:///C:/Server/git/Configurations/logic.csv");
         String line = "";
         BufferedReader bufferedReader = null;
 
-        try{
+        try
+        {
             bufferedReader = new BufferedReader(new FileReader(new File(filePath.toString())));
 
-            while ((line = bufferedReader.readLine()) != null) {
+            while ((line = bufferedReader.readLine()) != null)
+            {
 
                 if (line.isEmpty())
                     continue;
                 // use comma as separator
-                String[] row = line.split(cvsSplitBy,-1);
+                String[] row = line.split(cvsSplitBy, -1);
                 String forPattern = row[csvPattern];
-                if (!forPattern.isEmpty()) {
+                if (!forPattern.isEmpty())
+                {
                     Pattern p = Pattern.compile((forPattern), Pattern.CASE_INSENSITIVE);
                     Matcher m = p.matcher(userSentence);
-                    if (m.matches()) {
+                    if (m.matches())
+                    {
                         retFile = row[csvFile];
                         break;
                     }
@@ -207,7 +242,8 @@ public class UserConversation {
 
             }
 
-        }catch (Exception ex) {
+        } catch (Exception ex)
+        {
             System.out.println("UserConversation: error in finding file");
         }
         return retFile;
@@ -225,23 +261,26 @@ public class UserConversation {
         List<String> response = new LinkedList<String>();
 
 
-        Path filePath = Paths.get(basePath,"logic.csv");//URI filePath = URI.create("file:///C:/InMind/git/Configurations/logic.csv");
+        Path filePath = Paths.get(basePath, "logic.csv");//URI filePath = URI.create("file:///C:/Server/git/Configurations/logic.csv");
         String line = "";
         BufferedReader bufferedReader = null;
 
-        try{
+        try
+        {
             bufferedReader = new BufferedReader(new FileReader(new File(filePath.toString())));
 
-            while ((line = bufferedReader.readLine()) != null) {
+            while ((line = bufferedReader.readLine()) != null)
+            {
 
                 // use comma as separator
-                String[] row = line.split(cvsSplitBy,-1);
+                String[] row = line.split(cvsSplitBy, -1);
                 Pattern p = Pattern.compile((row[csvPattern]), Pattern.CASE_INSENSITIVE);
                 Matcher m = p.matcher(userSentence);
                 if (m.matches())
                 {
                     String toSay = refactorSentenceToSay(row[csvSay], m);
-                    if (!row[csvSay].isEmpty()) {
+                    if (!row[csvSay].isEmpty())
+                    {
                         response.add(commandSay(toSay));
                     }
                     if (!row[csvAdditionalCommand].isEmpty())
@@ -251,21 +290,28 @@ public class UserConversation {
 
             }
 
-        }catch (Exception ex) {
+        } catch (Exception ex)
+        {
             System.out.println("Logic: error in response");
         }
         return response;
     }
 
-    private static String commandSay(String toSay) {
-        return "Say"+commandChar+toSay;
+    private static String commandSay(String toSay)
+    {
+        return "Say" + commandChar + toSay;
     }
 
-    private static String refactorSentenceToSay(String toSay, Matcher m) {
+    // removes extra quotes and takes care of %1 and %r1
+    private static String refactorSentenceToSay(String toSay, Matcher m)
+    {
         toSay = removeExtraQuotes(toSay);
-        if (toSay.contains("%")) {
-            for (int i = 1; i <= m.groupCount() ; i++) {
-                if (toSay.contains("%" + i)) { //replace without reflection
+        if (toSay.contains("%"))
+        {
+            for (int i = 1; i <= m.groupCount(); i++)
+            {
+                if (toSay.contains("%" + i))
+                { //replace without reflection
                     toSay = toSay.replace("%" + i, m.group(i));
                 }
                 if (toSay.contains("%r" + i)) //replace with reflection
@@ -277,41 +323,46 @@ public class UserConversation {
         return toSay;
     }
 
-    private static String removeExtraQuotes(String string) {
+    private static String removeExtraQuotes(String string)
+    {
         string = string.replace("\"\"", "\""); //replace double quotes " " with single "
         string = string.replaceAll("^\"|\"$", ""); //remove quotes from beginning or end of sentence.
         return string;
     }
 
-    private static String reflect(String text) {
+    private static String reflect(String text)
+    {
 
         final int reflector = 0;
         final int reflectee = 1;
 
-        Path filePath = Paths.get(basePath,"reflection.csv"); //URI filePath = URI.create("file:///C:/InMind/git/Configurations/reflection.csv");
+        Path filePath = Paths.get(basePath, "reflection.csv"); //URI filePath = URI.create("file:///C:/Server/git/Configurations/reflection.csv");
         String line = "";
         BufferedReader bufferedReader = null;
         String alreadyReplaced = "~";
 
-        try {
+        try
+        {
             bufferedReader = new BufferedReader(new FileReader(new File(filePath.toString())));
 
-            while ((line = bufferedReader.readLine()) != null) {
+            while ((line = bufferedReader.readLine()) != null)
+            {
 
                 // use comma as separator
                 String[] row = line.split(cvsSplitBy, -1);
-                String wordsToMatch = "(?i)"+row[reflector]; //ignore case
-                String toMatch = "^"+wordsToMatch+" | "+wordsToMatch+" | "+wordsToMatch+"$|^"+wordsToMatch+"$";
-                String excludeAlreadyReplaced = toMatch+"(?=([^"+alreadyReplaced+"]*"+alreadyReplaced+"[^"+alreadyReplaced+"]*"+alreadyReplaced+")*[^"+alreadyReplaced+"]*$)";
+                String wordsToMatch = "(?i)" + row[reflector]; //ignore case
+                String toMatch = "^" + wordsToMatch + " | " + wordsToMatch + " | " + wordsToMatch + "$|^" + wordsToMatch + "$";
+                String excludeAlreadyReplaced = toMatch + "(?=([^" + alreadyReplaced + "]*" + alreadyReplaced + "[^" + alreadyReplaced + "]*" + alreadyReplaced + ")*[^" + alreadyReplaced + "]*$)";
 
-                text = text.replaceAll(excludeAlreadyReplaced,"~"+row[reflectee]+"~");
+                text = text.replaceAll(excludeAlreadyReplaced, "~" + row[reflectee] + "~");
             }
-        } catch (Exception ex) {
+        } catch (Exception ex)
+        {
             System.out.println("Logic: error in reflection");
             return text;
         }
 
-        return text.replaceAll(alreadyReplaced," ").trim();
+        return text.replaceAll(alreadyReplaced, " ").trim();
 
     }
 }

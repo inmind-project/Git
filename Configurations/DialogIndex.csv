@@ -1,2 +1,2 @@
-pattern,fileName
-(.*) bus,mybus.csv
+pattern,classAndFileBaseName
+(.*) bus(?: now)?,myBus

@@ -30,7 +30,7 @@ public class TTScontroller {
 	
     @SuppressWarnings("deprecation") public void speakThis(String message) {
 		Toast.makeText(appContect, message, Toast.LENGTH_SHORT).show();
-		 ttobj.speak(message, TextToSpeech.QUEUE_FLUSH, null);
+		 ttobj.speak(message, TextToSpeech.QUEUE_ADD, null);
 	}
 
 }

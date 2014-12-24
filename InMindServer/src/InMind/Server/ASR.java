@@ -1,4 +1,4 @@
-package com.InMind;
+package InMind.Server;
 
 import org.json.JSONObject;
 
@@ -14,19 +14,28 @@ import java.nio.file.Path;
 /**
  * Created by Amos on 16-Dec-14.
  */
-public class ASR {
+public class ASR
+{
 
 
-    static public class AsrRes {public String text; public double confidence;};
+    static public class AsrRes
+    {
+        public String text;
+        public double confidence;
+    }
+
+    ;
 
     /**
      * Send post to google
      */
-    static public AsrRes getGoogleASR(Path audioFile){
+    static public AsrRes getGoogleASR(Path audioFile)
+    {
         AsrRes res = new AsrRes();
         res.confidence = 0;
         res.text = "";
-        try {
+        try
+        {
             String USER_AGENT = "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/535.2 (KHTML, like Gecko) Chrome/15.0.874.121 Safari/535.2",
                     url = "https://www.google.com/speech-api/v2/recognize?output=json&lang=en-us&key=AIzaSyChZTv4KdGD56Uuh7uMBXy-YEdaAsSBmpw&client=chromium&maxresults=6&pfilter=2";
 
@@ -55,13 +64,14 @@ public class ASR {
             String inputLine;
             StringBuffer response = new StringBuffer();
 
-            while ((inputLine = in.readLine()) != null) {
+            while ((inputLine = in.readLine()) != null)
+            {
                 response.append(inputLine);
             }
             in.close();
 
-            System.out.println("Google response: "+ response.toString());
-            PrintWriter pw = new PrintWriter(audioFile.toString()+".txt");
+            System.out.println("Google response: " + response.toString());
+            PrintWriter pw = new PrintWriter(audioFile.toString() + ".txt");
             pw.print(response.toString());
             pw.flush();
             pw.close();

@@ -3,9 +3,9 @@ package com.company;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URI;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -15,12 +15,26 @@ public class Main {
 
     public static void main(String[] args) {
 
-        String format = (new SimpleDateFormat("File-ddMMyy-hhmmss.SSS.raw")).format(new Date());
-        int a = 5;
+        Method method = null;
+        try {
+            Package pack = Main.class.getPackage();
+            method = Class.forName(pack.getName() + "." + "Main").getMethod("regexify");
+                method.invoke(null);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        //String format = (new SimpleDateFormat("File-ddMMyy-hhmmss.SSS.raw")).format(new Date());
+        //int a = 5;
         //regexify();
     }
 
-    private static void regexify() {
+    public static void regexify() {
         String inputText = "tell me exactly what I am happy to hear you say";
         List<String> response = new LinkedList<String>();
 
