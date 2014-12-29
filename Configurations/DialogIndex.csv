@@ -1,2 +1,4 @@
 pattern,classAndFileBaseName
-(.*) bus(?: now)?,myBus
+.*(?: |^)bus(?: |$).*,myBus
+.*(?: |^)weather(?: |$).*,myWeather
+Marry me,marryMe

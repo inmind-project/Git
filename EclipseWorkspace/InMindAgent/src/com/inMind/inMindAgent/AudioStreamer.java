@@ -97,6 +97,7 @@ public class AudioStreamer {
 
 					Message msgTalk = new Message();
 					msgTalk.arg1 = 1;
+					msgTalk.arg2 = 1; //important toast
 					msgTalk.obj = "Talk!";
 					toasterHandler.sendMessage(msgTalk);
 					//Message msgPlayTone = new Message();

@@ -7,4 +7,5 @@ pattern - pattern in sentence
 state=finish - finish what you are doing and then clear dialog and reset back to top level.
 state=return - clear dialog and reset back to top level and find a new match for current sentence.
 callfun=     - call the given function with all information in dialog
+condition - can use either = or ==, both mean equality. Supports also <,<=,>,>=,!=. supports also +,-,*,/. Can also use matching groups from pattern. Cannot concatenate strings.
 

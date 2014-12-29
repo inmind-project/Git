@@ -44,7 +44,9 @@ public class InMindLogic
             {
                 tcpServer.sendMessage("ConnectUDP^" + udpDefaultPort);
 
-                Path obtainedFile = StreamAudioServer.runServer(udpDefaultPort);
+                StreamAudioServer streamAudioServer = new StreamAudioServer();
+
+                Path obtainedFile = streamAudioServer.runServer(udpDefaultPort);
 
                 tcpServer.sendMessage("StopUDP^");
 

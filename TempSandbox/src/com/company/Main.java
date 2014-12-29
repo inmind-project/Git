@@ -1,5 +1,8 @@
 package com.company;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -15,12 +18,25 @@ import java.util.regex.Pattern;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ScriptException
+    {
 
-        isSilentButDidTalk("C:\\InMind\\git\\UserData\\InputAt231214-122558.982.raw");
+//        String valStr="as+fjk- 5";
+//        String tmpValStr = valStr.replaceAll("[!?,\\+\\-\\*/]", " ");
+//        String[] allRefsToVariables = tmpValStr.split("[ ]+");
+//
+        ScriptEngineManager mgr = new ScriptEngineManager();
+        ScriptEngine engine = mgr.getEngineByName("JavaScript");
+        String foo = "3 == 17-14";
+        Boolean t = (Boolean)engine.eval(foo);
+        Boolean b = new Boolean(engine.eval(foo).toString());
+        int a = 5;
+        //System.out.println(engine.eval(foo));
+
+        //isSilentButDidTalk("C:\\InMind\\git\\UserData\\InputAt231214-122558.982.raw");
+
         //reflection();
         //String format = (new SimpleDateFormat("File-ddMMyy-hhmmss.SSS.raw")).format(new Date());
-        //int a = 5;
         //regexify();
     }
 

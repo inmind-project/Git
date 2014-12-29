@@ -2,18 +2,17 @@ package InMind.Server;
 
 import InMind.Consts;
 
-import javax.sound.sampled.DataLine;
 import javax.sound.sampled.SourceDataLine;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketTimeoutException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import static InMind.Utils.delIfExists;
+import static InMind.Utils.appendToFile;
 
 // This class is in-charge of receiving the audio stream from the user (via UDP).
 class StreamAudioServer
@@ -29,18 +28,23 @@ class StreamAudioServer
     static final String fileStart = "InputAt";
     static final int timeout = 1000;
 
-    static DataLine.Info dataLineInfo;
+    //static DataLine.Info dataLineInfo;
     static SourceDataLine sourceDataLine;
+    Path filePath = null;
 
-    public static Path runServer(int udpPort)
+
+    public Path runServer(int udpPort)
     {
+        Path retFileWithRaw = null;
 
-        Path fileWithRaw = null;
+        silentSampleLength = 0;
+        talkSampleLength = 0;
+        filePath = null;
 
         try
         {
 
-            Path filePath = Paths.get(folderPath.toString(), fileStart + (new SimpleDateFormat("ddMMyy-hhmmss.SSS").format(new Date())) + ".raw");
+            filePath = Paths.get(folderPath.toString(), fileStart + (new SimpleDateFormat("ddMMyy-hhmmss.SSS").format(new Date())) + ".raw");
 
             delIfExists(filePath);
 
@@ -85,8 +89,8 @@ class StreamAudioServer
                 }
 
                 System.out.println("Received Packet!" + receivePacket.getLength());
-                toFile(receivePacket.getData(), receivePacket.getLength(), filePath);
-                if (isSilentButDidTalk(filePath))
+                appendToFile(receivePacket.getData(), receivePacket.getLength(), filePath);
+                if (isSilentButDidTalk(receivePacket.getData()))
                     break;
                 // ais = new AudioInputStream(baiss, format,
                 // receivePacket.getLength());
@@ -96,28 +100,29 @@ class StreamAudioServer
             //sourceDataLine.close();
             serverSocket.close();
 
-            fileWithRaw = filePath;
+            retFileWithRaw = filePath;
 
         } catch (Exception ex)
         {
-            fileWithRaw = null;
+            retFileWithRaw = null;
             System.out.println("StreamAudio: Error");
         }
-        return fileWithRaw;
+        return retFileWithRaw;
     }
 
-    private static boolean isSilentButDidTalk(Path filePath)
-    {
-        int silentLengthNeeded = 500;  //in milliseconds
-        int considerSilent = 1500;  //TODO: may want to use mean squared error or other smart approaches.
-        int considerSpeech = 3000;
-        int minimalTalk = Consts.sampleRate / 1000; //require at least 0.001 sec of speech
+    int silentSampleLength = 0;
+    int talkSampleLength = 0;
 
-        int silentSampleLength = 0;
-        int talkSampleLength = 0;
+    private boolean isSilentButDidTalk(byte[] asByte)
+    {
+        final int silentLengthNeeded = 500;  //in milliseconds
+        final int considerSilent = 1500;  //TODO: may want to use mean squared error or other smart approaches.
+        final int considerSpeech = 3000;
+        final int minimalTalk = Consts.sampleRate / 1000; //require at least 0.001 sec of speech
+
         try
         {
-            byte[] asByte = Files.readAllBytes(filePath);
+            //byte[] asByte = Files.readAllBytes(filePath);
             //short[] asShort = new short[asByte.length/2];
             for (int i = 0; 2*i < asByte.length; i++)
             {
@@ -145,50 +150,16 @@ class StreamAudioServer
 
     }
 
-    public static void toSpeaker(byte soundbytes[], int soundlength)
-    {
-        try
-        {
-            sourceDataLine.write(soundbytes, 0, soundlength);
-        } catch (Exception e)
-        {
-            System.out.println("Not working in speakers...");
-            e.printStackTrace();
-        }
-    }
-
-    public static void toFile(byte soundbytes[], int soundlength, Path filePath)
-    {
-        FileOutputStream out;
-        try
-        {
-            out = new FileOutputStream(filePath.toFile(), true);
-            byte[] toWrite = new byte[soundlength];
-            System.arraycopy(soundbytes, 0, toWrite, 0, soundlength);
-            out.write(toWrite);
-            out.close();
-        } catch (Exception e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    public static void delIfExists(Path filePath)
-    {
-        try
-        {
-            // Delete if tempFile exists
-            File fileTemp = filePath.toFile();
-            if (fileTemp.exists())
-            {
-                fileTemp.delete();
-            }
-        } catch (Exception e)
-        {
-            // if any error occurs
-            e.printStackTrace();
-        }
-    }
+//    public static void toSpeaker(byte soundbytes[], int soundlength)
+//    {
+//        try
+//        {
+//            sourceDataLine.write(soundbytes, 0, soundlength);
+//        } catch (Exception e)
+//        {
+//            System.out.println("Not working in speakers...");
+//            e.printStackTrace();
+//        }
+//    }
 
 }

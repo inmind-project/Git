@@ -3,9 +3,13 @@ package com.inMind.inMindAgent;
 import android.util.Log;
 import java.io.*;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
  
 public class TCPClient {
+	
+	static final int connectionTimeout = 1000; //in milliseconds
  
     private String serverMessage;
 	String ipAddr; 
@@ -40,17 +44,19 @@ public class TCPClient {
         mRun = false;
     }
  
-    public void run() {
+    public void run() throws IOException {
  
         mRun = true;
  
-        try {
 
             InetAddress serverAddr = InetAddress.getByName(ipAddr);
             Log.d("TCP Client", "C: Connecting...");
  
             //create a socket to make the connection with the server
-            Socket socket = new Socket(serverAddr, portNum);
+            Socket socket = new Socket(); 
+            socket.connect(new InetSocketAddress(serverAddr, portNum),connectionTimeout);
+            
+            Log.d("TCP Client", "C: Connected!");
  
             try {
  
@@ -84,14 +90,20 @@ public class TCPClient {
             } finally {
                 //the socket must be closed. It is not possible to reconnect to this socket
                 // after it is closed, which means a new socket instance has to be created.
-                socket.close();
+                try
+                {
+            	socket.close();
+                }
+                catch (Exception e)
+                {
+                	Log.e("TCP", "S: Could not close",e);
+                }
             }
  
-        } catch (Exception e) {
  
-            Log.e("TCP", "C: Error", e);
+        	
+            //Log.e("TCP", "C: could not connect", e);
  
-        }
  
     }
  

@@ -1,5 +1,6 @@
 package com.inMind.inMindAgent;
 
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -96,6 +97,7 @@ public class LogicController {
 				stopStreaming();
 				Message msgToast = new Message();
 				msgToast.arg1 = 1;
+				msgToast.arg2 = 0; //not important
 				msgToast.obj = "Wait...";
 				toasterHandler.sendMessage(msgToast);
 			}				
@@ -150,7 +152,20 @@ public class LogicController {
 					//publishProgress(message);//this method calls the onProgressUpdate
 				}
 			});
-			tcpClient.run();
+			
+			
+			try {
+				tcpClient.run();
+			} catch (IOException e) {
+				
+				Message msgNotConnect = new Message();
+				msgNotConnect.arg1 = 1;
+				msgNotConnect.arg2 = 1; //important message.
+				msgNotConnect.obj = "Could not connect!";
+				toasterHandler.sendMessage(msgNotConnect);
+				
+				Log.e("LogicControl", "C: Could not Connect!");
+			}
 
 			return null;
 		}

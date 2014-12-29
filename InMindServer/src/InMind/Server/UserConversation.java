@@ -2,6 +2,8 @@ package InMind.Server;
 
 import InMind.DialogFunctions.FunctionInvoker;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -24,9 +26,10 @@ public class UserConversation
     static final String cvsSplitBy = ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
     static final String basePath = "..\\Configurations\\";
     static final String commandChar = "^";
-    static final String conditionsAndSetChar = ";";
-    static final String condAndSetEqual = "=";
     static final String cstExtension = "csv";
+    static final String conditionsAndSetChar = ";";
+    static final String setEquality = "=";
+
 
     static final String stateName = "state";
     static final String callFunName = "callfun";
@@ -35,10 +38,16 @@ public class UserConversation
     String dialogFileBase = "";
     Map<String, Object> fullInfo;
 
+
+
+    ScriptEngineManager mgr;
+    ScriptEngine engine;
     public UserConversation()
     {
         fullInfo = new HashMap<String, Object>();
         clearDialog();
+        mgr = new ScriptEngineManager();
+        engine = mgr.getEngineByName("JavaScript");
     }
 
 
@@ -59,9 +68,10 @@ public class UserConversation
         if (dialogFileBase.isEmpty())
         {
 
-            forUser = getResponse(asrRes.text);
+            forUser = getSocialTalkResponse(asrRes.text);
             sendToUser(messageSender, forUser);
-        } else
+        }
+        else
         {
             String toSay = executeDialogFile(asrRes.text);
             if (!toSay.isEmpty())
@@ -133,51 +143,40 @@ public class UserConversation
 
                 // use comma as separator
                 String[] row = line.split(cvsSplitBy, -1);
-                boolean matchesConditions = true;
-                if (!row[csvConditions].isEmpty())
+
+                Pattern p = Pattern.compile((row[csvPattern]), Pattern.CASE_INSENSITIVE);
+                Matcher m = p.matcher(userSentence);
+                if (m.matches())
                 {
-                    String conditions = removeExtraQuotes(row[csvConditions]);
-                    String[] conditionList = conditions.split(conditionsAndSetChar);
-                    for (String cond : conditionList)
+
+                    boolean matchesConditions = true;
+                    if (!row[csvConditions].isEmpty())
                     {
-                        String[] varVal = cond.split(condAndSetEqual);
-                        if (varVal.length != 2)
-                            continue;
-                        Object requiredVal;
-                        if (varVal[1].startsWith("\"") && varVal[1].endsWith("\"")) //if is surrounded by quotes, this is a string, remove quotes.
-                            requiredVal = new String(varVal[1].substring(1, varVal[1].length() - 1));
-                        else
-                            requiredVal = new Double(varVal[1]);
-                        Object storedVal = fullInfo.get(varVal[0]);
-                        if (storedVal == null || !storedVal.equals(requiredVal))
+                        String conditions = removeExtraQuotes(row[csvConditions]);
+                        String[] conditionList = conditions.split(conditionsAndSetChar);
+                        for (String cond : conditionList)
                         {
-                            matchesConditions = false;
-                            break;
+                            if (!checkCondition(cond,fullInfo,m))
+                            {
+                                matchesConditions = false;
+                                break;
+                            }
                         }
                     }
-                }
 
-                if (matchesConditions)
-                {
-                    Pattern p = Pattern.compile((row[csvPattern]), Pattern.CASE_INSENSITIVE);
-                    Matcher m = p.matcher(userSentence);
-                    if (m.matches())
+                    if (matchesConditions)
                     {
                         //retFile= row[csvFile];
-                        toSay = refactorSentenceToSay(row[csvSay], m);
+                        toSay = refactorStrUsingM(row[csvSay], m);
 
                         String toSet = removeExtraQuotes(row[csvSet]);
                         String[] setList = toSet.split(conditionsAndSetChar);
                         for (String singleSet : setList)
                         {
-                            String[] varVal = singleSet.split(condAndSetEqual);
+                            String[] varVal = singleSet.split(setEquality);
                             if (varVal.length != 2)
-                                continue;
-                            Object setTo;
-                            if (varVal[1].startsWith("\"") && varVal[1].endsWith("\"")) //if is surrounded by quotes, this is a string, remove quotes.
-                                setTo = refactorSentenceToSay(varVal[1], m); //new String(varVal[1].substring(1,varVal[1].length()-1));
-                            else
-                                setTo = new Double(varVal[1]); //TODO: may be referring to itself or other variables!
+                                throw new Exception("Error in:" + singleSet);
+                            Object setTo = evaluateVal(varVal[1],fullInfo,m);
                             fullInfo.put(varVal[0], setTo);
 
                         }
@@ -185,6 +184,7 @@ public class UserConversation
                         break;
                     }
                 }
+
 
             }
 
@@ -252,7 +252,7 @@ public class UserConversation
 
     // returns responses
     // may have multiple (say something and launch something.
-    static public List<String> getResponse(String userSentence)
+    static public List<String> getSocialTalkResponse(String userSentence)
     {
         final int csvPattern = 0;
         final int csvSay = 1;
@@ -261,7 +261,7 @@ public class UserConversation
         List<String> response = new LinkedList<String>();
 
 
-        Path filePath = Paths.get(basePath, "logic.csv");//URI filePath = URI.create("file:///C:/Server/git/Configurations/logic.csv");
+        Path filePath = Paths.get(basePath, "socialTalk.csv");//URI filePath = URI.create("file:///C:/Server/git/Configurations/logic.csv");
         String line = "";
         BufferedReader bufferedReader = null;
 
@@ -278,7 +278,7 @@ public class UserConversation
                 Matcher m = p.matcher(userSentence);
                 if (m.matches())
                 {
-                    String toSay = refactorSentenceToSay(row[csvSay], m);
+                    String toSay = refactorStrUsingM(row[csvSay], m);
                     if (!row[csvSay].isEmpty())
                     {
                         response.add(commandSay(toSay));
@@ -302,25 +302,26 @@ public class UserConversation
         return "Say" + commandChar + toSay;
     }
 
+
     // removes extra quotes and takes care of %1 and %r1
-    private static String refactorSentenceToSay(String toSay, Matcher m)
+    private static String refactorStrUsingM(String orgSentence, Matcher m)
     {
-        toSay = removeExtraQuotes(toSay);
-        if (toSay.contains("%"))
+        orgSentence = removeExtraQuotes(orgSentence);
+        if (orgSentence.contains("%"))
         {
             for (int i = 1; i <= m.groupCount(); i++)
             {
-                if (toSay.contains("%" + i))
+                if (orgSentence.contains("%" + i))
                 { //replace without reflection
-                    toSay = toSay.replace("%" + i, m.group(i));
+                    orgSentence = orgSentence.replace("%" + i, m.group(i));
                 }
-                if (toSay.contains("%r" + i)) //replace with reflection
+                if (orgSentence.contains("%r" + i)) //replace with reflection
                 {
-                    toSay = toSay.replace("%r" + i, reflect(m.group(i)));
+                    orgSentence = orgSentence.replace("%r" + i, reflect(m.group(i)));
                 }
             }
         }
-        return toSay;
+        return orgSentence;
     }
 
     private static String removeExtraQuotes(String string)
@@ -364,5 +365,78 @@ public class UserConversation
 
         return text.replaceAll(alreadyReplaced, " ").trim();
 
+    }
+
+    /// returns whether the condition is true or false.
+    private boolean checkCondition(String cond, Map<String, Object> fullInfo, Matcher m) throws Exception
+    {
+        final String condEquality = "=";
+        final String condEquality2 = "==";
+        final String condNotEqual = "!=";
+        final String condGreater = ">";
+        final String condGreaterEqual = ">=";
+        final String condSmaller = "<";
+        final String condSmallerEqual = "<=";
+        String[] condRelationList = new String[]{condEquality2,condNotEqual,condGreater,condGreaterEqual,condSmaller,condSmallerEqual,condEquality}; //condEquality must be last
+
+        String relation = null;
+        //find relation
+        for (String relationOption : condRelationList)
+        {
+            if (cond.contains(relationOption))
+            {
+                relation = relationOption;
+                break;
+            }
+        }
+        if (relation == null) //no relation found
+            throw new Exception("no relation found in " + cond);
+
+        String[] varVal = cond.split(relation);
+        if (varVal.length != 2)
+            throw new Exception("could not parse: " + cond);
+
+        Object val = evaluateVal(varVal[1],fullInfo,m);
+        Object storedVar = fullInfo.get(varVal[0].trim());
+
+        boolean matches = storedVar == val || (storedVar != null && storedVar.equals(val));
+        if (relation.equals(condEquality) || relation.equals(condEquality2))
+            return matches;
+        if (relation.equals(condNotEqual))
+            return !matches;
+
+        //must be a number.
+        return  (Boolean)engine.eval(storedVar.toString() + relation + val.toString());//can throw exception, it's ok
+
+    }
+
+    private Object evaluateVal(String valStr, Map<String, Object> fullInfo,Matcher m) throws Exception
+    {
+        valStr = valStr.trim();
+
+        if (valStr == "null")
+            return null;
+
+        if (valStr.startsWith("\"") && valStr.endsWith("\"")) //if is surrounded by quotes, this is a string (no referring to other strings allowed).
+            return refactorStrUsingM(valStr,m);
+
+        Object requiredVal;
+        if (fullInfo.containsKey(valStr)) //check if referring to a different variable
+            return fullInfo.get(valStr);
+
+        String tmpValStr = valStr.replaceAll("[!?,\\+\\-\\*/]", " ");
+        String[] allRefsToVariables = tmpValStr.split("[ ]+");
+        //this may be slow if fullInfo is big. Could look for words separated by space,+,- etc. to speedup if fullInfo is very big.
+        for (String refToVar : allRefsToVariables)
+        {
+            if (fullInfo.containsKey(refToVar))
+            {
+                if (fullInfo.get(refToVar) == null)
+                    throw new Exception("tried to reference null: " + refToVar);
+                valStr = valStr.replaceAll(refToVar, fullInfo.get(refToVar).toString());
+            }
+        }
+
+        return  engine.eval(valStr);
     }
 }
