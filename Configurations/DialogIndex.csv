@@ -2,3 +2,6 @@ pattern,classAndFileBaseName
 .*(?: |^)bus(?: |$).*,myBus
 .*(?: |^)weather(?: |$).*,myWeather
 Marry me,marryMe
+.* play .*(with you|guess).*,guessNum
+knock knock,knockKnock
+Hello,firstHello

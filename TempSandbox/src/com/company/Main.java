@@ -27,11 +27,10 @@ public class Main {
 //
         ScriptEngineManager mgr = new ScriptEngineManager();
         ScriptEngine engine = mgr.getEngineByName("JavaScript");
-        String foo = "3 == 17-14";
-        Boolean t = (Boolean)engine.eval(foo);
-        Boolean b = new Boolean(engine.eval(foo).toString());
-        int a = 5;
-        //System.out.println(engine.eval(foo));
+        String foo = "Math.floor(Math.random() * 6) + 1";
+        //Boolean t = (Boolean)engine.eval(foo);
+        //Boolean b = new Boolean(engine.eval(foo).toString());
+        System.out.println(engine.eval(foo));
 
         //isSilentButDidTalk("C:\\InMind\\git\\UserData\\InputAt231214-122558.982.raw");
 

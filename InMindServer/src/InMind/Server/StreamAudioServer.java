@@ -76,9 +76,11 @@ class StreamAudioServer
             // ByteArrayInputStream baiss = new
             // ByteArrayInputStream(receivePacket.getData());
 
+            System.out.println("receiving information");
+
             while (true)
             {
-                System.out.println("Waiting!");
+                //System.out.println("Waiting!");
                 try
                 {
                     serverSocket.receive(receivePacket);
@@ -88,7 +90,7 @@ class StreamAudioServer
                     break;
                 }
 
-                System.out.println("Received Packet!" + receivePacket.getLength());
+                //System.out.println("Received Packet!" + receivePacket.getLength());
                 appendToFile(receivePacket.getData(), receivePacket.getLength(), filePath);
                 if (isSilentButDidTalk(receivePacket.getData()))
                     break;
@@ -96,6 +98,7 @@ class StreamAudioServer
                 // receivePacket.getLength());
                 // toSpeaker(receivePacket.getData());
             }
+            System.out.println("receive complete!");
             //sourceDataLine.drain();
             //sourceDataLine.close();
             serverSocket.close();

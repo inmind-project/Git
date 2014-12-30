@@ -13,6 +13,7 @@ public class FunctionInvoker
 
     static final String sayStr = "Say^"; //TODO: should be only once
 
+    //returns a list of commands to the client. May return null.
     static public List<String> toInvoke(String dialogFileBase, String funName, Map<String, Object> fullInfo, String userId)
     {
         List<String> toSend = null;

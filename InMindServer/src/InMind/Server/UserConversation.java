@@ -167,18 +167,20 @@ public class UserConversation
                     if (matchesConditions)
                     {
                         //retFile= row[csvFile];
-                        toSay = refactorStrUsingM(row[csvSay], m);
+                        toSay = refactorStringToSay(row[csvSay], m);
 
                         String toSet = removeExtraQuotes(row[csvSet]);
                         String[] setList = toSet.split(conditionsAndSetChar);
                         for (String singleSet : setList)
                         {
-                            String[] varVal = singleSet.split(setEquality);
-                            if (varVal.length != 2)
-                                throw new Exception("Error in:" + singleSet);
-                            Object setTo = evaluateVal(varVal[1],fullInfo,m);
-                            fullInfo.put(varVal[0], setTo);
-
+                            if (!singleSet.isEmpty())
+                            {
+                                String[] varVal = singleSet.split(setEquality);
+                                if (varVal.length != 2)
+                                    throw new Exception("Error in:" + singleSet);
+                                Object setTo = evaluateVal(varVal[1], fullInfo, m);
+                                fullInfo.put(varVal[0], setTo);
+                            }
                         }
 
                         break;
@@ -190,7 +192,9 @@ public class UserConversation
 
         } catch (Exception ex)
         {
-            System.out.println("UserConversation: error in dialog file");
+
+            ex.printStackTrace();
+            System.out.println("UserConversation: error in dialog file: " + ex.getMessage());
         }
 
 
@@ -278,7 +282,7 @@ public class UserConversation
                 Matcher m = p.matcher(userSentence);
                 if (m.matches())
                 {
-                    String toSay = refactorStrUsingM(row[csvSay], m);
+                    String toSay = refactorStringToSay(row[csvSay], m);
                     if (!row[csvSay].isEmpty())
                     {
                         response.add(commandSay(toSay));
@@ -292,6 +296,7 @@ public class UserConversation
 
         } catch (Exception ex)
         {
+            ex.printStackTrace();
             System.out.println("Logic: error in response");
         }
         return response;
@@ -303,10 +308,13 @@ public class UserConversation
     }
 
 
-    // removes extra quotes and takes care of %1 and %r1
-    private static String refactorStrUsingM(String orgSentence, Matcher m)
+    private static String refactorStringToSay(String orgSentence, Matcher m)
     {
-        orgSentence = removeExtraQuotes(orgSentence);
+        return refactorUsingM(removeExtraQuotes(orgSentence), m);
+    }
+    // removes extra quotes and takes care of %1 and %r1
+    private static String refactorUsingM(String orgSentence, Matcher m)
+    {
         if (orgSentence.contains("%"))
         {
             for (int i = 1; i <= m.groupCount(); i++)
@@ -399,13 +407,19 @@ public class UserConversation
         Object val = evaluateVal(varVal[1],fullInfo,m);
         Object storedVar = fullInfo.get(varVal[0].trim());
 
-        boolean matches = storedVar == val || (storedVar != null && storedVar.equals(val));
-        if (relation.equals(condEquality) || relation.equals(condEquality2))
-            return matches;
-        if (relation.equals(condNotEqual))
-            return !matches;
+        if (storedVar instanceof String)
+        {
+
+            boolean matches = storedVar == val || (storedVar != null && storedVar.equals(val));
+            if (relation.equals(condEquality) || relation.equals(condEquality2))
+                return matches;
+            if (relation.equals(condNotEqual))
+                return !matches;
+        }
 
         //must be a number.
+        if (relation == condEquality)
+            relation = condEquality2;
         return  (Boolean)engine.eval(storedVar.toString() + relation + val.toString());//can throw exception, it's ok
 
     }
@@ -417,8 +431,12 @@ public class UserConversation
         if (valStr == "null")
             return null;
 
+        valStr = refactorUsingM(valStr, m);
+
         if (valStr.startsWith("\"") && valStr.endsWith("\"")) //if is surrounded by quotes, this is a string (no referring to other strings allowed).
-            return refactorStrUsingM(valStr,m);
+            return removeExtraQuotes(valStr);
+
+        //dealing with numeric
 
         Object requiredVal;
         if (fullInfo.containsKey(valStr)) //check if referring to a different variable
