@@ -1,5 +1,7 @@
 package InMind.Server;
 
+import InMind.Consts;
+
 import java.nio.file.Path;
 
 /**
@@ -42,13 +44,13 @@ public class InMindLogic
 
             if (message.equals("Client Connected"))
             {
-                tcpServer.sendMessage("ConnectUDP^" + udpDefaultPort);
+                tcpServer.sendMessage(Consts.connectUdp+Consts.commandChar + udpDefaultPort);
 
                 StreamAudioServer streamAudioServer = new StreamAudioServer();
 
                 Path obtainedFile = streamAudioServer.runServer(udpDefaultPort);
 
-                tcpServer.sendMessage("StopUDP^");
+                tcpServer.sendMessage(Consts.stopUdp+Consts.commandChar);
 
                 ASR.AsrRes asrRes = ASR.getGoogleASR(obtainedFile);
 

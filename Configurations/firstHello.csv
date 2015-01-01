@@ -1,6 +1,6 @@
 conditions,pattern,Say,Set
 "state=""start""",.*,,"callfun=""hello"";state=""get_name"""
 ,goodbye|exit|quit|stop,Goodbye!,"state=""finish"""
-"state=""get_name""",(?:what is your name)(?: again)?,,"callfun=""getAgentName"""
+"state=""get_name""",.*((^| )what($| )|(^| )again($| )).*,,"callfun=""getAgentName"""
 "state=""get_name""",(?:my name is )?(.*),"Hello %1, nice to meet you!","callfun=""saveName"";state=""finish"""
 ,.*,,"state=""return"""

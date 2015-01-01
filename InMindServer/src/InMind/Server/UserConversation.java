@@ -1,5 +1,6 @@
 package InMind.Server;
 
+import InMind.Consts;
 import InMind.DialogFunctions.FunctionInvoker;
 
 import javax.script.ScriptEngine;
@@ -25,7 +26,9 @@ public class UserConversation
 
     static final String cvsSplitBy = ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
     static final String basePath = "..\\Configurations\\";
-    static final String commandChar = "^";
+    static final String dialogReturn = "return";
+    static final String dialogFinish = "finish";
+
     static final String cstExtension = "csv";
     static final String conditionsAndSetChar = ";";
     static final String setEquality = "=";
@@ -36,6 +39,7 @@ public class UserConversation
 
 
     String dialogFileBase = "";
+    String tmpDialogFileBaseJustExited = ""; //used when returning from file use on the first time, not to enter same file again
     Map<String, Object> fullInfo;
 
 
@@ -53,12 +57,16 @@ public class UserConversation
 
     public void dealWithMessage(ASR.AsrRes asrRes, InMindLogic.MessageReceiver.MessageSender messageSender)
     {
-        List<String> forUser = new LinkedList<String>();
+        boolean firstEnter = false;
 
         if (dialogFileBase.isEmpty())
         {
-            dialogFileBase = findDialogFile(asrRes.text);
+            dialogFileBase = findDialogFile(asrRes.text,tmpDialogFileBaseJustExited);
+            tmpDialogFileBaseJustExited = "";
             if (!dialogFileBase.isEmpty())
+                firstEnter = true;
+
+            if (firstEnter)
             {
                 fullInfo.put(stateName, "start");
                 //TODO: may also want to load information from DB. maybe add a "required" field to dialogIndex file
@@ -67,17 +75,16 @@ public class UserConversation
 
         if (dialogFileBase.isEmpty())
         {
-
-            forUser = getSocialTalkResponse(asrRes.text);
+            List<String> forUser = new LinkedList<String>();
+            forUser.add(Consts.closeConnection + Consts.commandChar);
+            //forUser = getSocialTalkResponse(asrRes.text);
             sendToUser(messageSender, forUser);
         }
         else
         {
-            String toSay = executeDialogFile(asrRes.text);
-            if (!toSay.isEmpty())
-                forUser.add(toSay);
-
-            sendToUser(messageSender, forUser);
+            List<String> forUser = executeDialogFile(asrRes.text);
+            if (forUser!= null && forUser.size() > 0)
+                sendToUser(messageSender, forUser);
 
             //check if need to call a function (callfun)
             if (fullInfo.containsKey(callFunName) && !fullInfo.get(callFunName).toString().isEmpty())
@@ -86,17 +93,31 @@ public class UserConversation
                 sendToUser(messageSender, toSend);
             }
 
-            if (fullInfo.get(stateName).equals("return"))
+            if (fullInfo.get(stateName).equals(dialogReturn))
             {
+                if (firstEnter)
+                    tmpDialogFileBaseJustExited = dialogFileBase;
                 clearDialog();
                 dealWithMessage(asrRes, messageSender); //recall this function and send relevant information
                 return;
             }
 
-            if (fullInfo.get(stateName).equals("finish"))
+            if (fullInfo.get(stateName).equals(dialogFinish))
             {
                 clearDialog();
             }
+
+            List<String> closeOrRenewConnection = new LinkedList<String>();
+
+            if (dialogFileBase.isEmpty())
+            {
+                closeOrRenewConnection.add(Consts.closeConnection + Consts.commandChar);
+            }
+            else
+            {
+                closeOrRenewConnection.add(Consts.startNewConnection+Consts.commandChar);
+            }
+            sendToUser(messageSender, closeOrRenewConnection);
 
         }
 
@@ -110,21 +131,25 @@ public class UserConversation
             {
 
                 if (!command.isEmpty())
+                {
                     messageSender.sendMessage(command);//"Say^You Said:" + asrRes.text);
+                    System.out.println("sent message to user:" + command);
+                }
             }
         }
     }
 
-    private String executeDialogFile(String userSentence)
+    private List<String> executeDialogFile(String userSentence)
     {
-        String commandSay = "";
-        String toSay = "";
+        List<String> commandsForUser = new LinkedList<String>();
+        //String toSay = "";
 
 
         final int csvConditions = 0;
         final int csvPattern = 1;
         final int csvSay = 2;
         final int csvSet = 3;
+        final int csvAdditionalCommand = 4; //optional
 
 
         Path filePath = Paths.get(basePath, dialogFileBase + "." + cstExtension);//Is there a more elegant way to add the extension?
@@ -167,7 +192,16 @@ public class UserConversation
                     if (matchesConditions)
                     {
                         //retFile= row[csvFile];
-                        toSay = refactorStringToSay(row[csvSay], m);
+                        String orgToSay = row[csvSay].trim();
+                        if (!orgToSay.isEmpty())
+                        {
+                            String toSay = refactorStringToSay(orgToSay, m);
+                            commandsForUser.add(commandSay(toSay));
+                        }
+                        if (row.length >= csvAdditionalCommand+1 && !row[csvAdditionalCommand].trim().isEmpty())
+                        {
+                            commandsForUser.add(row[csvAdditionalCommand].trim());
+                        }
 
                         String toSet = removeExtraQuotes(row[csvSet]);
                         String[] setList = toSet.split(conditionsAndSetChar);
@@ -197,10 +231,7 @@ public class UserConversation
             System.out.println("UserConversation: error in dialog file: " + ex.getMessage());
         }
 
-
-        if (!toSay.isEmpty())
-            commandSay = commandSay(toSay);
-        return commandSay;
+        return commandsForUser;
     }
 
     private void clearDialog()
@@ -210,11 +241,15 @@ public class UserConversation
         fullInfo.put(stateName, "");
     }
 
-    private String findDialogFile(String userSentence)
+    // finds the relevant dialog file which appears after considerOnlyAfterMe
+    private String findDialogFile(String userSentence, String considerOnlyAfterMe)
     {
         final int csvPattern = 0;
         final int csvFile = 1;
         String retFile = "";
+        boolean startConsidering = false;
+        if (considerOnlyAfterMe == null || considerOnlyAfterMe.isEmpty())
+            startConsidering = true;
 
 
         Path filePath = Paths.get(basePath, "dialogIndex.csv");//URI filePath = URI.create("file:///C:/Server/git/Configurations/logic.csv");
@@ -232,15 +267,24 @@ public class UserConversation
                     continue;
                 // use comma as separator
                 String[] row = line.split(cvsSplitBy, -1);
-                String forPattern = row[csvPattern];
-                if (!forPattern.isEmpty())
+                if (!startConsidering)
                 {
-                    Pattern p = Pattern.compile((forPattern), Pattern.CASE_INSENSITIVE);
-                    Matcher m = p.matcher(userSentence);
-                    if (m.matches())
+                    if (row[csvFile].equals(considerOnlyAfterMe))
+                        startConsidering = true;
+                }
+
+                if (startConsidering)
+                {
+                    String forPattern = row[csvPattern];
+                    if (!forPattern.isEmpty())
                     {
-                        retFile = row[csvFile];
-                        break;
+                        Pattern p = Pattern.compile((forPattern), Pattern.CASE_INSENSITIVE);
+                        Matcher m = p.matcher(userSentence);
+                        if (m.matches())
+                        {
+                            retFile = row[csvFile];
+                            break;
+                        }
                     }
                 }
 
@@ -254,57 +298,57 @@ public class UserConversation
     }
 
 
-    // returns responses
-    // may have multiple (say something and launch something.
-    static public List<String> getSocialTalkResponse(String userSentence)
-    {
-        final int csvPattern = 0;
-        final int csvSay = 1;
-        final int csvAdditionalCommand = 2;
-
-        List<String> response = new LinkedList<String>();
-
-
-        Path filePath = Paths.get(basePath, "socialTalk.csv");//URI filePath = URI.create("file:///C:/Server/git/Configurations/logic.csv");
-        String line = "";
-        BufferedReader bufferedReader = null;
-
-        try
-        {
-            bufferedReader = new BufferedReader(new FileReader(new File(filePath.toString())));
-
-            while ((line = bufferedReader.readLine()) != null)
-            {
-
-                // use comma as separator
-                String[] row = line.split(cvsSplitBy, -1);
-                Pattern p = Pattern.compile((row[csvPattern]), Pattern.CASE_INSENSITIVE);
-                Matcher m = p.matcher(userSentence);
-                if (m.matches())
-                {
-                    String toSay = refactorStringToSay(row[csvSay], m);
-                    if (!row[csvSay].isEmpty())
-                    {
-                        response.add(commandSay(toSay));
-                    }
-                    if (!row[csvAdditionalCommand].isEmpty())
-                        response.add(row[csvAdditionalCommand]);
-                    break;
-                }
-
-            }
-
-        } catch (Exception ex)
-        {
-            ex.printStackTrace();
-            System.out.println("Logic: error in response");
-        }
-        return response;
-    }
+//    // returns responses
+//    // may have multiple (say something and launch something.
+//    static public List<String> getSocialTalkResponse(String userSentence)
+//    {
+//        final int csvPattern = 0;
+//        final int csvSay = 1;
+//        final int csvAdditionalCommand = 2;
+//
+//        List<String> response = new LinkedList<String>();
+//
+//
+//        Path filePath = Paths.get(basePath, "socialTalk.csv");//URI filePath = URI.create("file:///C:/Server/git/Configurations/logic.csv");
+//        String line = "";
+//        BufferedReader bufferedReader = null;
+//
+//        try
+//        {
+//            bufferedReader = new BufferedReader(new FileReader(new File(filePath.toString())));
+//
+//            while ((line = bufferedReader.readLine()) != null)
+//            {
+//
+//                // use comma as separator
+//                String[] row = line.split(cvsSplitBy, -1);
+//                Pattern p = Pattern.compile((row[csvPattern]), Pattern.CASE_INSENSITIVE);
+//                Matcher m = p.matcher(userSentence);
+//                if (m.matches())
+//                {
+//                    String toSay = refactorStringToSay(row[csvSay], m);
+//                    if (!row[csvSay].isEmpty())
+//                    {
+//                        response.add(commandSay(toSay));
+//                    }
+//                    if (!row[csvAdditionalCommand].isEmpty())
+//                        response.add(row[csvAdditionalCommand]);
+//                    break;
+//                }
+//
+//            }
+//
+//        } catch (Exception ex)
+//        {
+//            ex.printStackTrace();
+//            System.out.println("Logic: error in response");
+//        }
+//        return response;
+//    }
 
     private static String commandSay(String toSay)
     {
-        return "Say" + commandChar + toSay;
+        return Consts.sayCommand + Consts.commandChar + toSay;
     }
 
 

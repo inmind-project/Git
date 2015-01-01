@@ -3,33 +3,50 @@
 
 #include "stdafx.h"
 #include "ASRwrapper.h"
+#include "InMind_Server_MicrosoftASR.h"
 
 using namespace std;
 
-int _tmain(int argc, _TCHAR* argv[])
-{
 
-	CASRwrapper asrEngine;
-	std::wstring sPathToFile = L"C:\\InMind\\temp\\fromClient.wav";
-	asrEngine.InitSpeech(sPathToFile);
-	while (1)
+//int _tmain(int argc, _TCHAR* argv[])
+
+//std::wstring Java_To_WStr(JNIEnv *env, jstring string)
+//{
+//	std::wstring value;
+//
+//	const jchar *raw = env->GetStringChars(string, 0);
+//	jsize len = env->GetStringLength(string);
+//	const jchar *temp = raw;
+//
+//	value.assign(raw, raw + len);
+//
+//	env->ReleaseStringChars(string, raw);
+//
+//	return value;
+//}
+
+//JNIEXPORT jstring JNICALL Java_com_company_MicrosoftASR_fromFile(JNIEnv *env, jobject obj, jstring sPathToFile)
+JNIEXPORT jstring JNICALL Java_InMind_Server_MicrosoftASR_fromByteArr(JNIEnv *env, jclass, jbyteArray jbyteJArr)
+//int main()
+{
+	jboolean isCopy;
+	jbyte* jbytePtr = env->GetByteArrayElements(jbyteJArr, &isCopy);
+	jsize jarrSize = env->GetArrayLength(jbyteJArr);
+
+	char* arrRec = (char*)jbytePtr;
+	long arrSize = (long)jarrSize;
+	std::string sretRes = "";
+	if (arrRec != NULL && arrSize > 0)
 	{
-		asrEngine.Listen();
-		HANDLE handleEvent = asrEngine.GetNotifyHandle();
-		HANDLE handles[1];
-		handles[0] = handleEvent;
-		WaitForMultipleObjects(1, handles, FALSE, INFINITE);
-		std::wstring speechRes;
-		float firstConfidence;
-		const int requestedAlternates = 50;
-		std::wstring alternates[requestedAlternates];
-		float confidences[requestedAlternates];
-		asrEngine.GetText(speechRes, &firstConfidence, requestedAlternates, alternates, confidences);
-		asrEngine.StopListenning();
-		wcout << speechRes << endl;
-		//Sleep(100000);
-		//system("PAUSE");
+		std::wstring speechRes = CASRwrapper::DecodeFromCharArr(arrRec, arrSize); // (*env)->GetStringUTFChars(env, string, 0); ////Java_To_WStr(env, sPathToFile);
+
+		std::string sspeachRes(speechRes.begin(), speechRes.end()); //converting from wstring to string
+		sretRes = sspeachRes;
+
+		cout << sspeachRes << endl;
+
+		env->ReleaseByteArrayElements(jbyteJArr, jbytePtr, JNI_ABORT);
 	}
-	return 0;
+	return env->NewStringUTF(sretRes.c_str());
 }
 

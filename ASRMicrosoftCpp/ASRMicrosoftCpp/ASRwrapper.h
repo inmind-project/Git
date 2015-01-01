@@ -1,3 +1,22 @@
+
+#define _ATL_APARTMENT_THREADED
+
+#include <atlbase.h>
+//You may derive a class from CComModule and use it if you want to override something,
+//but do not change the name of _Module
+extern CComModule _Module;
+#include <atlcom.h>
+
+
+//#include<atlstr.h>
+#include <iostream>
+#include <string>
+
+#include <sapi.h>
+#pragma warning(disable:4996)
+#include <sphelper.h>
+#pragma warning(default:4996)
+
 #pragma once
 #define GID_DICTATION   0           // Dictation grammar has grammar ID 0
 class CASRwrapper
@@ -19,7 +38,8 @@ private:
 	//ISpVoice* m_pVoice;
 public:
 	CASRwrapper();
-	HRESULT InitSpeech(std::wstring sPathToFile = L"");
+	static std::wstring DecodeFromCharArr(char* charArr, long arrLength);
+	HRESULT InitSpeech(std::wstring sPathToFile = L"", IStream * pMemStream = NULL);
 	~CASRwrapper();
 
 	HRESULT Listen();
@@ -29,4 +49,3 @@ public:
 
 	static void __stdcall SpRecCallback(WPARAM wParam, LPARAM lParam);
 };
-

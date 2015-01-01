@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import InMind.Consts;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
@@ -16,7 +17,6 @@ import android.util.Log;
  */
 public class LogicController {
 
-	static final String messageSeperator = "\\^";
 
 	TCPClient tcpClient;
 	AudioStreamer audioStreamer;
@@ -31,6 +31,7 @@ public class LogicController {
 	private Handler toasterHandler; 
 	private Handler talkHandler;
 	private Handler launchHandler;
+	private boolean needToReconnect;
 
 	public LogicController(Handler toasterHandler, Handler talkHandler, Handler launchHandler)
 	{
@@ -86,13 +87,22 @@ public class LogicController {
 	private void dealWithMessage(String message)
 	{
 		Log.d("ServerConnector", "Dealing with message:" + message);
-		Pattern p = Pattern.compile("(\\p{Alpha}*)"+messageSeperator+"(.*)");
+		Pattern p = Pattern.compile("(\\p{Alpha}*)"+Consts.messageSeperatorForPattern+"(.*)");
 		Matcher m = p.matcher(message);
 		boolean found = m.find();
 		Log.d("ServerConnector", "found:" + found);
 		if (found)
 		{
-			if (m.group(1).equalsIgnoreCase("StopUDP"))
+			if (m.group(1).equalsIgnoreCase(Consts.closeConnection))
+			{
+				closeConnection();
+			}
+			if (m.group(1).equalsIgnoreCase(Consts.startNewConnection))
+			{
+				closeConnection();
+				needToReconnect = true;
+			}
+			if (m.group(1).equalsIgnoreCase(Consts.stopUdp))
 			{
 				stopStreaming();
 				Message msgToast = new Message();
@@ -101,14 +111,14 @@ public class LogicController {
 				msgToast.obj = "Wait...";
 				toasterHandler.sendMessage(msgToast);
 			}				
-			else if (m.group(1).equalsIgnoreCase("ConnectUDP"))
+			else if (m.group(1).equalsIgnoreCase(Consts.connectUdp))
 			{
 				udpIpPort = 0;
 				try	{
 					udpIpAddr = tcpIpAddr;
 					Log.d("ServerConnector", "found:" + found);
 					//String protocol = m.group(1);
-					udpIpPort = Integer.parseInt(m.group(2));
+					udpIpPort = Integer.parseInt(m.group(2).trim());
 					Log.d("ServerConnector", "Got port:" + udpIpPort);
 				} catch (Exception e)
 				{
@@ -117,7 +127,7 @@ public class LogicController {
 				if (udpIpPort > 0)
 					openAudioStream();
 			}
-			else if (m.group(1).equalsIgnoreCase("Say"))
+			else if (m.group(1).equalsIgnoreCase(Consts.sayCommand))
 			{
 				Log.d("ServerConnector", "saying:" + m.group(2));
 				Message msgTalk = new Message();
@@ -125,7 +135,7 @@ public class LogicController {
 				msgTalk.obj = m.group(2).trim();
 				talkHandler.sendMessage(msgTalk);
 			}
-			else if (m.group(1).equalsIgnoreCase("Launch"))
+			else if (m.group(1).equalsIgnoreCase(Consts.launchCommand))
 			{
 				Message msgLaunch = new Message();
 				msgLaunch.arg1 = 1;
@@ -180,6 +190,19 @@ public class LogicController {
 		//            // from server was added to the list
 		//            mAdapter.notifyDataSetChanged();
 		//        }
+	}
+
+
+
+	public void reconnectIfNeeded() {
+		Log.d("LogicControl", "Reconnecting if needed");
+
+		if (needToReconnect)
+		{
+			needToReconnect = false;
+			ConnectToServer();
+		}
+		
 	}
 
 

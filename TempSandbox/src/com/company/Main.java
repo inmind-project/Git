@@ -1,7 +1,7 @@
 package com.company;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
+import InMind.Server.MicrosoftASR;
+
 import javax.script.ScriptException;
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,17 +20,18 @@ public class Main {
 
     public static void main(String[] args) throws ScriptException
     {
+        System.out.println(MicrosoftASR.callFromFile(Paths.get("C:\\InMind\\git\\UserData\\InputAt301214-102518.986.raw")));
 
 //        String valStr="as+fjk- 5";
 //        String tmpValStr = valStr.replaceAll("[!?,\\+\\-\\*/]", " ");
 //        String[] allRefsToVariables = tmpValStr.split("[ ]+");
 //
-        ScriptEngineManager mgr = new ScriptEngineManager();
-        ScriptEngine engine = mgr.getEngineByName("JavaScript");
-        String foo = "Math.floor(Math.random() * 6) + 1";
-        //Boolean t = (Boolean)engine.eval(foo);
-        //Boolean b = new Boolean(engine.eval(foo).toString());
-        System.out.println(engine.eval(foo));
+        //ScriptEngineManager mgr = new ScriptEngineManager();
+        //ScriptEngine engine = mgr.getEngineByName("JavaScript");
+        //String foo = "Math.floor(Math.random() * 6) + 1";
+        ////Boolean t = (Boolean)engine.eval(foo);
+        ////Boolean b = new Boolean(engine.eval(foo).toString());
+        //System.out.println(engine.eval(foo));
 
         //isSilentButDidTalk("C:\\InMind\\git\\UserData\\InputAt231214-122558.982.raw");
 

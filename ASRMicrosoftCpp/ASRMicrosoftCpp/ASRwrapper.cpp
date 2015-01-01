@@ -20,7 +20,63 @@ CASRwrapper::~CASRwrapper()
 	::CoUninitialize();
 }
 
-HRESULT CASRwrapper::InitSpeech(std::wstring sPathToFile)
+std::wstring CASRwrapper::DecodeFromCharArr(char* charArr,long arrLength)
+{
+	LARGE_INTEGER ZERO;
+	ZERO.LowPart = 0;
+	ZERO.HighPart = 0;
+	std::wstring speechRes;
+	const double amplyfingRate = 0.18;
+	CComPtr<IStream> pMemStream;
+	HGLOBAL hGlobal = GlobalAlloc(GMEM_MOVEABLE, sizeof(pMemStream));
+	HRESULT hr = ::CreateStreamOnHGlobal(hGlobal, true, &pMemStream);
+	CASRwrapper asrEngine;
+	if (SUCCEEDED(hr))
+	{
+		ULONG cbWritten;
+		pMemStream->Write(charArr, arrLength*sizeof(char), &cbWritten);
+		if (cbWritten < (ULONG)arrLength)
+			return speechRes;
+		pMemStream->Seek(ZERO, STREAM_SEEK_SET, NULL);
+
+		std::wstring sPathToDummyFile = L"";// C:\\InMind\\temp\\fromClient.wav";// L"c:\\InMind\\temp\\fromClient.wav";//L"C:\\InMind\\temp\\Downtown.wav";
+		HRESULT hr = asrEngine.InitSpeech(sPathToDummyFile, pMemStream);
+	}
+	if (SUCCEEDED(hr))
+	{
+		//TODO: must be done in a thread!!!! can't block the server!!!
+		asrEngine.Listen();
+		HANDLE handleEvent = asrEngine.GetNotifyHandle();
+		HANDLE handles[1];
+		handles[0] = handleEvent;
+		DWORD maxWait = 3000;
+		DWORD waitRes = WaitForMultipleObjects(1, handles, FALSE, maxWait);
+		if (waitRes == WAIT_OBJECT_0)
+		{
+			asrEngine.GetText(speechRes);
+		}
+		else if (waitRes == 0x102)
+		{
+			speechRes.assign(L"Did not hear anything");
+		}
+		asrEngine.StopListenning();
+		//wcout << speechRes << endl;
+		//Sleep(100000);
+		//system("PAUSE");
+	}
+	else
+	{
+		//wcout << "ERROR!" << endl;
+		speechRes.assign(L"Error");
+	}
+	//pMemStream->Seek(ZERO, STREAM_SEEK_SET, NULL);
+
+	return speechRes;
+
+}
+
+//Speech Initialization is done here
+HRESULT CASRwrapper::InitSpeech(std::wstring sPathToFile, IStream * pMemStream)
 {
 	HRESULT hr = S_OK;
 
@@ -43,7 +99,7 @@ HRESULT CASRwrapper::InitSpeech(std::wstring sPathToFile)
 	if (SUCCEEDED(hr))
 	{
 		// This specifies which of the recognition events are going 
-		//to trigger notifications.Here, all we are interested in 
+		//to trigger notifications. Here, all we are interested in 
 		//is the beginning and ends of sounds, as well as
 		// when the engine has recognized something
 		//using ISpRecoContext
@@ -66,44 +122,72 @@ HRESULT CASRwrapper::InitSpeech(std::wstring sPathToFile)
 		hr = m_cpDictationGrammar->LoadDictation(NULL, SPLO_STATIC);
 	}
 
-	if (!sPathToFile.empty())
+	if (!sPathToFile.empty() || pMemStream != NULL)
 	{
 		CComPtr<ISpStream> cpInputStream;
-
-		// Create basic SAPI stream object
-		// NOTE: The helper SpBindToFile can be used to perform the following operations
-		hr = cpInputStream.CoCreateInstance(CLSID_SpStream);
-		// Check hr
+		if (SUCCEEDED(hr))
+		{
+			// Create basic SAPI stream object
+			// NOTE: The helper SpBindToFile can be used to perform the following operations
+			hr = cpInputStream.CoCreateInstance(CLSID_SpStream);
+		}
 
 		CSpStreamFormat sInputFormat;
-		// generate WaveFormatEx structure, assuming the wav format is 22kHz, 16-bit, Stereo
-		hr = sInputFormat.AssignFormat(SPSF_44kHz16BitMono);
-		// Check hr
+		// generate WaveFormatEx structure, assuming the wav format is 44kHz, 16-bit, Mono
+		if (SUCCEEDED(hr))
+		{
+			hr = sInputFormat.AssignFormat(SPSF_44kHz16BitMono);
+		}
 
-		//   for read-only access, since it will only be access by the SR engine
-		hr = cpInputStream->BindToFile(sPathToFile.c_str(),
-			SPFM_OPEN_READONLY,
-			&(sInputFormat.FormatId()),
-			sInputFormat.WaveFormatExPtr(),
-			SPFEI_ALL_EVENTS);
-		// Check hr
+		if (pMemStream != NULL)
+		{
+			if (SUCCEEDED(hr))
+			{
+				hr = cpInputStream->SetBaseStream(pMemStream, SPDFID_WaveFormatEx, sInputFormat.WaveFormatExPtr());
+			}
+		}
+		else
+		{
+			if (SUCCEEDED(hr))
+			{
+				//   for read-only access, since it will only be access by the SR engine
+				hr = cpInputStream->BindToFile(sPathToFile.c_str(),
+					SPFM_OPEN_READONLY,
+					&(sInputFormat.FormatId()),
+					sInputFormat.WaveFormatExPtr(),
+					SPFEI_ALL_EVENTS);
+			}
+		}
 
-		// connect wav input to recognizer
-		// SAPI will negotiate mismatched engine/input audio formats using system audio codecs, so second parameter is not important - use default of TRUE
-		hr = cpRecoEngine->SetInput(cpInputStream, TRUE);
-		// Check hr
+		if (SUCCEEDED(hr))
+		{
+			// connect wav input to recognizer
+			// SAPI will negotiate mismatched engine/input audio formats using system audio codecs, so second parameter is not important - use default of TRUE
+			hr = cpRecoEngine->SetInput(cpInputStream, TRUE);
+		}
 
 	}
-	else
+	else //connect to mic
 	{
 		// create default audio object
 		CComPtr<ISpAudio> cpAudio;
-		hr = SpCreateDefaultObjectFromCategoryId(SPCAT_AUDIOIN, &cpAudio);
+		if (SUCCEEDED(hr))
+		{
+			hr = SpCreateDefaultObjectFromCategoryId(SPCAT_AUDIOIN, &cpAudio);
+		}
 
 		// set the input for the engine
-		hr = cpRecoEngine->SetInput(cpAudio, TRUE);
-		hr = cpRecoEngine->SetRecoState(SPRST_ACTIVE);
+		if (SUCCEEDED(hr))
+		{
+			hr = cpRecoEngine->SetInput(cpAudio, TRUE);
+		}
+
+		if (SUCCEEDED(hr))
+		{
+			hr = cpRecoEngine->SetRecoState(SPRST_ACTIVE);
+		}
 	}
+
 
 	if (FAILED(hr))
 	{
@@ -114,7 +198,7 @@ HRESULT CASRwrapper::InitSpeech(std::wstring sPathToFile)
 	return hr;
 }
 
-//Speech Initialization is done here
+//Start listening to mic, file or mem
 HRESULT CASRwrapper::Listen()
 {
 
@@ -180,7 +264,7 @@ void CASRwrapper::GetText(std::wstring& speechRes, float* pconfidence, int reque
 	hr = recoResult->GetText(SP_GETWHOLEPHRASE, SP_GETWHOLEPHRASE, FALSE, &text, NULL);
 	speechRes.assign(text);
 	//if (confidence != NULL)
-		//*confidence = recoResult->->pElements->SREngineConfidence;;
+	//*confidence = recoResult->->pElements->SREngineConfidence;;
 	CoTaskMemFree(text);
 
 	if (requestedAlternates == 0 && pconfidence == NULL)

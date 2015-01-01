@@ -30,10 +30,12 @@ public class MainActivity extends ActionBarActivity {
 	private ImageButton startButton;
 	private Button stopButton;
 
-	private Handler toasterHandler, talkHandler, launchHandler; // TODO: should
+	private Handler toasterHandler, talkHandler, launchHandler, ttsCompleteHandler; // TODO: should
 																// these all be
 																// combined to
 																// one handler?
+	
+	boolean needToReconnect = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +63,16 @@ public class MainActivity extends ActionBarActivity {
 
 		});
 
+		ttsCompleteHandler = new Handler(new Handler.Callback() {
+
+			@Override
+			public boolean handleMessage(Message msg) {
+				
+				logicController.reconnectIfNeeded();
+				return false;
+			}
+		});
+		
 		talkHandler = new Handler(new Handler.Callback() {
 
 			@Override
@@ -99,7 +111,7 @@ public class MainActivity extends ActionBarActivity {
 			}
 		});
 
-		ttsCont = new TTScontroller(getApplicationContext());
+		ttsCont = new TTScontroller(getApplicationContext(),ttsCompleteHandler);
 		logicController = new LogicController(toasterHandler, talkHandler,
 				launchHandler);
 

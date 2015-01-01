@@ -1,7 +1,8 @@
 pattern,classAndFileBaseName
 .*(?: |^)bus(?: |$).*,myBus
 .*(?: |^)weather(?: |$).*,myWeather
-Marry me,marryMe
+(?:Will | would )?(you )?(please )?Marry me,marryMe
 .* play .*(with you|guess).*,guessNum
 knock knock,knockKnock
 Hello,firstHello
+.*,socialTalk

@@ -1,5 +1,7 @@
 package InMind.DialogFunctions;
 
+import InMind.Consts;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -11,7 +13,7 @@ import java.util.Map;
 public class FunctionInvoker
 {
 
-    static final String sayStr = "Say^"; //TODO: should be only once
+    static final String sayStr = Consts.sayCommand + Consts.commandChar;
 
     //returns a list of commands to the client. May return null.
     static public List<String> toInvoke(String dialogFileBase, String funName, Map<String, Object> fullInfo, String userId)
