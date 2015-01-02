@@ -20,7 +20,7 @@ public class Main {
 
     public static void main(String[] args) throws ScriptException
     {
-        System.out.println(MicrosoftASR.callFromFile(Paths.get("C:\\InMind\\git\\UserData\\InputAt301214-102518.986.raw")));
+        System.out.println(MicrosoftASR.callFromFile(Paths.get("C:\\InMind\\git\\UserData\\InputAt311214-124907.050.raw")));
 
 //        String valStr="as+fjk- 5";
 //        String tmpValStr = valStr.replaceAll("[!?,\\+\\-\\*/]", " ");
@@ -151,6 +151,9 @@ public class Main {
         String line = "";
         String cvsSplitBy = ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
         BufferedReader bufferedReader = null;
+
+
+
         String alreadyReplaced = "~";
 
         try {
@@ -175,3 +178,8 @@ public class Main {
 
     }
 }
+
+
+
+
+

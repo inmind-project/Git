@@ -26,7 +26,8 @@ class StreamAudioServer
     //static int sampleRate = 44100;
     static final Path folderPath = Paths.get("..\\UserData");//c:\\Server\\Git\\UserData");//TODO: fix to relative Paths.get("..\\..\\..\\..\\..\\..\\UserData");
     static final String fileStart = "InputAt";
-    static final int timeout = 1000;
+    static final int timeout = 1000; //in milliseconds
+    static final long maxRecordingTimeLength = 60*1000; //in milliseconds
 
     //static DataLine.Info dataLineInfo;
     static SourceDataLine sourceDataLine;
@@ -78,7 +79,8 @@ class StreamAudioServer
 
             System.out.println("receiving information");
 
-            while (true)
+            long expiringTime = System.currentTimeMillis() + maxRecordingTimeLength;
+            while (System.currentTimeMillis() < expiringTime)
             {
                 //System.out.println("Waiting!");
                 try

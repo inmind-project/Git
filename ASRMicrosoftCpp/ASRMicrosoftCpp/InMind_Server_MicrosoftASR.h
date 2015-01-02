@@ -13,7 +13,7 @@ extern "C" {
  * Signature: ([B)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_InMind_Server_MicrosoftASR_fromByteArr
-  (JNIEnv *, jclass, jbyteArray);
+  (JNIEnv *, jclass, jbyteArray, jdouble);
 
 #ifdef __cplusplus
 }

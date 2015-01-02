@@ -1,8 +1,11 @@
 package com.inMind.inMindAgent;
 
-import java.util.Calendar;
 import java.util.Date;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -10,7 +13,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,8 +21,8 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
-import java.text.SimpleDateFormat;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -30,7 +32,7 @@ public class MainActivity extends ActionBarActivity {
 	private ImageButton startButton;
 	private Button stopButton;
 
-	private Handler toasterHandler, talkHandler, launchHandler, ttsCompleteHandler; // TODO: should
+	private Handler userNotifierHandler, talkHandler, launchHandler, ttsCompleteHandler; // TODO: should
 																// these all be
 																// combined to
 																// one handler?
@@ -42,7 +44,7 @@ public class MainActivity extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		toasterHandler = new Handler(new Handler.Callback() {
+		userNotifierHandler = new Handler(new Handler.Callback() {
 
 			@Override
 			public boolean handleMessage(Message msg) {
@@ -50,6 +52,12 @@ public class MainActivity extends ActionBarActivity {
 					boolean important = msg.arg2 == 1;
 					String toToast = msg.obj.toString();
 					toastWithTimer(toToast, important);
+					if (toToast.equals("Talk!")) //if needs to talk, set recording image. //TODO: should be done nicer (all strings should be refactorred).
+					{
+						((ImageView)findViewById(R.id.image_recording)).setImageResource(R.drawable.rec_recording);
+					}
+					else
+						((ImageView)findViewById(R.id.image_recording)).setImageResource(R.drawable.not_recording);
 				} else if (msg.arg1 == 2) {
 					Log.d("Main", "Playing notification");
 					Uri notification = RingtoneManager
@@ -58,6 +66,8 @@ public class MainActivity extends ActionBarActivity {
 							getApplicationContext(), notification);
 					r.play();
 				}
+				else if (msg.arg1 == 0)
+					((ImageView)findViewById(R.id.image_recording)).setImageResource(R.drawable.not_recording); //just turn off recording image.
 				return false;
 			}
 
@@ -110,9 +120,21 @@ public class MainActivity extends ActionBarActivity {
 				return false;
 			}
 		});
+		
+		IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+		//intentFilter.addAction(Intent.ACTION_SCREEN_ON);
+		registerReceiver(new BroadcastReceiver() {
+		    @Override
+		    public void onReceive(Context context, Intent intent) {
+		        if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+		            Log.d("Main Activity", Intent.ACTION_SCREEN_OFF);
+		            logicController.closeConnection();
+		        }
+		    }
+		}, intentFilter);
 
 		ttsCont = new TTScontroller(getApplicationContext(),ttsCompleteHandler);
-		logicController = new LogicController(toasterHandler, talkHandler,
+		logicController = new LogicController(userNotifierHandler, talkHandler,
 				launchHandler);
 
 		startButton = (ImageButton) findViewById(R.id.button_rec);

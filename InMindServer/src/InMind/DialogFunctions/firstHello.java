@@ -25,9 +25,9 @@ public class firstHello
 
         fullInfo.put(agentNameKey, agentName);
         toSayList.add(FunctionInvoker.sayStr + "Hello, my name is " + agentName + ".");
+        toSayList.add(FunctionInvoker.sayStr + "This is my unique name.");
         toSayList.add(FunctionInvoker.sayStr + "I am your personal agent.");
-        toSayList.add(FunctionInvoker.sayStr + "Other agents are different and have different names.");
-        toSayList.add(FunctionInvoker.sayStr + "What is your name?");
+        toSayList.add(FunctionInvoker.sayStr + "Do you like my name?");
         return toSayList;
     }
 

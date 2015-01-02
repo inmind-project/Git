@@ -28,14 +28,14 @@ public class LogicController {
 
 	private enum StateSM {Initialized, ConnectedToTCP, StreamingAudio, Stopped };
 
-	private Handler toasterHandler; 
+	private Handler userNotifierHandler; 
 	private Handler talkHandler;
 	private Handler launchHandler;
 	private boolean needToReconnect;
 
-	public LogicController(Handler toasterHandler, Handler talkHandler, Handler launchHandler)
+	public LogicController(Handler userNotifierHandler, Handler talkHandler, Handler launchHandler)
 	{
-		this.toasterHandler = toasterHandler;	
+		this.userNotifierHandler = userNotifierHandler;	
 		this.talkHandler = talkHandler;
 		this.launchHandler = launchHandler;
 	}
@@ -80,7 +80,7 @@ public class LogicController {
 
 	private void openAudioStream()
 	{
-		audioStreamer = new AudioStreamer(udpIpAddr,udpIpPort,toasterHandler);
+		audioStreamer = new AudioStreamer(udpIpAddr,udpIpPort,userNotifierHandler);
 		audioStreamer.startStreaming(); //TODO: must be async!!!
 	}
 
@@ -109,7 +109,7 @@ public class LogicController {
 				msgToast.arg1 = 1;
 				msgToast.arg2 = 0; //not important
 				msgToast.obj = "Wait...";
-				toasterHandler.sendMessage(msgToast);
+				userNotifierHandler.sendMessage(msgToast);
 			}				
 			else if (m.group(1).equalsIgnoreCase(Consts.connectUdp))
 			{
@@ -172,7 +172,7 @@ public class LogicController {
 				msgNotConnect.arg1 = 1;
 				msgNotConnect.arg2 = 1; //important message.
 				msgNotConnect.obj = "Could not connect!";
-				toasterHandler.sendMessage(msgNotConnect);
+				userNotifierHandler.sendMessage(msgNotConnect);
 				
 				Log.e("LogicControl", "C: Could not Connect!");
 			}

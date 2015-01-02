@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "ASRwrapper.h"
 #include "InMind_Server_MicrosoftASR.h"
+#include "Utils.h"
 
 using namespace std;
 
@@ -26,18 +27,21 @@ using namespace std;
 //}
 
 //JNIEXPORT jstring JNICALL Java_com_company_MicrosoftASR_fromFile(JNIEnv *env, jobject obj, jstring sPathToFile)
-JNIEXPORT jstring JNICALL Java_InMind_Server_MicrosoftASR_fromByteArr(JNIEnv *env, jclass, jbyteArray jbyteJArr)
+JNIEXPORT jstring JNICALL Java_InMind_Server_MicrosoftASR_fromByteArr(JNIEnv *env, jclass, jbyteArray jbyteJArr, jdouble jreduceFactor)
 //int main()
 {
 	jboolean isCopy;
 	jbyte* jbytePtr = env->GetByteArrayElements(jbyteJArr, &isCopy);
 	jsize jarrSize = env->GetArrayLength(jbyteJArr);
 
+
 	char* arrRec = (char*)jbytePtr;
 	long arrSize = (long)jarrSize;
+	double reduceFactor = (double)jreduceFactor;
 	std::string sretRes = "";
 	if (arrRec != NULL && arrSize > 0)
 	{
+		ReduceAmplitude(arrRec, arrSize, jreduceFactor);
 		std::wstring speechRes = CASRwrapper::DecodeFromCharArr(arrRec, arrSize); // (*env)->GetStringUTFChars(env, string, 0); ////Java_To_WStr(env, sPathToFile);
 
 		std::string sspeachRes(speechRes.begin(), speechRes.end()); //converting from wstring to string

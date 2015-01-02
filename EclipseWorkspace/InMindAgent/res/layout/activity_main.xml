@@ -42,6 +42,15 @@
         android:layout_margin="10dp"
         android:layout_marginTop="37dp"
         android:src="@android:drawable/ic_btn_speak_now" ></ImageButton>
+       
+       <ImageView
+        android:id="@+id/image_recording"
+        android:layout_below="@+id/button_rec"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/not_recording">
+       </ImageView>
 
 <!--         <Button -->
 <!--             android:id="@+id/button_rec" -->

@@ -27,24 +27,20 @@ public class AudioStreamer {
 
 	String ipAddr; 
 	int portNum;
-	private Handler toasterHandler;
+	private Handler userNotifierHandler;
 
-	public AudioStreamer(String ipAddr, int portNum, Handler toasterHandler)
+	public AudioStreamer(String ipAddr, int portNum, Handler userNotifierHandler)
 	{
 		this.ipAddr = ipAddr;
 		this.portNum = portNum;		
-		this.toasterHandler = toasterHandler;
+		this.userNotifierHandler = userNotifierHandler;
 	}
 	
 	@Override
 	protected
 	void finalize()
 	{
-		if (recorder != null)
-		{
-			recorder.release();
-			recorder = null;
-		}
+		stopStreaming();
 	}
 
 	public void stopStreaming()
@@ -56,6 +52,9 @@ public class AudioStreamer {
 			recorder = null;
 		}
 		Log.d("VS","Recorder released");
+		Message msgNotRecording = new Message();
+		msgNotRecording.arg1 = 0;
+		userNotifierHandler.sendMessage(msgNotRecording); //set not recording image.
 	}
 
 	public void startStreaming() {
@@ -99,7 +98,7 @@ public class AudioStreamer {
 					msgTalk.arg1 = 1;
 					msgTalk.arg2 = 1; //important toast
 					msgTalk.obj = "Talk!";
-					toasterHandler.sendMessage(msgTalk);
+					userNotifierHandler.sendMessage(msgTalk);
 					//Message msgPlayTone = new Message();
 					//msgPlayTone.arg1 = 2;					
 					//toasterHandler.sendMessage(msgPlayTone);

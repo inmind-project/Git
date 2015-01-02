@@ -9,15 +9,17 @@ import java.nio.file.Path;
  */
 public class MicrosoftASR
 {
-    public static native String fromByteArr(byte[] rawData);
+    //Microsoft ASR works better when the amplitude is tuned.
+    public static native String fromByteArr(byte[] rawData, double reduceFactor);
 
     public static String callFromFile(Path sPath)
     {
+        final double defaultReduce = 0.1;
         System.loadLibrary("ASRMicrosoftCpp");
         String decodedText = "";
         try
         {
-            decodedText = MicrosoftASR.fromByteArr(Files.readAllBytes(sPath));
+            decodedText = MicrosoftASR.fromByteArr(Files.readAllBytes(sPath),defaultReduce);
         } catch (IOException e)
         {
             e.printStackTrace();

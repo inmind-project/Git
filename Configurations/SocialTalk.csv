@@ -19,6 +19,7 @@ condition,pattern,Say,Set,Additional Command
 ,really,You sound surprised!,"state=""finish""",
 ,(?:Have a )?good (.*),Thanks. Good %r1 to you too!,"state=""finish""",
 ,Goodbye,Goodbye!,"state=""finish""",
-,(?:Tell me |Say )(?:that ) (.*),%r1,"state=""finish""",
+,(?:Tell me |Say )(?:that )?(.*),%r1,"state=""finish""",
 ,(?:.*)how(?:.*) you,I'm good. Thanks for asking.,"state=""finish""",
+,(I )?(don't know|do not know|can't think|cannot think).*,That's ok with me.,"state=""finish""",
 ,(.*),Why did you say: %1?,"state=""finish""",

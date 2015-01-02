@@ -91,6 +91,7 @@ public class UserConversation
             {
                 List<String> toSend = FunctionInvoker.toInvoke(dialogFileBase, fullInfo.get(callFunName).toString(), fullInfo, "n/a"); //TODO: add userId
                 sendToUser(messageSender, toSend);
+                fullInfo.remove(callFunName); //remove it so it won't be called again next time.
             }
 
             if (fullInfo.get(stateName).equals(dialogReturn))
