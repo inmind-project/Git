@@ -111,6 +111,7 @@ class StreamAudioServer
         {
             retFileWithRaw = null;
             System.out.println("StreamAudio: Error");
+            ex.printStackTrace();
         }
         return retFileWithRaw;
     }

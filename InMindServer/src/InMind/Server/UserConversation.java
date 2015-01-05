@@ -229,7 +229,8 @@ public class UserConversation
         {
 
             ex.printStackTrace();
-            System.out.println("UserConversation: error in dialog file: " + ex.getMessage());
+            System.out.println("UserConversation: error in dialog file: ");
+            ex.printStackTrace();
         }
 
         return commandsForUser;
@@ -291,9 +292,10 @@ public class UserConversation
 
             }
 
-        } catch (Exception ex)
+        } catch (Exception e)
         {
             System.out.println("UserConversation: error in finding file");
+            e.printStackTrace();
         }
         return retFile;
     }
@@ -410,9 +412,10 @@ public class UserConversation
 
                 text = text.replaceAll(excludeAlreadyReplaced, "~" + row[reflectee] + "~");
             }
-        } catch (Exception ex)
+        } catch (Exception e)
         {
             System.out.println("Logic: error in reflection");
+            e.printStackTrace();
             return text;
         }
 
@@ -452,9 +455,8 @@ public class UserConversation
         Object val = evaluateVal(varVal[1],fullInfo,m);
         Object storedVar = fullInfo.get(varVal[0].trim());
 
-        if (storedVar instanceof String)
+        if (storedVar==null || storedVar instanceof String)
         {
-
             boolean matches = storedVar == val || (storedVar != null && storedVar.equals(val));
             if (relation.equals(condEquality) || relation.equals(condEquality2))
                 return matches;
@@ -465,8 +467,16 @@ public class UserConversation
         //must be a number.
         if (relation == condEquality)
             relation = condEquality2;
-        return  (Boolean)engine.eval(storedVar.toString() + relation + val.toString());//can throw exception, it's ok
-
+        Boolean isConditionTrue = false;
+        try
+        {
+            isConditionTrue = (Boolean) engine.eval(storedVar.toString() + relation + val.toString());//can throw exception, it's ok
+        } catch (Exception ex)
+        {
+            System.out.println("Error in evaluating expression");
+            ex.printStackTrace();
+        }
+        return isConditionTrue;
     }
 
     private Object evaluateVal(String valStr, Map<String, Object> fullInfo,Matcher m) throws Exception

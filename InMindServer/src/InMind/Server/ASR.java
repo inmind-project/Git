@@ -84,8 +84,9 @@ public class ASR
 
             // print result
             System.out.println(response.toString());
-        } catch (Exception Ex)
+        } catch (Exception e)
         {
+            e.printStackTrace();
         }
 
         return res;
