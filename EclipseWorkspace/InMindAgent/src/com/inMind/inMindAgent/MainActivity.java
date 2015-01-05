@@ -24,6 +24,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+/**
+ * Created by Amos Azaria on 31-Dec-14.
+ */
 public class MainActivity extends ActionBarActivity {
 
 	TTScontroller ttsCont;
@@ -244,13 +247,14 @@ public class MainActivity extends ActionBarActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	/** Called when the user clicks the talk button */
+	/** Called when the user clicks the send button */
 	public void talkText(View view) {
-		// Do something in response to button
+
 		EditText editText = (EditText) findViewById(R.id.text_to_talk);
 		String toSay = editText.getText().toString();
-		ttsCont.speakThis(toSay);
-		toastWithTimer(toSay, true);
+		logicController.ConnectToServer(toSay);
+		//ttsCont.speakThis(toSay);
+		//toastWithTimer(toSay, true);
 	}
 
 	private final OnClickListener stopListener = new OnClickListener() {

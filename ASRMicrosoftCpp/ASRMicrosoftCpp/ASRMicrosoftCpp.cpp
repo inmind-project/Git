@@ -26,9 +26,10 @@ using namespace std;
 //	return value;
 //}
 
-//JNIEXPORT jstring JNICALL Java_com_company_MicrosoftASR_fromFile(JNIEnv *env, jobject obj, jstring sPathToFile)
+/**
+* Created by Amos Azaria on 31-Dec-14.
+*/
 JNIEXPORT jstring JNICALL Java_InMind_Server_MicrosoftASR_fromByteArr(JNIEnv *env, jclass, jbyteArray jbyteJArr, jdouble jreduceFactor)
-//int main()
 {
 	jboolean isCopy;
 	jbyte* jbytePtr = env->GetByteArrayElements(jbyteJArr, &isCopy);

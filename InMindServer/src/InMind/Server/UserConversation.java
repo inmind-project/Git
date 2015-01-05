@@ -18,7 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by User on 23-Dec-14.
+ * Created by Amos Azaria on 23-Dec-14.
  */
 public class UserConversation
 {

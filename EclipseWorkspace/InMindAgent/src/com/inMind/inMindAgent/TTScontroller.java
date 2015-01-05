@@ -10,6 +10,9 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
 
+/**
+ * Created by Amos Azaria on 01-Nov-14.
+ */
 public class TTScontroller {
 
 	final boolean alwaysUseFlite = false;

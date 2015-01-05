@@ -13,6 +13,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+/**
+ * Created by Amos Azaria on 31-Dec-14.
+ */
 public class AudioStreamer {
 
 	AudioRecord recorder;

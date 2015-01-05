@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by User on 29-Dec-14.
+ * Created by Amos Azaria on 29-Dec-14.
  */
 public class myWeather
 {

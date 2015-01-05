@@ -19,6 +19,10 @@ extern CComModule _Module;
 
 #pragma once
 #define GID_DICTATION   0           // Dictation grammar has grammar ID 0
+
+/**
+* Created by Amos Azaria on 31-Dec-14.
+*/
 class CASRwrapper
 {
 

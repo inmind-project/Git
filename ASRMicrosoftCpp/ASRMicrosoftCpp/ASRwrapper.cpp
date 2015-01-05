@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "ASRwrapper.h"
 
-
+/**
+* Created by Amos Azaria on 31-Dec-14.
+*/
 CASRwrapper::CASRwrapper()
 {
 	::CoInitialize(NULL);

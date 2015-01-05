@@ -3,9 +3,11 @@ package InMind.Server;
 import InMind.Consts;
 
 import java.nio.file.Path;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * Created by User on 16-Dec-14.
+ * Created by Amos Azaria on 16-Dec-14.
  */
 public class InMindLogic
 {
@@ -41,26 +43,44 @@ public class InMindLogic
         //TCPServer class (at while)
         public void messageReceived(String message)
         {
-
-            if (message.equals("Client Connected"))
+            System.out.println("InMindLogic" + "Dealing with message:" + message);
+            Pattern p = Pattern.compile(Consts.messagePattern);
+            Matcher m = p.matcher(message);
+            boolean found = m.find();
+            if (found)
             {
-                tcpServer.sendMessage(Consts.connectUdp+Consts.commandChar + udpDefaultPort);
+                ASR.AsrRes asrRes = null;
 
-                StreamAudioServer streamAudioServer = new StreamAudioServer();
+                if (m.group(1).equalsIgnoreCase(Consts.sendingText))
+                {
+                    asrRes = new ASR.AsrRes();
+                    asrRes.confidence = 1;
+                    asrRes.text = m.group(2).trim();//TODO: might want to remove punctuation.
+                }
 
-                Path obtainedFile = streamAudioServer.runServer(udpDefaultPort);
+                if (m.group(1).equalsIgnoreCase(Consts.requestSendAudio))
+                {
+                    tcpServer.sendMessage(Consts.connectUdp + Consts.commandChar + udpDefaultPort);
 
-                tcpServer.sendMessage(Consts.stopUdp+Consts.commandChar);
+                    StreamAudioServer streamAudioServer = new StreamAudioServer();
 
-                ASR.AsrRes asrRes = ASR.getGoogleASR(obtainedFile);
+                    Path obtainedFile = streamAudioServer.runServer(udpDefaultPort);
 
-                System.out.println(asrRes.text);
+                    tcpServer.sendMessage(Consts.stopUdp + Consts.commandChar);
 
-                userConversation.dealWithMessage(asrRes, new MessageSender());
+                    asrRes = ASR.getGoogleASR(obtainedFile);
 
-                tcpServer.abandonClient();
+                    System.out.println(asrRes.text);
+                }
 
-                runServer();
+                if (asrRes != null)
+                {
+                    userConversation.dealWithMessage(asrRes, new MessageSender());
+
+                    tcpServer.abandonClient();
+
+                    runServer();
+                }
             }
         }
 

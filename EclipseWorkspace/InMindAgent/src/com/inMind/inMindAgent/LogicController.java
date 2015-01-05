@@ -14,6 +14,9 @@ import android.util.Log;
  * This class is in-charge of all connections to the server. 
  * It first connects to the server (via TCP), authentication etc.
  * Then receives a port number and connects to it via UDP to stream the audio.
+ * 
+ * 
+ * Created by Amos Azaria on 31-Dec-14.
  */
 public class LogicController {
 
@@ -22,7 +25,7 @@ public class LogicController {
 	AudioStreamer audioStreamer;
 
 	String tcpIpAddr  = "128.2.209.220";
-	int tcpIpPort = 4444;
+	int tcpIpPort = Consts.serverPort;
 	String udpIpAddr;
 	int udpIpPort;
 
@@ -39,16 +42,17 @@ public class LogicController {
 		this.talkHandler = talkHandler;
 		this.launchHandler = launchHandler;
 	}
+	
+	public void ConnectToServer(String sendThisText)
+	{
+		closeConnection();
+		new connectTask().execute(Consts.sendingText + Consts.commandChar + sendThisText);				
+	}
 
 	public void ConnectToServer()
 	{
-		if (tcpClient != null)
-		{
-			tcpClient.closeConnection();
-			tcpClient = null;
-		}
-		// connect to the server
-		new connectTask().execute("");
+		closeConnection();
+		new connectTask().execute(Consts.requestSendAudio+Consts.commandChar);
 	}
 
 	public void closeConnection() 
@@ -87,7 +91,7 @@ public class LogicController {
 	private void dealWithMessage(String message)
 	{
 		Log.d("ServerConnector", "Dealing with message:" + message);
-		Pattern p = Pattern.compile("(\\p{Alpha}*)"+Consts.messageSeperatorForPattern+"(.*)");
+		Pattern p = Pattern.compile(Consts.messagePattern);
 		Matcher m = p.matcher(message);
 		boolean found = m.find();
 		Log.d("ServerConnector", "found:" + found);
@@ -147,7 +151,7 @@ public class LogicController {
 	}
 
 
-
+/// connects to TCP server and sends the string as the first messages to send (use: obj.execute(message)).
 	public class connectTask extends AsyncTask<String,String,TCPClient> {
 
 		@Override
@@ -165,7 +169,7 @@ public class LogicController {
 			
 			
 			try {
-				tcpClient.run();
+				tcpClient.run(message);
 			} catch (IOException e) {
 				
 				Message msgNotConnect = new Message();

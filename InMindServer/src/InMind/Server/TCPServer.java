@@ -1,5 +1,7 @@
 package InMind.Server;
 
+import InMind.Consts;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -10,10 +12,11 @@ import java.net.Socket;
 public class TCPServer extends Thread
 {
 
-    public static final int SERVER_PORT = 4444;
     private boolean running = false;
     private PrintWriter mOut;
     private OnMessageReceived messageListener;
+
+    static final String clientConnected = "Client Connected";
 
     static ServerSocket serverSocket = null; //TODO: protect from multithread access
 
@@ -56,7 +59,7 @@ public class TCPServer extends Thread
 
             //create a server socket. A server socket waits for requests to come in over the network.
             if (serverSocket == null)
-                serverSocket = new ServerSocket(SERVER_PORT);
+                serverSocket = new ServerSocket(Consts.serverPort);
 
             //create client socket... the method accept() listens for a connection to be made to this socket and accepts it.
             Socket client = serverSocket.accept();
@@ -71,7 +74,7 @@ public class TCPServer extends Thread
                 //read the message received from client
                 BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
-                messageListener.messageReceived("Client Connected");
+                messageListener.messageReceived(clientConnected);
                 //in this while we wait to receive messages from client (it's an infinite loop)
                 //this while it's like a listener for messages
                 while (running)
