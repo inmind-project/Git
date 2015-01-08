@@ -53,7 +53,7 @@ public class firstHello
 
 
 
-        static int minLen = 6;
+        static int minLen = 5;
         static int maxLen = 9;
         static String year = "1980";
         static Boolean CreateMale = false;
