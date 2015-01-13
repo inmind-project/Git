@@ -248,9 +248,9 @@ public class MainActivity extends ActionBarActivity {
 	}
 
 	/** Called when the user clicks the send button */
-	public void talkText(View view) {
+	public void sendText(View view) {
 
-		EditText editText = (EditText) findViewById(R.id.text_to_talk);
+		EditText editText = (EditText) findViewById(R.id.text_to_send);
 		String toSay = editText.getText().toString();
 		logicController.ConnectToServer(toSay);
 		//ttsCont.speakThis(toSay);

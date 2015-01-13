@@ -9,20 +9,20 @@
     tools:context="com.inMind.inMindAgent.MainActivity" >
 
     <EditText
-        android:id="@+id/text_to_talk"
+        android:id="@+id/text_to_send"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="@string/edit_message" />
 
     <Button
-        android:id="@+id/button_talk"
+        android:id="@+id/button_send_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/text_to_talk"
-        android:layout_alignBottom="@+id/text_to_talk"
+        android:layout_alignBaseline="@+id/text_to_send"
+        android:layout_alignBottom="@+id/text_to_send"
         android:layout_alignParentRight="true"
         android:text="@string/button_send" 
-        android:onClick="talkText"/>
+        android:onClick="sendText"/>
 
         <Button
             android:id="@+id/button_stop"

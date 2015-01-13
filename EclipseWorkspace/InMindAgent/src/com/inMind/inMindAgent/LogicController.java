@@ -51,6 +51,9 @@ public class LogicController {
 
 	public void ConnectToServer()
 	{
+		//if is currently streaming, ignore request.
+		if (tcpClient != null && audioStreamer != null && audioStreamer.isStreaming())
+			return;
 		closeConnection();
 		new connectTask().execute(Consts.requestSendAudio+Consts.commandChar);
 	}

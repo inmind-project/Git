@@ -39,6 +39,11 @@ public class AudioStreamer {
 		this.userNotifierHandler = userNotifierHandler;
 	}
 	
+	public boolean isStreaming()
+	{
+		return status;
+	}
+	
 	@Override
 	protected
 	void finalize()

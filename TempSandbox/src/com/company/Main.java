@@ -1,8 +1,5 @@
 package com.company;
 
-import InMind.Server.MicrosoftASR;
-
-import javax.script.ScriptException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -18,9 +15,28 @@ import java.util.regex.Pattern;
 
 public class Main {
 
-    public static void main(String[] args) throws ScriptException
+    public static void main(String[] args) throws Exception
     {
-        System.out.println(MicrosoftASR.callFromFile(Paths.get("C:\\InMind\\git\\UserData\\InputAt311214-124907.050.raw")));
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(new File("c:\\InMind\\Git\\TempSandbox\\words.txt")));
+        String line;
+        StringBuilder allWords = new StringBuilder();
+        while ((line = bufferedReader.readLine()) != null)
+        {
+            allWords.append(line+"|");
+        }
+
+
+        String sAllwords = allWords.toString();
+        String pat = ".{0,5}" + "("+sAllwords+")";
+        long start = System.currentTimeMillis();
+        Pattern p = Pattern.compile(pat);
+        Matcher m = p.matcher("afdssazebra");
+        boolean match = m.matches();
+        long took = System.currentTimeMillis() - start;
+        System.out.println("match: " + match + ", time: " + took + " millisec");
+
+
+        //System.out.println(MicrosoftASR.callFromFile(Paths.get("C:\\InMind\\git\\UserData\\InputAt311214-124907.050.raw")));
 
 //        String valStr="as+fjk- 5";
 //        String tmpValStr = valStr.replaceAll("[!?,\\+\\-\\*/]", " ");
