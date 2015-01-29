@@ -2,6 +2,7 @@ package com.inMind.inMindAgent;
 
 import java.util.Date;
 
+import InMind.simpleUtils;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -184,10 +185,10 @@ public class MainActivity extends ActionBarActivity {
 				}, toastTimeFinal);
 			}
 			// set for when this toast will finish
-			lastToastFinishes = addMillisec(timeNow, toastTime);
+			lastToastFinishes = simpleUtils.addMillisec(timeNow, toastTime);
 		} else // if not, need to take care of delay for start as well
 		{
-			int startIn = subtractDatesInMillisec(lastToastFinishes, timeNow);//lastToastFinishes - timeNow;
+			int startIn = simpleUtils.subtractDatesInMillisec(lastToastFinishes, timeNow);//lastToastFinishes - timeNow;
 			Handler toastStarter = new Handler();
 			toastStarter.postDelayed(new Runnable() {
 				@Override
@@ -204,18 +205,9 @@ public class MainActivity extends ActionBarActivity {
 				}
 			}, startIn);
 			// set for when this toast will finish
-			lastToastFinishes = addMillisec(lastToastFinishes, toastTime);
+			lastToastFinishes = simpleUtils.addMillisec(lastToastFinishes, toastTime);
 		}
 
-	}
-
-	static Date addMillisec(Date base, int millisec) {
-		return new Date(base.getTime()+millisec);
-	}
-	
-	//returns date1 - date2 in milliseconds
-	static int subtractDatesInMillisec(Date date1, Date date2) {
-		return (int)(date1.getTime() - date2.getTime());
 	}
 
 	@Override
