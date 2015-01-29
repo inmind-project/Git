@@ -67,6 +67,7 @@ Sandbox/WindowsSTT/WindowsSTT/obj/
 EclipseWorkspace/.metadata/
 EclipseWorkspace/InMindAgent/bin/
 EclipseWorkspace/InMindAgent/gen/
+EclipseWorkspace/InMindAgentLib/bin/
 EclipseWorkspace/StreamAudioClient/bin/
 EclipseWorkspace/StreamAudioServer/bin/
 EclipseWorkspace/VoiceRec/bin
@@ -82,7 +83,6 @@ InMindServer/out
 
 *.opensdf
 *.prefs
-*.jar
 googleASR.txt
 *.suo
 *.class
