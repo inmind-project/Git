@@ -68,6 +68,7 @@ EclipseWorkspace/.metadata/
 EclipseWorkspace/InMindAgent/bin/
 EclipseWorkspace/InMindAgent/gen/
 EclipseWorkspace/InMindAgentLib/bin/
+EclipseWorkspace/InMindAgentLib/gen/
 EclipseWorkspace/StreamAudioClient/bin/
 EclipseWorkspace/StreamAudioServer/bin/
 EclipseWorkspace/VoiceRec/bin
