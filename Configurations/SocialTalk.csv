@@ -1,6 +1,7 @@
 condition,pattern,Say,Set,Additional Command
 ,.*calculator,Enjoy the Calculator!,"state=""finish""",Launch^com.android.calculator2
 ,.*news,Here is your news!,"state=""finish""",Launch^com.yahoo.inmind.reader
+,(?:could you )?(?:please )?(?:repeat|say that again|what)(?: did you say)?,,"callfun=""repeat"";state=""finish""",
 ,(?:Hi|Hello),"Hello, how are you today?","state=""finish""",
 ,(?:I am |I'm )?(good|ok|o.k.|okay|not bad|fine)(?: thank you| thanks)?,Good! I'm glad to hear that!,"state=""finish""",
 ,I want (.*),What would it mean to you if you got %r1?,"state=""finish""",

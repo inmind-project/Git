@@ -19,6 +19,8 @@ import java.util.regex.Pattern;
 
 /**
  * Created by Amos Azaria on 23-Dec-14.
+ *
+ * Important: Should be unique per user.
  */
 public class UserConversation
 {
@@ -36,12 +38,14 @@ public class UserConversation
 
     static final String stateName = "state";
     static final String callFunName = "callfun";
+    static final String callFunRepeat = "repeat";
 
 
     String dialogFileBase = "";
     String tmpDialogFileBaseJustExited = ""; //used when returning from file use on the first time, not to enter same file again
     Map<String, Object> fullInfo;
 
+    List<String> previousMessages = new LinkedList<String>();;
 
 
     ScriptEngineManager mgr;
@@ -58,6 +62,8 @@ public class UserConversation
     public void dealWithMessage(ASR.AsrRes asrRes, InMindLogic.MessageReceiver.MessageSender messageSender)
     {
         boolean firstEnter = false;
+        List<String> tmpPrevMessages = new LinkedList<String>(previousMessages);
+        previousMessages = new LinkedList<String>();
 
         if (dialogFileBase.isEmpty())
         {
@@ -78,20 +84,29 @@ public class UserConversation
             List<String> forUser = new LinkedList<String>();
             forUser.add(Consts.closeConnection + Consts.commandChar);
             //forUser = getSocialTalkResponse(asrRes.text);
-            sendToUser(messageSender, forUser);
+            sendToUser(messageSender, forUser, false);
         }
         else
         {
             List<String> forUser = executeDialogFile(asrRes.text);
             if (forUser!= null && forUser.size() > 0)
-                sendToUser(messageSender, forUser);
+                sendToUser(messageSender, forUser, true);
 
             //check if need to call a function (callfun)
             if (fullInfo.containsKey(callFunName) && !fullInfo.get(callFunName).toString().isEmpty())
             {
-                List<String> toSend = FunctionInvoker.toInvoke(dialogFileBase, fullInfo.get(callFunName).toString(), fullInfo, "n/a"); //TODO: add userId
-                sendToUser(messageSender, toSend);
+                List<String> toSend;
+                if (fullInfo.get(callFunName).toString().equals(callFunRepeat))
+                {
+                    toSend = tmpPrevMessages;
+                }
+                else
+                {
+                    toSend = FunctionInvoker.toInvoke(dialogFileBase, fullInfo.get(callFunName).toString(), fullInfo, "n/a"); //TODO: add userId
+                }
+                sendToUser(messageSender, toSend, true);
                 fullInfo.remove(callFunName); //remove it so it won't be called again next time.
+
             }
 
             if (fullInfo.get(stateName).equals(dialogReturn))
@@ -118,13 +133,13 @@ public class UserConversation
             {
                 closeOrRenewConnection.add(Consts.startNewConnection+Consts.commandChar);
             }
-            sendToUser(messageSender, closeOrRenewConnection);
+            sendToUser(messageSender, closeOrRenewConnection, false);
 
         }
 
     }
 
-    private void sendToUser(InMindLogic.MessageReceiver.MessageSender messageSender, List<String> forUser)
+    private void sendToUser(InMindLogic.MessageReceiver.MessageSender messageSender, List<String> forUser, boolean saveMessage)
     {
         if (forUser != null)
         {
@@ -135,6 +150,8 @@ public class UserConversation
                 {
                     messageSender.sendMessage(command);//"Say^You Said:" + asrRes.text);
                     System.out.println("sent message to user:" + command);
+                    if (saveMessage)
+                        previousMessages.add(command);
                 }
             }
         }
