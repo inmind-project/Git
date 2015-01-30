@@ -37,6 +37,7 @@ class StreamAudioServer
 
     public interface StreamingAlerts
     {
+        void rawFilePath(Path filePathForSavingAudio);
         void audioArrived(byte[] audio);
         void audioEnded();
     }
@@ -46,7 +47,7 @@ class StreamAudioServer
         this.streamingAlerts = streamingAlerts;
     }
 
-    public Path runServer(int udpPort)
+    public void runServer(int udpPort)
     {
         Path retFileWithRaw = null;
 
@@ -58,6 +59,8 @@ class StreamAudioServer
         {
 
             filePath = Paths.get(folderPath.toString(), fileStart + (new SimpleDateFormat("ddMMyy-hhmmss.SSS").format(new Date())) + ".raw");
+
+            streamingAlerts.rawFilePath(filePath);
 
             delIfExists(filePath);
 
@@ -133,7 +136,7 @@ class StreamAudioServer
             System.out.println("StreamAudio: Error");
             ex.printStackTrace();
         }
-        return retFileWithRaw;
+        return;
     }
 
     int silentSampleLength = 0;

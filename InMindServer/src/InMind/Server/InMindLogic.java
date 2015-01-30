@@ -38,7 +38,6 @@ public class InMindLogic
     {
 
         TCPServer tcpServer = null;
-        Path obtainedFile = null;
 
         //this method declared in the interface from TCPServer class is implemented here
         //this method is actually a callback method, because it will run every time when it will be called from
@@ -70,6 +69,13 @@ public class InMindLogic
                     StreamAudioServer streamAudioServer = new StreamAudioServer(new StreamAudioServer.StreamingAlerts()
                     {
                         ASR asr = new ASR();
+                        Path obtainedFile = null;
+
+                        @Override
+                        public void rawFilePath(Path filePathForSavingAudio)
+                        {
+                            obtainedFile = filePathForSavingAudio;
+                        }
 
                         @Override
                         public void audioArrived(byte[] audio)
@@ -117,7 +123,7 @@ public class InMindLogic
 
 
 
-                    obtainedFile = streamAudioServer.runServer(udpDefaultPort);
+                    streamAudioServer.runServer(udpDefaultPort);
 
                     //asrRes = ASR.getGoogleASR(obtainedFile);
 
