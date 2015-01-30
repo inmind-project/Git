@@ -33,6 +33,18 @@ class StreamAudioServer
     static SourceDataLine sourceDataLine;
     Path filePath = null;
 
+    StreamingAlerts streamingAlerts = null;
+
+    public interface StreamingAlerts
+    {
+        void audioArrived(byte[] audio);
+        void audioEnded();
+    }
+
+    public StreamAudioServer(StreamingAlerts streamingAlerts )
+    {
+        this.streamingAlerts = streamingAlerts;
+    }
 
     public Path runServer(int udpPort)
     {
@@ -92,14 +104,22 @@ class StreamAudioServer
                     break;
                 }
 
+                if (streamingAlerts != null)
+                    streamingAlerts.audioArrived(receivePacket.getData());
+
                 //System.out.println("Received Packet!" + receivePacket.getLength());
                 appendToFile(receivePacket.getData(), receivePacket.getLength(), filePath);
+
                 if (isSilentButDidTalk(receivePacket.getData()))
+                {
                     break;
+                }
                 // ais = new AudioInputStream(baiss, format,
                 // receivePacket.getLength());
                 // toSpeaker(receivePacket.getData());
             }
+            if (streamingAlerts != null)
+                streamingAlerts.audioEnded();
             System.out.println("receive complete!");
             //sourceDataLine.drain();
             //sourceDataLine.close();

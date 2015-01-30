@@ -2,6 +2,7 @@ package InMind.Server;
 
 import InMind.Consts;
 
+import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,6 +38,7 @@ public class InMindLogic
     {
 
         TCPServer tcpServer = null;
+        Path obtainedFile = null;
 
         //this method declared in the interface from TCPServer class is implemented here
         //this method is actually a callback method, because it will run every time when it will be called from
@@ -56,32 +58,84 @@ public class InMindLogic
                     asrRes = new ASR.AsrRes();
                     asrRes.confidence = 1;
                     asrRes.text = m.group(2).trim();//TODO: might want to remove punctuation.
+                    dealWithText(asrRes);
                 }
 
                 if (m.group(1).equalsIgnoreCase(Consts.requestSendAudio))
                 {
                     tcpServer.sendMessage(Consts.connectUdp + Consts.commandChar + udpDefaultPort);
 
-                    StreamAudioServer streamAudioServer = new StreamAudioServer();
 
-                    Path obtainedFile = streamAudioServer.runServer(udpDefaultPort);
 
-                    tcpServer.sendMessage(Consts.stopUdp + Consts.commandChar);
+                    StreamAudioServer streamAudioServer = new StreamAudioServer(new StreamAudioServer.StreamingAlerts()
+                    {
+                        ASR asr = new ASR();
 
-                    asrRes = ASR.getGoogleASR(obtainedFile);
+                        @Override
+                        public void audioArrived(byte[] audio)
+                        {
+                            try
+                            {
+                                if (!asr.isConnectionOpen())
+                                    asr.beginTransmission();
+                                asr.sendDataAsync(audio);
 
-                    System.out.println(asrRes.text);
+                            } catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                        @Override
+                        public void audioEnded()
+                        {
+                            try
+                            {
+                                ASR.AsrRes asrRes = null;
+                                if (asr.isConnectionOpen())
+                                {
+                                    tcpServer.sendMessage(Consts.stopUdp + Consts.commandChar);
+                                    asrRes = asr.closeAndGetResponse();
+                                    if (obtainedFile != null) //write json response text file
+                                    {
+                                        PrintWriter pw = new PrintWriter(obtainedFile.toString() + ".txt");
+                                        pw.print(asrRes.fullJsonRes);
+                                        pw.flush();
+                                        pw.close();
+                                    }
+                                    System.out.println(asrRes.text);
+                                    dealWithText(asrRes);
+                                }
+                            } catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    });
+
+
+
+                    obtainedFile = streamAudioServer.runServer(udpDefaultPort);
+
+                    //asrRes = ASR.getGoogleASR(obtainedFile);
+
                 }
 
-                if (asrRes != null)
-                {
-                    userConversation.dealWithMessage(asrRes, new MessageSender());
-
-                    tcpServer.abandonClient();
-
-                    runServer();
-                }
             }
+        }
+
+        private void dealWithText(ASR.AsrRes asrRes)
+        {
+            if (asrRes != null && asrRes.text != null && !asrRes.text.isEmpty())
+            {
+                userConversation.dealWithMessage(asrRes, new MessageSender());
+            }
+
+            tcpServer.abandonClient();
+
+            runServer();
         }
 
         public class MessageSender implements SendMessageToUser
