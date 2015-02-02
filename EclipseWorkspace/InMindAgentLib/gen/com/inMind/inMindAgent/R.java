@@ -17,9 +17,6 @@ public final class R {
          would include 7" and 10" devices in landscape (~960dp and ~1280dp respectively).
     
          */
-        public static int activity_horizontal_margin=0x7f030000;
-    }
-    public static final class drawable {
-        public static int ic_launcher=0x7f020000;
+        public static int activity_horizontal_margin=0x7f020000;
     }
 }

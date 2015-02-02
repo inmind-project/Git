@@ -200,16 +200,19 @@ public class LogicController {
 	}
 
 
-
-	public void reconnectIfNeeded() {
+	/*
+	 * returns whether is reconnecting now.
+	 */
+	public boolean reconnectIfNeeded() {
 		Log.d("LogicControl", "Reconnecting if needed");
 
+		boolean isReconnecting = needToReconnect; 		
 		if (needToReconnect)
 		{
 			needToReconnect = false;
 			ConnectToServer();
 		}
-		
+		return isReconnecting;		
 	}
 
 

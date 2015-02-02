@@ -3,10 +3,12 @@ package com.example.voicerec;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
-import android.media.AudioFormat;
-import android.media.AudioRecord;
-import android.media.MediaRecorder;
+import android.media.AudioManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -28,21 +30,30 @@ public class VoiceRecognizer extends Activity implements OnClickListener {
 	private SpeechRecognizer sr;
 	//Android does not allow two intents to access the microphone :(
 	//AudioRecord recorder;
+	private AudioManager mAudioManager;
+	private int mStreamVolume = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_voice_recognizer);
         findViewById(R.id.button1).setOnClickListener(this);
+        
         sr = SpeechRecognizer.createSpeechRecognizer(this);       
         sr.setRecognitionListener(new listener());
         mText = ((TextView)findViewById(R.id.text1));
+        
+        getApplicationContext();
+		mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
     }
 
     class listener implements RecognitionListener          
     {
              public void onReadyForSpeech(Bundle params)
              {
+            	    // this methods called when Speech Recognition is ready
+            	    // also this is the right time to un-mute system volume because the annoying sound played already
+            	    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mStreamVolume, 0); // again setting the system volume back to the original, un-mutting
                       Log.d(TAG, "onReadyForSpeech");
              }
              public void onBeginningOfSpeech()
@@ -67,6 +78,8 @@ public class VoiceRecognizer extends Activity implements OnClickListener {
              {
                       Log.d(TAG,  "error: " +  error);
                       mText.setText("error: " + error);
+                      
+                      onClick(null);
              }
              public void onResults(Bundle results)                   
              {
@@ -79,7 +92,21 @@ public class VoiceRecognizer extends Activity implements OnClickListener {
                                 str += data.get(i);
                       }
                       //mText.setText("results: "+String.valueOf(data.size()));
-                      mText.setText(data.get(0).toString());
+                      String firstRes =data.get(0).toString(); 
+                      mText.setText(firstRes);
+                      
+                      if (firstRes.contains("mind agent"))
+                      {
+      					Log.d("Main", "Playing notification");
+    					Uri notification = RingtoneManager
+    							.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+    					Ringtone r = RingtoneManager.getRingtone(
+    							getApplicationContext(), notification);
+    					r.play();
+                      }
+                      
+                      
+                      onClick(null);
              }
              public void onPartialResults(Bundle partialResults)
              {
@@ -126,8 +153,12 @@ public class VoiceRecognizer extends Activity implements OnClickListener {
              intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
              intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,"voice.recognition.test");
 
-             intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS,5); 
-                  sr.startListening(intent);
+             intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS,5);
+             
+             sr.startListening(intent);
+             mStreamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC); // getting system volume into var for later un-muting 
+             mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0); // setting system volume to zero, muting
+             
 
 //            	 try {
 //                 startActivityForResult(i, REQUEST_OK);

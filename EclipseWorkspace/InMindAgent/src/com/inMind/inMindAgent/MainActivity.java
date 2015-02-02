@@ -1,18 +1,25 @@
 package com.inMind.inMindAgent;
 
+import java.util.ArrayList;
 import java.util.Date;
+
+import com.inMind.inMindAgent.InMindCommandListener.InmindCommandInterface;
 
 import InMind.simpleUtils;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -23,6 +30,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -32,6 +40,7 @@ public class MainActivity extends ActionBarActivity {
 
 	TTScontroller ttsCont;
 	LogicController logicController;
+	InMindCommandListener inmindCommandListener;
 
 	private ImageButton startButton;
 	private Button stopButton;
@@ -41,13 +50,20 @@ public class MainActivity extends ActionBarActivity {
 																// combined to
 																// one handler?
 	
-	boolean needToReconnect = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		inmindCommandListener = new InMindCommandListener(new InmindCommandInterface(){
+
+			@Override
+			public void commandDetected() {
+				// TODO Auto-generated method stub
+				connectAudioToServer();
+			}}, getApplicationContext());
+		
 		userNotifierHandler = new Handler(new Handler.Callback() {
 
 			@Override
@@ -82,7 +98,11 @@ public class MainActivity extends ActionBarActivity {
 			@Override
 			public boolean handleMessage(Message msg) {
 				
-				logicController.reconnectIfNeeded();
+				boolean isReconnecting = logicController.reconnectIfNeeded();
+				if (!isReconnecting)
+				{
+					inmindCommandListener.listenForInmindCommand();
+				}
 				return false;
 			}
 		});
@@ -152,7 +172,21 @@ public class MainActivity extends ActionBarActivity {
 
 		// attach a Message. set msg.arg to 1 and msg.obj to string for toast.
 
+		inmindCommandListener.listenForInmindCommand();
 	}
+
+	
+	
+
+	
+	void connectAudioToServer()
+	{
+		inmindCommandListener.stopListening();
+		logicController.ConnectToServer();
+	}
+	
+	
+	
 
 	Date lastToastFinishes = new Date();
 
@@ -256,6 +290,7 @@ public class MainActivity extends ActionBarActivity {
 			Log.d("Main", "Stop Clicked");
 			// audioStreamer.stopStreaming();
 			logicController.stopStreaming();
+			inmindCommandListener.stopListening();
 		}
 
 	};
@@ -266,7 +301,7 @@ public class MainActivity extends ActionBarActivity {
 		public void onClick(View arg0) {
 			Log.d("Main", "Start Clicked");
 			// audioStreamer.startStreaming();
-			logicController.ConnectToServer();
+			connectAudioToServer();
 		}
 
 	};
