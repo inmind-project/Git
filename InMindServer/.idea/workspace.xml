@@ -48,8 +48,8 @@
       <file leaf-file-name="UserConversation.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/InMind/Server/UserConversation.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.68139964" vertical-offset="2299" max-vertical-offset="9095">
-              <caret line="157" column="5" selection-start-line="157" selection-start-column="5" selection-end-line="157" selection-end-column="5" />
+            <state vertical-scroll-proportion="0.37384897" vertical-offset="3996" max-vertical-offset="9095">
+              <caret line="247" column="12" selection-start-line="247" selection-start-column="12" selection-end-line="247" selection-end-column="33" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1359#1367#0" expanded="true" />
@@ -1500,8 +1500,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/InMind/Server/UserConversation.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.68139964" vertical-offset="2299" max-vertical-offset="9095">
-          <caret line="157" column="5" selection-start-line="157" selection-start-column="5" selection-end-line="157" selection-end-column="5" />
+        <state vertical-scroll-proportion="0.37384897" vertical-offset="3996" max-vertical-offset="9095">
+          <caret line="247" column="12" selection-start-line="247" selection-start-column="12" selection-end-line="247" selection-end-column="33" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#1359#1367#0" expanded="true" />

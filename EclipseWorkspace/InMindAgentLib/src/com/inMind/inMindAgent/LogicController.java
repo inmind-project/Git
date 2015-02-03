@@ -35,12 +35,15 @@ public class LogicController {
 	private Handler talkHandler;
 	private Handler launchHandler;
 	private boolean needToReconnect;
+	
+	private MessageController messageController;
 
 	public LogicController(Handler userNotifierHandler, Handler talkHandler, Handler launchHandler)
 	{
 		this.userNotifierHandler = userNotifierHandler;	
 		this.talkHandler = talkHandler;
 		this.launchHandler = launchHandler;
+		messageController = new MessageController();
 	}
 	
 	public void ConnectToServer(String sendThisText)
@@ -149,7 +152,19 @@ public class LogicController {
 				msgLaunch.obj = m.group(2).trim();
 				launchHandler.sendMessage(msgLaunch);					
 			}
-
+			
+			String command = m.group(1);
+			String args = null;
+			if (m.groupCount() > 1)
+				args = m.group(2);
+			try
+			{
+				messageController.dealWithMessage(command,args);
+			} catch (Exception ex)
+			{
+				Log.e("messageController.dealWithMessage","command="+command+" args="+args + " " +ex.toString());
+				//ex.printStackTrace();
+			}
 		}
 	}
 
