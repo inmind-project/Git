@@ -40,7 +40,7 @@ public class TTScontroller {
 
 						@Override
 						public void onDone(String utteranceId) {
-							Log.e("TTScontroller", "OnDone called");
+							Log.d("TTScontroller", "OnDone called");
 							if (utteranceId.equals(lastMessageQueued.toString())) {
 								Message msg = new Message();
 								msg.arg1 = 1;

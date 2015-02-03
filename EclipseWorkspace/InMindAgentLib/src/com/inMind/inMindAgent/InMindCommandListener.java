@@ -30,7 +30,8 @@ public class InMindCommandListener {
         sr = SpeechRecognizer.createSpeechRecognizer(context);       
         sr.setRecognitionListener(new RecListener());
         
-		mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);	
+		mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+		mStreamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC); // getting system volume into var for later un-muting 
 	}
 	
 	public void stopListening()
@@ -79,36 +80,38 @@ public class InMindCommandListener {
 		@Override
 		public void onBeginningOfSpeech() {
 			// TODO Auto-generated method stub
-			
+			mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mStreamVolume, 0);
 		}
 
 		@Override
 		public void onRmsChanged(float rmsdB) {
 			// TODO Auto-generated method stub
-			
+			mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mStreamVolume, 0);
 		}
 
 		@Override
 		public void onBufferReceived(byte[] buffer) {
 			// TODO Auto-generated method stub
-			
+			mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mStreamVolume, 0);
 		}
 
 		@Override
 		public void onEndOfSpeech() {
 			// TODO Auto-generated method stub
-			
+			mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mStreamVolume, 0);
 		}
 
 		@Override
 		public void onError(int error) {
 			// TODO Auto-generated method stub
 			testForInmindCommand();
+			mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mStreamVolume, 0);
 		}
 
 		@Override
 		public void onResults(Bundle results) {
 			// TODO Auto-generated method stub
+			mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mStreamVolume, 0);
 			ArrayList<String> data = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 			
 			 String firstRes =data.get(0); 
