@@ -96,9 +96,9 @@ public class InMindLogic
                         @Override
                         public void audioEnded()
                         {
+                            ASR.AsrRes asrRes = null;
                             try
                             {
-                                ASR.AsrRes asrRes = null;
                                 if (asr.isConnectionOpen())
                                 {
                                     tcpServer.sendMessage(Consts.stopUdp + Consts.commandChar);
@@ -111,13 +111,12 @@ public class InMindLogic
                                         pw.close();
                                     }
                                     System.out.println(asrRes.text);
-                                    dealWithText(asrRes);
                                 }
                             } catch (Exception e)
                             {
                                 e.printStackTrace();
                             }
-
+                            dealWithText(asrRes);
                         }
                     });
 

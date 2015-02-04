@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">News Reader API</string>
+    <string name="app_login">Login</string>
+    <string name="app_action_settings">Settings</string>
+    <string name="app_action_settings_2">Settings</string>
+    <string name="app_default_reader">Default Reader</string>
+    <string name="app_extended_reader">Extended Reader</string>
+    <string name="app_modified_news">Modified News</string>
+    <string name="app_list_news_items">List news articles</string>
+    <string name="app_custom_reader_layout">Customized Layout</string>
+    <string name="app_navigation_drawer_open">Open navigation drawer</string>
+    <string name="app_navigation_drawer_close">Close navigation drawer</string>
+    <string name="app_exit">Exit</string>
+    <string name="app_exit_action">Exit</string>
+    <string name="app_news_summary_list">News Articles List</string>
+    <string name="app_user_profile">User Profile</string>
+    <string name="app_filtered_news">Filtered News</string>
+    <string name="app_news_commands">News Commands</string>
+    <string name="title_activity_commands">CommandsActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+</resources>

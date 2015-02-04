@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.yahoo.inmind.your_app" >
+
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <application
+        android:allowBackup="true"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="com.yahoo.inmind.your_app.view.NewsExtendedActivity"
+            android:label="@string/app_extended_reader"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity
+            android:name="com.yahoo.inmind.your_app.view.CustomizedLayoutActivity"
+            android:label="@string/app_custom_reader_layout" >
+        </activity>
+        <activity
+            android:name="com.yahoo.inmind.your_app.view.MainActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.yahoo.inmind.your_app.view.NewsArticleList"
+            android:label="@string/app_news_summary_list" >
+        </activity>
+        <activity
+            android:name="com.yahoo.inmind.your_app.view.UserProfileList"
+            android:label="@string/app_user_profile" >
+        </activity>
+        <activity
+            android:name=".view.CommandsActivity"
+            android:label="@string/title_activity_commands" >
+        </activity>
+    </application>
+
+</manifest>

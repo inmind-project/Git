@@ -53,7 +53,7 @@ public class ASR
         wr = new DataOutputStream(con.getOutputStream());
     }
 
-    public void sendDataAsync(byte[] dataToSend) throws IOException
+    public void sendDataAsync(byte[] dataToSend)
     {
         Thread a = new Thread(() -> {
             try
@@ -110,6 +110,7 @@ public class ASR
             res.confidence = bestRes.getDouble("confidence");
         } catch (org.json.JSONException ex)
         {
+            System.out.println("Error parsing JSon, possibly only confidence missing.");
         }
 
         // print result
@@ -123,7 +124,7 @@ public class ASR
     /**
      * get google asr from file (static)
      */
-    static public AsrRes getGoogleASR(Path audioFile)
+    static public AsrRes getGoogleASRFromFile(Path audioFile)
     {
         try
         {

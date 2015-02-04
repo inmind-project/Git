@@ -30,8 +30,6 @@ public class VoiceRecognizer extends Activity implements OnClickListener {
 	private SpeechRecognizer sr;
 	//Android does not allow two intents to access the microphone :(
 	//AudioRecord recorder;
-	private AudioManager mAudioManager;
-	private int mStreamVolume = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +42,6 @@ public class VoiceRecognizer extends Activity implements OnClickListener {
         mText = ((TextView)findViewById(R.id.text1));
         
         getApplicationContext();
-		mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
     }
 
     class listener implements RecognitionListener          
@@ -53,7 +50,6 @@ public class VoiceRecognizer extends Activity implements OnClickListener {
              {
             	    // this methods called when Speech Recognition is ready
             	    // also this is the right time to un-mute system volume because the annoying sound played already
-            	    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mStreamVolume, 0); // again setting the system volume back to the original, un-mutting
                       Log.d(TAG, "onReadyForSpeech");
              }
              public void onBeginningOfSpeech()
@@ -79,7 +75,7 @@ public class VoiceRecognizer extends Activity implements OnClickListener {
                       Log.d(TAG,  "error: " +  error);
                       mText.setText("error: " + error);
                       
-                      onClick(null);
+                      //onClick(null);
              }
              public void onResults(Bundle results)                   
              {
@@ -106,7 +102,7 @@ public class VoiceRecognizer extends Activity implements OnClickListener {
                       }
                       
                       
-                      onClick(null);
+                      //onClick(null);
              }
              public void onPartialResults(Bundle partialResults)
              {
@@ -156,8 +152,6 @@ public class VoiceRecognizer extends Activity implements OnClickListener {
              intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS,5);
              
              sr.startListening(intent);
-             mStreamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC); // getting system volume into var for later un-muting 
-             mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0); // setting system volume to zero, muting
              
 
 //            	 try {

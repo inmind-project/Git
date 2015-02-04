@@ -1,6 +1,10 @@
 condition,pattern,Say,Set,Additional Command
 ,.*calculator,Enjoy the Calculator!,"state=""finish""",Launch^com.android.calculator2
-,.*news,Here is your news!,"state=""finish""",Launch^com.yahoo.inmind.reader
+,.*news,Here is your news!,"state=""finish""",News^launch
+,I want to see you|come back,Here I am,"state=""finish""",Launch^InMind agent
+,next(?: article)?(?: please)?,Here you go!,"state=""finish""",News^next
+,previous(?: article)?(?: please)?,Previous!,"state=""finish""",News^previous
+,(?:please )?expand(?: article)?(?: please)?,I see you like this article!,"state=""finish""",News^expand
 ,(?:could you )?(?:please )?(?:repeat|say that again|what)(?: did you say)?,,"callfun=""repeat"";state=""finish""",
 ,(?:Hi|Hello),"Hello, how are you today?","state=""finish""",
 ,(?:I am |I'm )?(good|ok|o.k.|okay|not bad|fine)(?: thank you| thanks)?,Good! I'm glad to hear that!,"state=""finish""",
@@ -21,6 +25,6 @@ condition,pattern,Say,Set,Additional Command
 ,(?:Have a )?good (.*),Thanks. Good %r1 to you too!,"state=""finish""",
 ,Goodbye,Goodbye!,"state=""finish""",
 ,(?:Tell me |Say )(?:that )?(.*),%r1,"state=""finish""",
-,(?:.*)how(?:.*) you,I'm good. Thanks for asking.,"state=""finish""",
+,.*how.* you,I'm good. Thanks for asking.,"state=""finish""",
 ,(I )?(don't know|do not know|can't think|cannot think).*,That's ok with me.,"state=""finish""",
 ,(.*),Why did you say: %1?,"state=""finish""",
