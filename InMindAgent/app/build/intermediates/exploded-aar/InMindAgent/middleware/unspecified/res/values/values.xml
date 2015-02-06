@@ -10,7 +10,7 @@
     <string name="title_activity_news_adapter">NewsAdapterActivity</string>
     <!-- From: file:/Users/oscarr/Development/AndroidStudioProjects/TestIntegration/middleware/src/main/res/values/styles.xml -->
     <eat-comment/>
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
     </style>
 </resources>

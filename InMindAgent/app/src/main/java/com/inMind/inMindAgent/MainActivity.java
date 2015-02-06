@@ -60,16 +60,6 @@ public class MainActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        inmindCommandListener = new InMindCommandListener(new InmindCommandInterface()
-        {
-
-            @Override
-            public void commandDetected()
-            {
-                // TODO Auto-generated method stub
-                connectAudioToServer();
-            }
-        }, getApplicationContext());
 
         userNotifierHandler = new Handler(new Handler.Callback()
         {
@@ -95,7 +85,7 @@ public class MainActivity extends ActionBarActivity
                     Uri notification = RingtoneManager
                             .getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                     Ringtone r = RingtoneManager.getRingtone(
-                            getApplicationContext(), notification);
+                            MainActivity.this, notification);
                     r.play();
                 }
                 else if (msg.arg1 == 0)
@@ -127,10 +117,10 @@ public class MainActivity extends ActionBarActivity
             @Override
             public boolean handleMessage(Message msg)
             {
-                if (msg.arg1 == 1)
+                String toSay = msg.obj.toString();
+                ttsCont.speakThis(toSay);
+                if (msg.arg1 == 1) //toast
                 {
-                    String toSay = msg.obj.toString();
-                    ttsCont.speakThis(toSay);
                     toastWithTimer(toSay, true);
                 }
                 return false;
@@ -149,20 +139,30 @@ public class MainActivity extends ActionBarActivity
                     // Matcher m = p.matcher(msg.obj.toString());
                     // m.find();
                     String appToLaunch = msg.obj.toString();
-                    Intent i;
+                    Intent intent;
                     if (appToLaunch.equalsIgnoreCase("InMind agent"))
                     {
-                        i = getIntent();
+                        intent = new Intent(MainActivity.this,MainActivity.class);
+                        //getconinical...
+                        //intent = getIntent();
                     }
                     else
                     {
-                        i = getApplicationContext().getPackageManager()
+                        intent = MainActivity.this.getPackageManager()
                                 .getLaunchIntentForPackage(appToLaunch);// m.group(1));
                     }
-                    if (i != null)
+                    if (intent != null)
                     {
-                        getApplicationContext().startActivity(i);
-                        Log.d("Main Activity", "Launching intent");
+                        try
+                        {
+                            //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            MainActivity.this.startActivity(intent);
+                            Log.d("Main Activity", "Launching intent");
+                        }catch (Exception ex)
+                        {
+                            Log.e("MainActivity","error starting activity" + ex.getMessage());
+                        }
                     }
 
                     // Intent myIntent = new Intent();
@@ -192,20 +192,41 @@ public class MainActivity extends ActionBarActivity
             }
         }, intentFilter);
 
-        ttsCont = new TTScontroller(getApplicationContext(), ttsCompleteHandler);
+        if (ttsCont == null)
+        {
+            ttsCont = new TTScontroller(this, ttsCompleteHandler);
+        }
 
         MessageBroker messageBroker = null;
         try
         {
-            messageBroker = MessageBroker.getInstance(getApplicationContext());
+            messageBroker = MessageBroker.getInstance(this);
         }
         catch (Exception ex)
         {
             Log.e("Middleware", "Exception getting MW instance: " + ex.getMessage());
         }
 
-        logicController = new LogicController(userNotifierHandler, talkHandler,
-                launchHandler, messageBroker);
+        if (logicController == null)
+        {
+            logicController = new LogicController(userNotifierHandler, talkHandler,
+                    launchHandler, messageBroker);
+        }
+
+        if (inmindCommandListener == null)
+        {
+            inmindCommandListener = new InMindCommandListener(new InmindCommandInterface()
+            {
+
+                @Override
+                public void commandDetected()
+                {
+                    // TODO Auto-generated method stub
+                    connectAudioToServer();
+                }
+            }, this);
+            inmindCommandListener.listenForInmindCommand();
+        }
 
         startButton = (ImageButton) findViewById(R.id.button_rec);
         stopButton = (Button) findViewById(R.id.button_stop);
@@ -217,8 +238,6 @@ public class MainActivity extends ActionBarActivity
         // System.out.println("minBufSize: " + minBufSize);
 
         // attach a Message. set msg.arg to 1 and msg.obj to string for toast.
-
-        inmindCommandListener.listenForInmindCommand();
     }
 
 
@@ -244,7 +263,7 @@ public class MainActivity extends ActionBarActivity
             toastTime = 3500;
 
         final int toastTimeFinal = toastTime;
-        final Toast toast = Toast.makeText(getApplicationContext(), toToast,
+        final Toast toast = Toast.makeText(this, toToast,
                 Toast.LENGTH_LONG);
 
 

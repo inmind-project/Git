@@ -14,13 +14,14 @@
   limitations under the License.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
      <item android:id="@+id/news_action_switchview"
           android:icon="@drawable/news_ic_flip"
           android:title="@string/news_action_switchview"
-          android:showAsAction="ifRoom|withText" />
+          app:showAsAction="ifRoom|withText" />
      <item android:id="@+id/news_action_settings"
           android:icon="@drawable/news_ic_settings"
           android:title="@string/news_action_settings"
-          android:showAsAction="ifRoom|withText" />
+          app:showAsAction="ifRoom|withText" />
 </menu><!-- From: file:/Users/oscarr/Development/AndroidStudioProjects/TestIntegration/news/src/main/res/menu/news_main.xml --><!-- From: file:/C:/InMind/Git/InMindAgent/app/build/intermediates/exploded-aar/InMindAgent/news/unspecified/res/menu/news_main.xml -->

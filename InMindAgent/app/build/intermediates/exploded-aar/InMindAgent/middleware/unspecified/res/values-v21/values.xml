@@ -2,6 +2,6 @@
 <resources>
     <!-- From: file:/Users/oscarr/Development/AndroidStudioProjects/TestIntegration/middleware/src/main/res/values-v21/styles.xml -->
     <eat-comment/>
-    <style name="AppTheme" parent="android:Theme.Material.Light">
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
     </style>
 </resources>

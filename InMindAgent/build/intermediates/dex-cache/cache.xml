@@ -2,11 +2,11 @@
 <items version="2" >
 
     <item
-        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.code.gson\gson\2.3\5fc52c41ef0239d1093a1eb7c3697036183677ce\gson-2.3.jar"
+        jar="C:\InMind\Git\InMindAgent\app\build\intermediates\exploded-aar\InMindAgent\middleware\unspecified\classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="5fc52c41ef0239d1093a1eb7c3697036183677ce">
-        <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\gson-2.3-6d63b2c19b72956c34d46f3a74b11dbb0b09c3a8.jar" />
+        sha1="4c1fb59c2d1f5e911bf3f2bdea6b8f3ceecd6ab4">
+        <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\classes-5803b751b01554ee8448b4bc2b40d33774ff73b5.jar" />
     </item>
     <item
         jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\de.greenrobot\eventbus\2.4.0\ddd166d01b3158d1c00576d29f7ed15c030df719\eventbus-2.4.0.jar"
@@ -23,17 +23,17 @@
         <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\internal_impl-21.0.3-5a261e5b466bcf5a91724603edfd59be176b97d1.jar" />
     </item>
     <item
-        jar="C:\InMind\Git\InMindAgent\app\build\intermediates\exploded-aar\InMindAgent\middleware\unspecified\classes.jar"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.code.gson\gson\2.3\5fc52c41ef0239d1093a1eb7c3697036183677ce\gson-2.3.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="0a77e9496d864b313e26dd00f5a873ef17bdeb36">
-        <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\classes-5803b751b01554ee8448b4bc2b40d33774ff73b5.jar" />
+        sha1="5fc52c41ef0239d1093a1eb7c3697036183677ce">
+        <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\gson-2.3-6d63b2c19b72956c34d46f3a74b11dbb0b09c3a8.jar" />
     </item>
     <item
         jar="C:\InMind\Git\InMindAgent\app\build\intermediates\exploded-aar\InMindAgent\commons\unspecified\classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="4fdfc571da8e5bc7bfd5f9bab138a0af8bddf89d">
+        sha1="8b350783144569bc1b6fc707b5807dfeb0c39dc7">
         <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\classes-a18154d172c3cb946943da7f30110f30e746b803.jar" />
     </item>
     <item
@@ -96,7 +96,7 @@
         jar="C:\InMind\Git\InMindAgent\app\build\intermediates\exploded-aar\InMindAgent\news\unspecified\classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="31b0e531b4cd79327669c4cb875f1eb511dbeabe">
+        sha1="a6298bdf00c40175117182fbce32d725194557b6">
         <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\classes-53949d1e6ac3d0a87a6b24710641cac1ee0b2881.jar" />
     </item>
     <item

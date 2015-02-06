@@ -174,7 +174,7 @@ public class LogicController
                 args = m.group(2);
             try
             {
-                messageController.dealWithMessage(command, args, messageBroker);
+                messageController.dealWithMessage(command, args, messageBroker, talkHandler);
             }
             catch (Exception ex)
             {

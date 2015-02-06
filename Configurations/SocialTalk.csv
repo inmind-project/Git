@@ -1,11 +1,13 @@
 condition,pattern,Say,Set,Additional Command
 ,.*calculator,Enjoy the Calculator!,"state=""finish""",Launch^com.android.calculator2
 ,.*news,Here is your news!,"state=""finish""",News^launch
-,I want to see you|come back,Here I am,"state=""finish""",Launch^InMind agent
+,I want to see you|come back|where are you|where did you go,Here I am,"state=""finish""",Launch^InMind agent
 ,next(?: article)?(?: please)?,Here you go!,"state=""finish""",News^next
 ,previous(?: article)?(?: please)?,Previous!,"state=""finish""",News^previous
 ,(?:please )?expand(?: article)?(?: please)?,I see you like this article!,"state=""finish""",News^expand
+,(please )?read( me)?( the| this)?( news)?( article)?,,"state=""finish""",News^read
 ,(?:could you )?(?:please )?(?:repeat|say that again|what)(?: did you say)?,,"callfun=""repeat"";state=""finish""",
+,Thank you,You are welcome!,"state=""finish""",
 ,(?:Hi|Hello),"Hello, how are you today?","state=""finish""",
 ,(?:I am |I'm )?(good|ok|o.k.|okay|not bad|fine)(?: thank you| thanks)?,Good! I'm glad to hear that!,"state=""finish""",
 ,I want (.*),What would it mean to you if you got %r1?,"state=""finish""",

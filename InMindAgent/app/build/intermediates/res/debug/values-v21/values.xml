@@ -2,7 +2,7 @@
 <resources>
     <!-- From: file:/C:/InMind/Git/InMindAgent/app/build/intermediates/exploded-aar/InMindAgent/news/unspecified/res/values-v21/values.xml -->
     <eat-comment/>
-    <style name="AppTheme" parent="android:Theme.Material.Light">
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
     </style>
     <!-- From: file:/C:/InMind/Git/InMindAgent/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/21.0.3/res/values-v21/values.xml -->
     <eat-comment/>
