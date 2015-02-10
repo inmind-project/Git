@@ -47,12 +47,51 @@ import edu.cmu.pocketsphinx.Hypothesis;
 import edu.cmu.pocketsphinx.RecognitionListener;
 import edu.cmu.pocketsphinx.SpeechRecognizer;
 
-public class PocketSphinxActivity extends Activity implements
-        RecognitionListener {
+
+
+public class PocketSphinxActivity extends Activity  {
+	
+	public class MyListener implements RecognitionListener
+	{
+
+	    @Override
+	    public void onPartialResult(Hypothesis hypothesis) {
+	        String text = hypothesis.getHypstr();
+	        if (text.equals(KEYPHRASE))
+	            switchSearch(MENU_SEARCH);
+	        else if (text.equals(DIGITS_SEARCH))
+	            switchSearch(DIGITS_SEARCH);
+	        else if (text.equals(FORECAST_SEARCH))
+	            switchSearch(FORECAST_SEARCH);
+	        else
+	            ((TextView) findViewById(R.id.result_text)).setText(text);
+	    }
+
+	    @Override
+	    public void onResult(Hypothesis hypothesis) {
+	        ((TextView) findViewById(R.id.result_text)).setText("");
+	        if (hypothesis != null) {
+	            String text = hypothesis.getHypstr() + hypothesis.getBestScore();
+	            makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+	        }
+	    }
+
+	    @Override
+	    public void onBeginningOfSpeech() {
+	    }
+
+	    @Override
+	    public void onEndOfSpeech() {
+	        if (DIGITS_SEARCH.equals(recognizer.getSearchName())
+	                || FORECAST_SEARCH.equals(recognizer.getSearchName()))
+	            switchSearch(KWS_SEARCH);
+	    }
+		
+	}
 
     private static final String KWS_SEARCH = "wakeup";
     private static final String FORECAST_SEARCH = "forecast";
-    private static final String DIGITS_SEARCH = "digits";
+    private static final String DIGITS_SEARCH = "simple commands";//"digits";
     private static final String MENU_SEARCH = "menu";
     private static final String KEYPHRASE = "oh mighty computer";
 
@@ -101,38 +140,7 @@ public class PocketSphinxActivity extends Activity implements
         }.execute();
     }
 
-    @Override
-    public void onPartialResult(Hypothesis hypothesis) {
-        String text = hypothesis.getHypstr();
-        if (text.equals(KEYPHRASE))
-            switchSearch(MENU_SEARCH);
-        else if (text.equals(DIGITS_SEARCH))
-            switchSearch(DIGITS_SEARCH);
-        else if (text.equals(FORECAST_SEARCH))
-            switchSearch(FORECAST_SEARCH);
-        else
-            ((TextView) findViewById(R.id.result_text)).setText(text);
-    }
 
-    @Override
-    public void onResult(Hypothesis hypothesis) {
-        ((TextView) findViewById(R.id.result_text)).setText("");
-        if (hypothesis != null) {
-            String text = hypothesis.getHypstr();
-            makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onBeginningOfSpeech() {
-    }
-
-    @Override
-    public void onEndOfSpeech() {
-        if (DIGITS_SEARCH.equals(recognizer.getSearchName())
-                || FORECAST_SEARCH.equals(recognizer.getSearchName()))
-            switchSearch(KWS_SEARCH);
-    }
 
     private void switchSearch(String searchName) {
         recognizer.stop();
@@ -148,15 +156,19 @@ public class PocketSphinxActivity extends Activity implements
                 .setDictionary(new File(modelsDir, "dict/cmu07a.dic"))
                 .setRawLogDir(assetsDir).setKeywordThreshold(1e-20f)
                 .getRecognizer();
-        recognizer.addListener(this);
+        recognizer.addListener(new MyListener());
 
         // Create keyword-activation search.
         recognizer.addKeyphraseSearch(KWS_SEARCH, KEYPHRASE);
         // Create grammar-based searches.
         File menuGrammar = new File(modelsDir, "grammar/menu.gram");
         recognizer.addGrammarSearch(MENU_SEARCH, menuGrammar);
-        File digitsGrammar = new File(modelsDir, "grammar/digits.gram");
-        recognizer.addGrammarSearch(DIGITS_SEARCH, digitsGrammar);
+        //File digitsGrammar = new File(modelsDir, "grammar/digits.gram");
+        //recognizer.addGrammarSearch(DIGITS_SEARCH, digitsGrammar);
+        
+        File simpleCommandsGrammar = new File(modelsDir, "grammar/simpleCommands.gram");
+        recognizer.addGrammarSearch(DIGITS_SEARCH, simpleCommandsGrammar);
+        
         // Create language model search.
         File languageModel = new File(modelsDir, "lm/weather.dmp");
         recognizer.addNgramSearch(FORECAST_SEARCH, languageModel);

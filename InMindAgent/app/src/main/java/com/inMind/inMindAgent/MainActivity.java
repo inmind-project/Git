@@ -23,6 +23,7 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.support.v7.app.ActionBarActivity;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -209,8 +210,14 @@ public class MainActivity extends ActionBarActivity
 
         if (logicController == null)
         {
+            final TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
+            String uniqueId = tm.getDeviceId();
+            if (uniqueId == null)
+                uniqueId = tm.getSimSerialNumber();
+            if (uniqueId == null)
+                uniqueId = "errorId";
             logicController = new LogicController(userNotifierHandler, talkHandler,
-                    launchHandler, messageBroker);
+                    launchHandler, messageBroker, uniqueId);
         }
 
         if (inmindCommandListener == null)

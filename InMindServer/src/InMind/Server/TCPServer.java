@@ -20,6 +20,8 @@ public class TCPServer extends Thread
 
     static ServerSocket serverSocket = null; //TODO: protect from multithread access
 
+    Socket client = null;
+
 
     /**
      * Constructor of the class
@@ -52,58 +54,64 @@ public class TCPServer extends Thread
 
         running = true;
 
+
         try
         {
-            System.out.println("S: Connecting...");
 
+            //sends the message to the client
+            mOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(client.getOutputStream())), true);
 
-            //create a server socket. A server socket waits for requests to come in over the network.
-            if (serverSocket == null)
-                serverSocket = new ServerSocket(Consts.serverPort);
+            //read the message received from client
+            BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
-            //create client socket... the method accept() listens for a connection to be made to this socket and accepts it.
-            Socket client = serverSocket.accept();
-            System.out.println("S: Receiving...");
-
-            try
+            messageListener.messageReceived(clientConnected);
+            //in this while we wait to receive messages from client (it's an infinite loop)
+            //this while it's like a listener for messages
+            while (running)
             {
+                String message = in.readLine();
 
-                //sends the message to the client
-                mOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(client.getOutputStream())), true);
-
-                //read the message received from client
-                BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-
-                messageListener.messageReceived(clientConnected);
-                //in this while we wait to receive messages from client (it's an infinite loop)
-                //this while it's like a listener for messages
-                while (running)
+                if (message != null && messageListener != null)
                 {
-                    String message = in.readLine();
-
-                    if (message != null && messageListener != null)
-                    {
-                        //call the method messageReceived from ServerBoard class
-                        messageListener.messageReceived(message);
-                    }
+                    //call the method messageReceived from ServerBoard class
+                    messageListener.messageReceived(message);
                 }
-
-            } catch (Exception e)
-            {
-                System.out.println("S: Error");
-                e.printStackTrace();
-            } finally
-            {
-                client.close();
-                System.out.println("S: Done.");
             }
 
         } catch (Exception e)
         {
             System.out.println("S: Error");
             e.printStackTrace();
+        } finally
+        {
+            try
+            {
+                client.close();
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+            System.out.println("S: Done.");
         }
+    }
 
+    /*
+    should be called first. Listens for connection.
+     */
+    public void listenForConnection() throws IOException
+    {
+        System.out.println("S: Connecting...");
+
+
+        //create a server socket. A server socket waits for requests to come in over the network.
+        if (serverSocket == null)
+            serverSocket = new ServerSocket(Consts.serverPort);
+
+        //create client socket... the method accept() listens for a connection to be made to this socket and accepts it.
+        client = serverSocket.accept();
+        System.out.println("S: Accepted...");
+        if (client == null)
+            throw new IOException("Error, client is null");
     }
 
     //Declare the interface.

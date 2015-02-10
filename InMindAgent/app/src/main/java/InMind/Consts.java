@@ -1,7 +1,7 @@
 package InMind;
 
 /**
- * Created by User on 24-Dec-14.
+ * Created by Amos Azaria on 24-Dec-14.
  */
 public class Consts
 {
@@ -10,7 +10,7 @@ public class Consts
 
     static public final String commandChar = "^";
     static public final String messageSeparatorForPattern = "\\^";
-    static public final String messagePattern = "(\\p{Alpha}*)"+Consts.messageSeparatorForPattern+"(.*)";
+    static public final String serverMessagePattern = "(\\p{Alpha}*)"+Consts.messageSeparatorForPattern+"(.*)";
 
     //connection commands from server
     static public final String connectUdp = "ConnectUDP";
@@ -20,6 +20,8 @@ public class Consts
     static public final String startNewConnection = "StartNewConnection";
     static public final String closeConnection = "CloseConnection";
 
+    //client requests must start with user Id. e.g., userId^SendingText^text
+    static public final String clientMessagePattern = "[-a-zA-Z0-9]+"+Consts.messageSeparatorForPattern+"(\\p{Alpha}*)"+Consts.messageSeparatorForPattern+"(.*)";
     //client requests
     static public final String requestSendAudio = "RequestSendAudio";
     static public final String sendingText = "SendingText";

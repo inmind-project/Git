@@ -100,7 +100,7 @@ public class ASR
         in.close();
 
         System.out.println("Google response: " + response.toString());
-        res.fullJsonRes =response.toString();
+        res.fullJsonRes = response.toString();
         //remove first empty result (13 chars): {"result":[]}
         try
         {

@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 /**
  * Created by Amos Azaria on 23-Dec-14.
- *
+ * <p/>
  * Important: Should be unique per user.
  */
 public class UserConversation
@@ -45,11 +45,13 @@ public class UserConversation
     String tmpDialogFileBaseJustExited = ""; //used when returning from file use on the first time, not to enter same file again
     Map<String, Object> fullInfo;
 
-    List<String> previousMessages = new LinkedList<String>();;
+    List<String> previousMessages = new LinkedList<String>();
+    ;
 
 
     ScriptEngineManager mgr;
     ScriptEngine engine;
+
     public UserConversation()
     {
         fullInfo = new HashMap<String, Object>();
@@ -67,7 +69,7 @@ public class UserConversation
 
         if (dialogFileBase.isEmpty())
         {
-            dialogFileBase = findDialogFile(asrRes.text,tmpDialogFileBaseJustExited);
+            dialogFileBase = findDialogFile(asrRes.text, tmpDialogFileBaseJustExited);
             tmpDialogFileBaseJustExited = "";
             if (!dialogFileBase.isEmpty())
                 firstEnter = true;
@@ -85,11 +87,10 @@ public class UserConversation
             forUser.add(Consts.closeConnection + Consts.commandChar);
             //forUser = getSocialTalkResponse(asrRes.text);
             sendToUser(messageSender, forUser, false);
-        }
-        else
+        } else
         {
             List<String> forUser = executeDialogFile(asrRes.text);
-            if (forUser!= null && forUser.size() > 0)
+            if (forUser != null && forUser.size() > 0)
                 sendToUser(messageSender, forUser, true);
 
             //check if need to call a function (callfun)
@@ -99,8 +100,7 @@ public class UserConversation
                 if (fullInfo.get(callFunName).toString().equals(callFunRepeat))
                 {
                     toSend = tmpPrevMessages;
-                }
-                else
+                } else
                 {
                     toSend = FunctionInvoker.toInvoke(dialogFileBase, fullInfo.get(callFunName).toString(), fullInfo, "n/a"); //TODO: add userId
                 }
@@ -128,10 +128,9 @@ public class UserConversation
             if (dialogFileBase.isEmpty())
             {
                 closeOrRenewConnection.add(Consts.closeConnection + Consts.commandChar);
-            }
-            else
+            } else
             {
-                closeOrRenewConnection.add(Consts.startNewConnection+Consts.commandChar);
+                closeOrRenewConnection.add(Consts.startNewConnection + Consts.commandChar);
             }
             sendToUser(messageSender, closeOrRenewConnection, false);
 
@@ -199,7 +198,7 @@ public class UserConversation
                         String[] conditionList = conditions.split(conditionsAndSetChar);
                         for (String cond : conditionList)
                         {
-                            if (!checkCondition(cond,fullInfo,m))
+                            if (!checkCondition(cond, fullInfo, m))
                             {
                                 matchesConditions = false;
                                 break;
@@ -216,7 +215,7 @@ public class UserConversation
                             String toSay = refactorStringToSay(orgToSay, m);
                             commandsForUser.add(commandSay(toSay));
                         }
-                        if (row.length >= csvAdditionalCommand+1 && !row[csvAdditionalCommand].trim().isEmpty())
+                        if (row.length >= csvAdditionalCommand + 1 && !row[csvAdditionalCommand].trim().isEmpty())
                         {
                             commandsForUser.add(row[csvAdditionalCommand].trim());
                         }
@@ -376,6 +375,7 @@ public class UserConversation
     {
         return refactorUsingM(removeExtraQuotes(orgSentence), m);
     }
+
     // removes extra quotes and takes care of %1 and %r1
     private static String refactorUsingM(String orgSentence, Matcher m)
     {
@@ -450,7 +450,7 @@ public class UserConversation
         final String condGreaterEqual = ">=";
         final String condSmaller = "<";
         final String condSmallerEqual = "<=";
-        String[] condRelationList = new String[]{condEquality2,condNotEqual,condGreater,condGreaterEqual,condSmaller,condSmallerEqual,condEquality}; //condEquality must be last
+        String[] condRelationList = new String[]{condEquality2, condNotEqual, condGreater, condGreaterEqual, condSmaller, condSmallerEqual, condEquality}; //condEquality must be last
 
         String relation = null;
         //find relation
@@ -469,10 +469,10 @@ public class UserConversation
         if (varVal.length != 2)
             throw new Exception("could not parse: " + cond);
 
-        Object val = evaluateVal(varVal[1],fullInfo,m);
+        Object val = evaluateVal(varVal[1], fullInfo, m);
         Object storedVar = fullInfo.get(varVal[0].trim());
 
-        if (storedVar==null || storedVar instanceof String)
+        if (storedVar == null || storedVar instanceof String)
         {
             boolean matches = storedVar == val || (storedVar != null && storedVar.equals(val));
             if (relation.equals(condEquality) || relation.equals(condEquality2))
@@ -496,7 +496,7 @@ public class UserConversation
         return isConditionTrue;
     }
 
-    private Object evaluateVal(String valStr, Map<String, Object> fullInfo,Matcher m) throws Exception
+    private Object evaluateVal(String valStr, Map<String, Object> fullInfo, Matcher m) throws Exception
     {
         valStr = valStr.trim();
 
@@ -527,6 +527,6 @@ public class UserConversation
             }
         }
 
-        return  engine.eval(valStr);
+        return engine.eval(valStr);
     }
 }

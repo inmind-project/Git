@@ -33,13 +33,7 @@ public class LogicController
     int tcpIpPort = Consts.serverPort;
     String udpIpAddr;
     int udpIpPort;
-
-    private enum StateSM
-    {
-        Initialized, ConnectedToTCP, StreamingAudio, Stopped
-    }
-
-    ;
+    String uniqueId;
 
     private Handler userNotifierHandler;
     private Handler talkHandler;
@@ -50,19 +44,20 @@ public class LogicController
     private Context context = null;
     MessageBroker messageBroker;
 
-    public LogicController(Handler userNotifierHandler, Handler talkHandler, Handler launchHandler, MessageBroker messageBroker)
+    public LogicController(Handler userNotifierHandler, Handler talkHandler, Handler launchHandler, MessageBroker messageBroker, String uniqueId)
     {
         this.userNotifierHandler = userNotifierHandler;
         this.talkHandler = talkHandler;
         this.launchHandler = launchHandler;
         messageController = new MessageController();
         this.messageBroker = messageBroker;
+        this.uniqueId = uniqueId;
     }
 
     public void ConnectToServer(String sendThisText)
     {
         closeConnection();
-        new connectTask().execute(Consts.sendingText + Consts.commandChar + sendThisText);
+        new connectTask().execute(uniqueId + Consts.commandChar + Consts.sendingText + Consts.commandChar + sendThisText);
     }
 
     public void ConnectToServer()
@@ -71,7 +66,7 @@ public class LogicController
         if (tcpClient != null && audioStreamer != null && audioStreamer.isStreaming())
             return;
         closeConnection();
-        new connectTask().execute(Consts.requestSendAudio + Consts.commandChar);
+        new connectTask().execute(uniqueId + Consts.commandChar + Consts.requestSendAudio + Consts.commandChar);
     }
 
     public void closeConnection()
@@ -110,7 +105,7 @@ public class LogicController
     private void dealWithMessage(String message)
     {
         Log.d("ServerConnector", "Dealing with message:" + message);
-        Pattern p = Pattern.compile(Consts.messagePattern);
+        Pattern p = Pattern.compile(Consts.serverMessagePattern);
         Matcher m = p.matcher(message);
         boolean found = m.find();
         Log.d("ServerConnector", "found:" + found);

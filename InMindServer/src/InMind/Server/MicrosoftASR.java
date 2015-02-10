@@ -19,7 +19,7 @@ public class MicrosoftASR
         String decodedText = "";
         try
         {
-            decodedText = MicrosoftASR.fromByteArr(Files.readAllBytes(sPath),defaultReduce);
+            decodedText = MicrosoftASR.fromByteArr(Files.readAllBytes(sPath), defaultReduce);
         } catch (IOException e)
         {
             e.printStackTrace();

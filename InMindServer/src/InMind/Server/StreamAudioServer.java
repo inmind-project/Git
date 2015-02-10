@@ -27,7 +27,7 @@ class StreamAudioServer
     static final Path folderPath = Paths.get("..\\UserData");//c:\\Server\\Git\\UserData");//TODO: fix to relative Paths.get("..\\..\\..\\..\\..\\..\\UserData");
     static final String fileStart = "InputAt";
     static final int timeout = 1000; //in milliseconds
-    static final long maxRecordingTimeLength = 60*1000; //in milliseconds
+    static final long maxRecordingTimeLength = 60 * 1000; //in milliseconds
 
     //static DataLine.Info dataLineInfo;
     static SourceDataLine sourceDataLine;
@@ -38,11 +38,13 @@ class StreamAudioServer
     public interface StreamingAlerts
     {
         void rawFilePath(Path filePathForSavingAudio);
+
         void audioArrived(byte[] audio);
+
         void audioEnded();
     }
 
-    public StreamAudioServer(StreamingAlerts streamingAlerts )
+    public StreamAudioServer(StreamingAlerts streamingAlerts)
     {
         this.streamingAlerts = streamingAlerts;
     }
@@ -153,9 +155,9 @@ class StreamAudioServer
         {
             //byte[] asByte = Files.readAllBytes(filePath);
             //short[] asShort = new short[asByte.length/2];
-            for (int i = 0; 2*i < asByte.length; i++)
+            for (int i = 0; 2 * i < asByte.length; i++)
             {
-                short sample = (short) (asByte[2*i+1] << 8 | asByte[2*i]); //little endian 16bit
+                short sample = (short) (asByte[2 * i + 1] << 8 | asByte[2 * i]); //little endian 16bit
                 if (Math.abs(sample) < considerSilent)
                     silentSampleLength++;
                 else
@@ -167,8 +169,8 @@ class StreamAudioServer
                     }
                 }
             }
-            double silentLength = silentSampleLength/(double) Consts.sampleRate;
-            if (silentLength*1000 > silentLengthNeeded && talkSampleLength > minimalTalk)
+            double silentLength = silentSampleLength / (double) Consts.sampleRate;
+            if (silentLength * 1000 > silentLengthNeeded && talkSampleLength > minimalTalk)
                 return true;
 
         } catch (Exception e)
