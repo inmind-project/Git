@@ -65,18 +65,18 @@
         <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\guava-18.0-282a2bb23954d3314fa50afb3651d2cae31b0a1b.jar" />
     </item>
     <item
-        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.httpcomponents\httpcore\4.3.2\31fbbff1ddbf98f3aa7377c94d33b0447c646b6e\httpcore-4.3.2.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="31fbbff1ddbf98f3aa7377c94d33b0447c646b6e">
-        <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\httpcore-4.3.2-ab8361ce1aa8bec17389998f46eba4aecb1fe111.jar" />
-    </item>
-    <item
         jar="C:\InMind\Development\adt-bundle-windows-x86_64-20140702\sdk\extras\android\m2repository\com\android\support\support-annotations\21.0.3\support-annotations-21.0.3.jar"
         jumboMode="false"
         revision="21.1.2"
         sha1="4b74cefe1f0c1b819e7260c8627a14674e37fd35">
         <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\support-annotations-21.0.3-0b44d65e1e5b9684026d7c39e979eeb05cec1472.jar" />
+    </item>
+    <item
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.httpcomponents\httpcore\4.3.2\31fbbff1ddbf98f3aa7377c94d33b0447c646b6e\httpcore-4.3.2.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="31fbbff1ddbf98f3aa7377c94d33b0447c646b6e">
+        <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\httpcore-4.3.2-ab8361ce1aa8bec17389998f46eba4aecb1fe111.jar" />
     </item>
     <item
         jar="C:\InMind\Git\InMindAgent\app\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.3\classes.jar"
@@ -98,6 +98,20 @@
         revision="21.1.2"
         sha1="a6298bdf00c40175117182fbce32d725194557b6">
         <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\classes-53949d1e6ac3d0a87a6b24710641cac1ee0b2881.jar" />
+    </item>
+    <item
+        jar="C:\InMind\Git\InMindAgent\app\libs\poketSphinx_jni_so.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="2155857af4ed1121f1d62a42a9011f0ac83b649f">
+        <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\poketSphinx_jni_so-7815c477450dbebf4db7453a7db207fb90a48ae9.jar" />
+    </item>
+    <item
+        jar="C:\InMind\Git\InMindAgent\app\libs\pocketsphinx-android-0.8-nolib.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="79e72ad97c6001aa89f3a250970615d92eb05fb8">
+        <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\pocketsphinx-android-0.8-nolib-fdbe7e271c8af0db40dfee842b6e240a785032dc.jar" />
     </item>
     <item
         jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\commons-codec\commons-codec\1.6\b7f0fc8f61ecadeb3695f0b9464755eee44374d4\commons-codec-1.6.jar"

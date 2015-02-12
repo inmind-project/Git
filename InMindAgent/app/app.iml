@@ -91,9 +91,11 @@
     <orderEntry type="library" exported="" name="httpcore-4.3.2" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="json-simple-1.1.1" level="project" />
+    <orderEntry type="library" exported="" name="pocketsphinx-android-0.8-nolib" level="project" />
     <orderEntry type="library" exported="" name="middleware-unspecified" level="project" />
     <orderEntry type="library" exported="" name="cloning-1.9.1" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-21.0.3" level="project" />
+    <orderEntry type="library" exported="" name="poketSphinx_jni_so" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="objenesis-2.1" level="project" />
     <orderEntry type="library" exported="" name="commons-unspecified" level="project" />

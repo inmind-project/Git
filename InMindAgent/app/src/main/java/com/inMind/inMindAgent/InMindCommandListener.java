@@ -11,6 +11,8 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
 
+import com.inMind.pocketSphinx.PocketSphinxSearcher;
+
 public class InMindCommandListener
 {
 
@@ -19,137 +21,31 @@ public class InMindCommandListener
         void commandDetected();
     }
 
-    boolean isListening = true;
-    InmindCommandInterface inmindCommandInterface;
+    InmindCommandInterface minmindCommandInterface;
     Context context;
+    PocketSphinxSearcher pocketSphinxSearcher = null;
 
     InMindCommandListener(InmindCommandInterface inmindCommandInterface, final Context context)
     {
-        this.inmindCommandInterface = inmindCommandInterface;
+        minmindCommandInterface = inmindCommandInterface;
         this.context = context;
 
-        sr = SpeechRecognizer.createSpeechRecognizer(context);
-        sr.setRecognitionListener(new RecListener());
+        pocketSphinxSearcher = new PocketSphinxSearcher(context,"in mind agent",new PocketSphinxSearcher.SphinxRes(){
 
-        mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        //mStreamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC); // getting system volume into var for later un-muting
+            int i =0;
+            @Override
+            public void keyDetected() {
+                minmindCommandInterface.commandDetected();
+            }});
     }
 
     public void stopListening()
     {
-        isListening = false;
-        sr.cancel();
-        mAudioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+        pocketSphinxSearcher.stopListening();
     }
 
     public void listenForInmindCommand()
     {
-        isListening = true;
-        testForInmindCommand();
-    }
-
-    private void testForInmindCommand()
-    {
-        if (isListening)
-        {
-            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-            intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, "voice.recognition.test");
-
-            intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
-
-            sr.startListening(intent);
-            //mStreamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC); // getting system volume into var for later un-muting
-            //mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0);
-            mAudioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
-        }
-    }
-
-    private SpeechRecognizer sr;
-    //Android does not allow two intents to access the microphone :(
-    //AudioRecord recorder;
-    private AudioManager mAudioManager;
-    private int mStreamVolume;
-
-    class RecListener implements RecognitionListener
-    {
-
-        @Override
-        public void onReadyForSpeech(Bundle params)
-        {
-            // TODO Auto-generated method stub
-            //mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mStreamVolume, 0); // again setting the system volume back to the original, un-mutting
-            mAudioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
-        }
-
-        @Override
-        public void onBeginningOfSpeech()
-        {
-            // TODO Auto-generated method stub
-        }
-
-        @Override
-        public void onRmsChanged(float rmsdB)
-        {
-            // TODO Auto-generated method stub
-        }
-
-        @Override
-        public void onBufferReceived(byte[] buffer)
-        {
-            // TODO Auto-generated method stub
-        }
-
-        @Override
-        public void onEndOfSpeech()
-        {
-            // TODO Auto-generated method stub
-        }
-
-        @Override
-        public void onError(int error)
-        {
-            // TODO Auto-generated method stub
-            //mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mStreamVolume, 0);
-            mAudioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
-            testForInmindCommand();
-        }
-
-        @Override
-        public void onResults(Bundle results)
-        {
-            // TODO Auto-generated method stub
-            //mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mStreamVolume, 0);
-            mAudioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
-            ArrayList<String> data = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-
-            String firstRes = data.get(0);
-
-            if (firstRes.contains("mind agent"))
-            {
-                Log.d("Main", "got inmind command");
-                inmindCommandInterface.commandDetected();
-            }
-            else
-            {
-                testForInmindCommand();
-            }
-        }
-
-        @Override
-        public void onPartialResults(Bundle partialResults)
-        {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void onEvent(int eventType, Bundle params)
-        {
-            // TODO Auto-generated method stub
-
-        }
-
+        pocketSphinxSearcher.startListeningForKeyword();
     }
 }

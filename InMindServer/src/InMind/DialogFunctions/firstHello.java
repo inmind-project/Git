@@ -14,7 +14,7 @@ import java.util.Random;
 public class firstHello
 {
     static final String agentNameKey = "agentName";
-    public static List<String> hello(Map<String, Object> fullInfo, String userId)
+    public static List<String> hello(Map<String, Object> fullInfo, String userId, String userText)
     {
         List<String> toSayList = new LinkedList<String>();
         String agentName = null;

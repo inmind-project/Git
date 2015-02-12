@@ -10,7 +10,7 @@ import java.util.Map;
 public class myBus
 {
 
-    public static List<String> getBusInfo(Map<String, Object> fullInfo, String userId)
+    public static List<String> getBusInfo(Map<String, Object> fullInfo, String userId, String userText)
     {
         final String sourceTag = "source";
         final String targetTag = "target";

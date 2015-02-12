@@ -44,16 +44,18 @@ public class UserConversation
     String dialogFileBase = "";
     String tmpDialogFileBaseJustExited = ""; //used when returning from file use on the first time, not to enter same file again
     Map<String, Object> fullInfo;
+    String userId;
 
     List<String> previousMessages = new LinkedList<String>();
-    ;
+
 
 
     ScriptEngineManager mgr;
     ScriptEngine engine;
 
-    public UserConversation()
+    public UserConversation(String userId)
     {
+        this.userId = userId;
         fullInfo = new HashMap<String, Object>();
         clearDialog();
         mgr = new ScriptEngineManager();
@@ -63,13 +65,14 @@ public class UserConversation
 
     public void dealWithMessage(ASR.AsrRes asrRes, InMindLogic.MessageReceiver.MessageSender messageSender)
     {
+        String userText = asrRes.text;
         boolean firstEnter = false;
         List<String> tmpPrevMessages = new LinkedList<String>(previousMessages);
         previousMessages = new LinkedList<String>();
 
         if (dialogFileBase.isEmpty())
         {
-            dialogFileBase = findDialogFile(asrRes.text, tmpDialogFileBaseJustExited);
+            dialogFileBase = findDialogFile(userText, tmpDialogFileBaseJustExited);
             tmpDialogFileBaseJustExited = "";
             if (!dialogFileBase.isEmpty())
                 firstEnter = true;
@@ -89,7 +92,7 @@ public class UserConversation
             sendToUser(messageSender, forUser, false);
         } else
         {
-            List<String> forUser = executeDialogFile(asrRes.text);
+            List<String> forUser = executeDialogFile(userText);
             if (forUser != null && forUser.size() > 0)
                 sendToUser(messageSender, forUser, true);
 
@@ -102,7 +105,7 @@ public class UserConversation
                     toSend = tmpPrevMessages;
                 } else
                 {
-                    toSend = FunctionInvoker.toInvoke(dialogFileBase, fullInfo.get(callFunName).toString(), fullInfo, "n/a"); //TODO: add userId
+                    toSend = FunctionInvoker.toInvoke(dialogFileBase, fullInfo.get(callFunName).toString(), fullInfo, userId, userText); //TODO: add userId
                 }
                 sendToUser(messageSender, toSend, true);
                 fullInfo.remove(callFunName); //remove it so it won't be called again next time.

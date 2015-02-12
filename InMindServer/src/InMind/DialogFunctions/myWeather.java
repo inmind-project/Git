@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public class myWeather
 {
-    public static List<String> getWeatherInfo(Map<String, Object> fullInfo, String userId)
+    public static List<String> getWeatherInfo(Map<String, Object> fullInfo, String userId, String userText)
     {
         final String locationTag = "location";
         List<String> ret = new LinkedList<String>();

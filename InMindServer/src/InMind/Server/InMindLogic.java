@@ -169,7 +169,7 @@ public class InMindLogic
                     userConversation = userConversationMap.get(userId);
                 else
                 {
-                    userConversation = new UserConversation();
+                    userConversation = new UserConversation(userId);
                     userConversationMap.put(userId,userConversation);
                 }
 

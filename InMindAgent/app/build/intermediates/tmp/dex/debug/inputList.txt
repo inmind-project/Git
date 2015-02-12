@@ -4,6 +4,7 @@ C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\classes-a18154
 C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\classes-5803b751b01554ee8448b4bc2b40d33774ff73b5.jar
 C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\cloning-1.9.1-f8e85167ee89be9aeb6802c2352cc4ff5cc31f97.jar
 C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\json-simple-1.1.1-ad8986034f131de54f4652745f3a33423d46db79.jar
+C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\pocketsphinx-android-0.8-nolib-fdbe7e271c8af0db40dfee842b6e240a785032dc.jar
 C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\objenesis-2.1-34388bd594bdd15fa82cc72de279c303cde2503b.jar
 C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\eventbus-2.4.0-456d8056aede02ad394d819ab84d08fac8666a12.jar
 C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\classes-53949d1e6ac3d0a87a6b24710641cac1ee0b2881.jar
@@ -12,6 +13,7 @@ C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\gson-2.3-6d63b
 C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\external_android-flip-648f9ab463cb576d504f801e2d4b298ea641cc9a.jar
 C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\httpcore-4.3.2-ab8361ce1aa8bec17389998f46eba4aecb1fe111.jar
 C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\commons-codec-1.6-249620c2dab3298fe8658b3f6e0464933c70c281.jar
+C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\poketSphinx_jni_so-7815c477450dbebf4db7453a7db207fb90a48ae9.jar
 C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\classes-21f067fc5f6c19001e801d700a2bc8087b64a282.jar
 C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\classes-d4f250808507ba446ca57440c30cbc0e8872c926.jar
 C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\guava-18.0-282a2bb23954d3314fa50afb3651d2cae31b0a1b.jar

@@ -5,4 +5,5 @@ pattern,classAndFileBaseName
 .* play .*(with you|guess).*,guessNum
 knock knock,knockKnock
 Hello,firstHello
+start .*,rapport
 .*,socialTalk
