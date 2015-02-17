@@ -6,23 +6,27 @@ package InMind.Server;
 
 public class InteractionManager implements IInteractionManager
 {
+    int vadCount = 0;
 
     @Override
-    public actionToTake updatedAudioInfo(int vad, int finalPause)
+    public ActionToTake updatedAudioInfo(int vad, int finalPause)
     {
-        return null;
+        vadCount += vad;
+        if (finalPause > 500 && vadCount >=3)
+            return ActionToTake.goToGoogle;
+        return ActionToTake.none;
     }
 
     @Override
     public void start()
     {
-
+        vadCount = 0;
     }
 
     @Override
     public void stop()
     {
-
+        vadCount = 0;
     }
 
     @Override

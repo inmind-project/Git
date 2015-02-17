@@ -140,19 +140,12 @@ public class AudioStreamer
 
 
                 }
-                catch (UnknownHostException e)
+                catch (Exception ex)
                 {
-                    Log.e("VS", "UnknownHostException");
+                    stopStreaming();
+                    if (socket != null)
+                        socket.close();
                 }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                    Log.e("VS", "IOException");
-                } //catch (InterruptedException e) {
-                //e.printStackTrace();
-                //Log.e("VS", "InterruptedException");
-                //}
-
             }
 
         });

@@ -5,7 +5,7 @@ package InMind.Server;
  */
 public interface IInteractionManager
 {
-    enum actionToTake {none, goToGoogle, cancel, commit};
+    enum ActionToTake {none, goToGoogle, cancel, commit};
 
     /*
     main function. Is called every time new audio arrives.
@@ -14,7 +14,7 @@ public interface IInteractionManager
     should cancel all actions from previous start (cancel),
     or should commit and end current stream of audio (commit)
      */
-    actionToTake updatedAudioInfo(int vad, int finalPause);
+    ActionToTake updatedAudioInfo(int vad, int finalPause);
 
     /*
     will be called before the first information arrives

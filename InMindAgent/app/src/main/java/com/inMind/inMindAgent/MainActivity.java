@@ -166,13 +166,6 @@ public class MainActivity extends ActionBarActivity
                         }
                     }
 
-                    // Intent myIntent = new Intent();
-                    // //myIntent.setClassName("com.android.calculator2","com.android.calculator2.Calculator");
-                    // myIntent.setClassName(m.group(1),m.group(2));
-                    // //myIntent.putExtra("com.android.samples.SpecialValue",
-                    // "Hello, Joe!"); // key/value pair, where key needs
-                    // current package prefix.
-                    // startActivity(myIntent);
                 }
                 return false;
             }

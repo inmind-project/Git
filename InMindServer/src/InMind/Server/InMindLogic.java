@@ -2,8 +2,6 @@ package InMind.Server;
 
 import InMind.Consts;
 
-import java.io.PrintWriter;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -93,64 +91,28 @@ public class InMindLogic
                         tcpServer.sendMessage(Consts.connectUdp + Consts.commandChar + portToUse);
 
 
-                        StreamAudioServer streamAudioServer = new StreamAudioServer(new StreamAudioServer.StreamingAlerts()
+                        AudioTopDirector audioTopDirector = new AudioTopDirector(portToUse, new InteractionManager(), new AudioTopDirector.IControllingOrders()
                         {
-                            ASR asr = new ASR();
-                            Path obtainedFile = null;
-
                             @Override
-                            public void rawFilePath(Path filePathForSavingAudio)
+                            public void dealWithAsrRes(ASR.AsrRes asrRes)
                             {
-                                obtainedFile = filePathForSavingAudio;
-                            }
-
-                            @Override
-                            public void audioArrived(byte[] audio)
-                            {
-                                try
-                                {
-                                    if (!asr.isConnectionOpen())
-                                        asr.beginTransmission();
-                                    asr.sendDataAsync(audio);
-
-                                } catch (Exception e)
-                                {
-                                    e.printStackTrace();
-                                }
-
-                            }
-
-                            @Override
-                            public void audioEnded()
-                            {
-                                ASR.AsrRes asrRes = null;
-                                try
-                                {
-                                    if (asr.isConnectionOpen())
-                                    {
-                                        tcpServer.sendMessage(Consts.stopUdp + Consts.commandChar);
-                                        asrRes = asr.closeAndGetResponse();
-                                        if (obtainedFile != null) //write json response text file
-                                        {
-                                            PrintWriter pw = new PrintWriter(obtainedFile.toString() + ".txt");
-                                            pw.print(asrRes.fullJsonRes);
-                                            pw.flush();
-                                            pw.close();
-                                        }
-                                        System.out.println(asrRes.text);
-                                    }
-                                } catch (Exception e)
-                                {
-                                    e.printStackTrace();
-                                }
                                 dealWithText(userId, asrRes);
+                            }
+
+                            @Override
+                            public void cancelAllAction()
+                            {
+
+                            }
+
+                            @Override
+                            public void closeAudioConnection()
+                            {
+                                tcpServer.sendMessage(Consts.stopUdp + Consts.commandChar);
                             }
                         });
 
-
-                        streamAudioServer.runServer(portToUse);
-
-                        //asrRes = ASR.getGoogleASR(obtainedFile);
+                        audioTopDirector.runServer();
                     }
 
                 }
@@ -174,6 +136,10 @@ public class InMindLogic
                 }
 
                 userConversation.dealWithMessage(asrRes, new MessageSender());
+            }
+            else
+            {
+                tcpServer.sendMessage(Consts.sayCommand+ Consts.commandChar+"I didn't hear anything.");
             }
 
             tcpServer.abandonClient();
