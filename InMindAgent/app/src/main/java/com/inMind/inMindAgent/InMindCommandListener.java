@@ -1,17 +1,8 @@
 package com.inMind.inMindAgent;
 
-import java.util.ArrayList;
-
 import android.content.Context;
-import android.content.Intent;
-import android.media.AudioManager;
-import android.os.Bundle;
-import android.speech.RecognitionListener;
-import android.speech.RecognizerIntent;
-import android.speech.SpeechRecognizer;
-import android.util.Log;
 
-import com.inMind.pocketSphinx.PocketSphinxSearcher;
+import com.inMind.pocketSphinxBridge.PocketSphinxSearcher;
 
 public class InMindCommandListener
 {

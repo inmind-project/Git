@@ -1,0 +1,31 @@
+find human task management software (open source). organizational management
+
+identify tasks 
+easily analized
+deadlines who commits to what as verified by the user. (interface to schedule tasks)
+forms edit to create a task.
+group pojects (for undergraduates).
+
+bag of words
+email headers
+NER (inc. dates)
+
+
+dependency (which dates refers to what).
+data (from darpa?)
+
+enron email corpus
+
+
+
+Tom calander varification to meeting (calander assistant)
+
+what would you call this cluster (suggesting a name)? (The more you tell the better it would work).
+
+
+tasks teams times and places on the user.
+
+(relevent interuptions).
+
+Talk to justin (the first consumer of the email understanding component).
+NELL markup.
