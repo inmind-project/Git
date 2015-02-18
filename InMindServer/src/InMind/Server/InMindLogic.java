@@ -135,11 +135,14 @@ public class InMindLogic
                     userConversationMap.put(userId,userConversation);
                 }
 
-                userConversation.dealWithMessage(asrRes, new MessageSender());
+                boolean renewConnection = userConversation.dealWithMessage(asrRes, new MessageSender());
+
+                tcpServer.sendMessage((renewConnection ? Consts.startNewConnection : Consts.closeConnection) + Consts.commandChar);
             }
             else
             {
-                tcpServer.sendMessage(Consts.sayCommand+ Consts.commandChar+"I didn't hear anything.");
+                tcpServer.sendMessage(Consts.sayCommand + Consts.commandChar + "I didn't hear anything.");
+                tcpServer.sendMessage(Consts.closeConnection + Consts.commandChar);
             }
 
             tcpServer.abandonClient();

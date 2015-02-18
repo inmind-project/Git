@@ -12,6 +12,7 @@ public class SignalInfoProvider
     int bytesSilentAtEnd = 0;
     int bytesTalkAtCurrentSample = 0;
     int bytesTotalTalkLength = 0;
+    double totalTimeFromStart = 0;
 
 
     final int silentLengthNeeded = 500;  //in milliseconds
@@ -28,7 +29,9 @@ public class SignalInfoProvider
     class SignalInfo
     {
         public int vad; //was their noise in this sample
-        public int finalPause; //in milliseconds
+        public double finalPause; //in milliseconds
+        public double offSetFromFirst; //in milliseconds
+        public double sampleLength; //in milliseconds
     }
 
 
@@ -37,8 +40,11 @@ public class SignalInfoProvider
         SignalInfo signalInfo = new SignalInfo();
         updateTalkAndSilent(asByte);
 
-        signalInfo.finalPause = (int)convertToMilliSeconds(bytesSilentAtEnd);
+        signalInfo.finalPause = convertToMilliSeconds(bytesSilentAtEnd);
         signalInfo.vad = (bytesTalkAtCurrentSample > minimalTalk) ? 1 : 0;
+        signalInfo.offSetFromFirst = totalTimeFromStart;
+        signalInfo.sampleLength = asByte.length * 1000.0 / Consts.sampleRate;
+        totalTimeFromStart += signalInfo.sampleLength;
         return signalInfo;
     }
 

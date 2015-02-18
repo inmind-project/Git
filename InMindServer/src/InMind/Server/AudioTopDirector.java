@@ -79,10 +79,11 @@ public class AudioTopDirector
                     SignalInfoProvider.SignalInfo signalInfo = signalInfoProvider.obtainSampleInfo(audioReceived);
 
 
-                    IInteractionManager.ActionToTake actionToTake = interactionManager.updatedAudioInfo(signalInfo.vad, signalInfo.finalPause);
+                    IInteractionManager.ActionToTake actionToTake = interactionManager.updatedAudioInfo(signalInfo.offSetFromFirst,signalInfo.sampleLength,signalInfo.vad, signalInfo.finalPause);
 
                     if (actionToTake == IInteractionManager.ActionToTake.goToGoogle && asr.isConnectionOpen())
                     {
+                        controllingOrders.closeAudioConnection();
                         ASR.AsrRes asrRes = getAsrRes();
 
                         controllingOrders.dealWithAsrRes(asrRes);

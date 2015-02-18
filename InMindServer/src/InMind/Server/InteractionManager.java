@@ -8,8 +8,9 @@ public class InteractionManager implements IInteractionManager
 {
     int vadCount = 0;
 
+
     @Override
-    public ActionToTake updatedAudioInfo(int vad, int finalPause)
+    public ActionToTake updatedAudioInfo(double offsetFromFirst, double sampleLength, int vad, double finalPause)
     {
         vadCount += vad;
         if (finalPause > 500 && vadCount >=3)

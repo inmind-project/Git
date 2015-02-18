@@ -63,7 +63,10 @@ public class UserConversation
     }
 
 
-    public void dealWithMessage(ASR.AsrRes asrRes, InMindLogic.MessageReceiver.MessageSender messageSender)
+    /*
+    returns whether to renew a connection.
+     */
+    public boolean dealWithMessage(ASR.AsrRes asrRes, InMindLogic.MessageReceiver.MessageSender messageSender)
     {
         String userText = asrRes.text;
         boolean firstEnter = false;
@@ -117,8 +120,7 @@ public class UserConversation
                 if (firstEnter)
                     tmpDialogFileBaseJustExited = dialogFileBase;
                 clearDialog();
-                dealWithMessage(asrRes, messageSender); //recall this function and send relevant information
-                return;
+                return dealWithMessage(asrRes, messageSender); //recall this function and send relevant information
             }
 
             if (fullInfo.get(stateName).equals(dialogFinish))
@@ -126,19 +128,11 @@ public class UserConversation
                 clearDialog();
             }
 
-            List<String> closeOrRenewConnection = new LinkedList<String>();
-
-            if (dialogFileBase.isEmpty())
-            {
-                closeOrRenewConnection.add(Consts.closeConnection + Consts.commandChar);
-            } else
-            {
-                closeOrRenewConnection.add(Consts.startNewConnection + Consts.commandChar);
-            }
-            sendToUser(messageSender, closeOrRenewConnection, false);
 
         }
 
+        boolean renewConnection = !dialogFileBase.isEmpty();
+        return renewConnection;
     }
 
     private void sendToUser(InMindLogic.MessageReceiver.MessageSender messageSender, List<String> forUser, boolean saveMessage)
