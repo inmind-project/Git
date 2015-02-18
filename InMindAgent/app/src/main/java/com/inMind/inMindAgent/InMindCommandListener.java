@@ -15,6 +15,7 @@ public class InMindCommandListener
     InmindCommandInterface minmindCommandInterface;
     Context context;
     PocketSphinxSearcher pocketSphinxSearcher = null;
+    boolean isListeningForCommand = false;
 
     InMindCommandListener(InmindCommandInterface inmindCommandInterface, final Context context)
     {
@@ -33,10 +34,15 @@ public class InMindCommandListener
     public void stopListening()
     {
         pocketSphinxSearcher.stopListening();
+        isListeningForCommand = false;
     }
 
     public void listenForInmindCommand()
     {
-        pocketSphinxSearcher.startListeningForKeyword();
+        if (!isListeningForCommand)
+        {
+            pocketSphinxSearcher.startListeningForKeyword();
+            isListeningForCommand = true;
+        }
     }
 }

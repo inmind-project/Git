@@ -141,7 +141,7 @@ public class InMindLogic
             }
             else
             {
-                tcpServer.sendMessage(Consts.sayCommand + Consts.commandChar + "I didn't hear anything.");
+                //tcpServer.sendMessage(Consts.sayCommand + Consts.commandChar + "I didn't hear anything.");
                 tcpServer.sendMessage(Consts.closeConnection + Consts.commandChar);
             }
 

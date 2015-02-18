@@ -123,8 +123,9 @@ public class AudioTopDirector
                     try
                     {
                         asr.beginTransmission();
-                        asr.sendDataAsync(allAudioFromBeginning.getRawData());
-                    } catch (IOException e)
+                        if (asr.isConnectionOpen())
+                            asr.sendDataAsync(allAudioFromBeginning.getRawData());
+                    } catch (Exception e)
                     {
                         e.printStackTrace();
                     }
@@ -171,9 +172,9 @@ public class AudioTopDirector
                 boolean wasNotCanceled = myGoogleCallId == validGoogleCallId;
                 if (wasNotCanceled)
                 {
-                    controllingOrders.dealWithAsrRes(asrRes);
                     interactionManager.stop();
                     controllingOrders.closeAudioConnection();
+                    controllingOrders.dealWithAsrRes(asrRes);
                 }
             }
 

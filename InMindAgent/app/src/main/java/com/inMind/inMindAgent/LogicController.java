@@ -38,17 +38,19 @@ public class LogicController
     private Handler userNotifierHandler;
     private Handler talkHandler;
     private Handler launchHandler;
+    private Handler stopRecHandler;
     private boolean needToReconnect;
 
     private MessageController messageController;
     private Context context = null;
     MessageBroker messageBroker;
 
-    public LogicController(Handler userNotifierHandler, Handler talkHandler, Handler launchHandler, MessageBroker messageBroker, String uniqueId)
+    public LogicController(Handler userNotifierHandler, Handler talkHandler, Handler launchHandler, Handler stopRecHandler, MessageBroker messageBroker, String uniqueId)
     {
         this.userNotifierHandler = userNotifierHandler;
         this.talkHandler = talkHandler;
         this.launchHandler = launchHandler;
+        this.stopRecHandler = stopRecHandler;
         messageController = new MessageController();
         this.messageBroker = messageBroker;
         this.uniqueId = uniqueId;
@@ -123,11 +125,7 @@ public class LogicController
             if (m.group(1).equalsIgnoreCase(Consts.stopUdp))
             {
                 stopStreaming();
-                Message msgToast = new Message();
-                msgToast.arg1 = 1;
-                msgToast.arg2 = 0; //not important
-                msgToast.obj = "Wait...";
-                userNotifierHandler.sendMessage(msgToast);
+                stopRecHandler.sendMessage(new Message());
             }
             else if (m.group(1).equalsIgnoreCase(Consts.connectUdp))
             {

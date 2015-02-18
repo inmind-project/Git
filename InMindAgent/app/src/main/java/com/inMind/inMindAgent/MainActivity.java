@@ -49,7 +49,7 @@ public class MainActivity extends ActionBarActivity
     private ImageButton startButton;
     private Button stopButton;
 
-    private Handler userNotifierHandler, talkHandler, launchHandler, ttsCompleteHandler; // TODO: should
+    private Handler userNotifierHandler, talkHandler, launchHandler, ttsCompleteHandler, endRecHandler; // TODO: should
     // these all be
     // combined to
     // one handler?
@@ -104,10 +104,6 @@ public class MainActivity extends ActionBarActivity
             {
 
                 boolean isReconnecting = logicController.reconnectIfNeeded();
-                if (!isReconnecting)
-                {
-                    inmindCommandListener.listenForInmindCommand();
-                }
                 return false;
             }
         });
@@ -171,6 +167,21 @@ public class MainActivity extends ActionBarActivity
             }
         });
 
+        endRecHandler = new Handler(new Handler.Callback()
+        {
+            @Override
+            public boolean handleMessage(Message msg)
+            {
+                //Message msgToast = new Message();
+                //msgToast.arg1 = 1;
+                //msgToast.arg2 = 0; //not important
+                //msgToast.obj = "Wait...";
+                //userNotifierHandler.sendMessage(msgToast);
+                inmindCommandListener.listenForInmindCommand();
+                return false;
+            }
+        });
+
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         //intentFilter.addAction(Intent.ACTION_SCREEN_ON);
         registerReceiver(new BroadcastReceiver()
@@ -210,7 +221,7 @@ public class MainActivity extends ActionBarActivity
             if (uniqueId == null)
                 uniqueId = "errorId";
             logicController = new LogicController(userNotifierHandler, talkHandler,
-                    launchHandler, messageBroker, uniqueId);
+                    launchHandler, endRecHandler, messageBroker, uniqueId);
         }
 
         if (inmindCommandListener == null)
