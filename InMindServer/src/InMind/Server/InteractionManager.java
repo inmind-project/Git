@@ -11,7 +11,7 @@ public class InteractionManager implements IInteractionManager
     int vadCountWhenSentCall = 0;
     boolean stoppedState = false;
 
-    final int minimalVadRequired = 3;
+    final int minimalVadRequired = 4;
     final int minimalFinalPause = 250;
     final int maximalFinalPause = 3000;
 

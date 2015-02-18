@@ -16,8 +16,8 @@ public class SignalInfoProvider
 
 
     final int silentLengthNeeded = 500;  //in milliseconds
-    final int considerSilent = 1500;  //TODO: may want to use mean squared error or other smart approaches.
-    final int considerSpeech = 2200;
+    final int considerSilent = 2000;  //TODO: may want to use mean squared error or other smart approaches.
+    final int considerSpeech = 3000;
     final int minimalTalk = Consts.sampleRate / 5000; //require at least 0.001 sec of speech
 
 

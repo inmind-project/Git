@@ -20,8 +20,7 @@ public class AudioStreamer
 {
 
     AudioRecord recorder;
-
-    public byte[] buffer;
+    
     public static DatagramSocket socket;
 
     private int sampleRate = 44100;
