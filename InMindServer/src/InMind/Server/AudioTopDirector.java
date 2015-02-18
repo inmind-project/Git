@@ -2,6 +2,7 @@ package InMind.Server;
 
 import com.sun.xml.internal.ws.util.ByteArrayBuffer;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
@@ -61,12 +62,15 @@ public class AudioTopDirector
             {
                 try
                 {
-                asr.beginTransmission();
-            } catch (Exception e)
-            {
-                e.printStackTrace();
+                    asr.beginTransmission();
+                } catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
-            }
+
+            boolean hasValidGoogleCall = false;
+            int validGoogleCallId = 0;
 
             @Override
             public boolean audioArrived(byte[] audioReceived)
@@ -81,14 +85,10 @@ public class AudioTopDirector
 
                     IInteractionManager.ActionToTake actionToTake = interactionManager.updatedAudioInfo(signalInfo.offSetFromFirst,signalInfo.sampleLength,signalInfo.vad, signalInfo.finalPause);
 
-                    if (actionToTake == IInteractionManager.ActionToTake.goToGoogle && asr.isConnectionOpen())
+                    if (actionToTake == IInteractionManager.ActionToTake.goToGoogle)
                     {
-                        controllingOrders.closeAudioConnection();
-                        ASR.AsrRes asrRes = getAsrRes();
-
-                        controllingOrders.dealWithAsrRes(asrRes);
-                        interactionManager.stop();
-                        retGetMoreAudio = false;
+                        invalidateOldCallIfExistsAndStreamNew();
+                        getAsrResAsync();
                     }
                     else if (actionToTake == IInteractionManager.ActionToTake.none)
                     {
@@ -97,9 +97,12 @@ public class AudioTopDirector
                     }
                     else if (actionToTake == IInteractionManager.ActionToTake.commit)
                     {
+                        controllingOrders.closeAudioConnection();
                         retGetMoreAudio = false;
+                    } else  if (actionToTake == IInteractionManager.ActionToTake.cancel)
+                    {
+                        invalidateOldCallIfExistsAndStreamNew();
                     }
-                    //TODO: deal with cancel!!!
 
                 } catch (Exception e)
                 {
@@ -110,18 +113,68 @@ public class AudioTopDirector
                 return  retGetMoreAudio;
             }
 
-            private ASR.AsrRes getAsrRes() throws IOException
+            private void invalidateOldCallIfExistsAndStreamNew()
             {
-                ASR.AsrRes asrRes = asr.closeAndGetResponse(); //TODO: must be done async!
+                validGoogleCallId++;
+                if (hasValidGoogleCall)
+                {
+                    hasValidGoogleCall = false;
+                    asr = new ASR();
+                    try
+                    {
+                        asr.beginTransmission();
+                        asr.sendDataAsync(allAudioFromBeginning.getRawData());
+                    } catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+
+            private void getAsrResAsync() throws IOException
+            {
+                if (asr.isConnectionOpen())
+                {
+                    hasValidGoogleCall = true;
+                    asr.closeAndGetResponseAsync(new ASR.IAsrGetResponse()
+                    {
+                        int myGoogleCallId = validGoogleCallId;
+
+                        @Override
+                        public void gotResponse(ASR.AsrRes asrRes)
+                        {
+                            dealWithAsrResponse(asrRes, myGoogleCallId);
+                        }
+                    });
+                }
+
+            }
+
+            private void dealWithAsrResponse(ASR.AsrRes asrRes, int myGoogleCallId)
+            {
                 if (obtainedFile != null) //write json response text file
                 {
-                    PrintWriter pw = new PrintWriter(obtainedFile.toString() + ".txt");
-                    pw.print(asrRes.fullJsonRes);
-                    pw.flush();
-                    pw.close();
+                    PrintWriter pw = null;
+                    try
+                    {
+                        pw = new PrintWriter(obtainedFile.toString() + ".txt");
+                        pw.print(asrRes.fullJsonRes);
+                        pw.flush();
+                        pw.close();
+                    } catch (FileNotFoundException e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
                 System.out.println(asrRes.text);
-                return asrRes;
+                boolean wasNotCanceled = myGoogleCallId == validGoogleCallId;
+                if (wasNotCanceled)
+                {
+                    controllingOrders.dealWithAsrRes(asrRes);
+                    interactionManager.stop();
+                    controllingOrders.closeAudioConnection();
+                }
             }
 
             @Override
@@ -144,9 +197,8 @@ public class AudioTopDirector
             {
                 try
                 {
-                    ASR.AsrRes asrRes = getAsrRes();
-                    interactionManager.stop();
-                    controllingOrders.dealWithAsrRes(asrRes);
+                    if (!hasValidGoogleCall)
+                        getAsrResAsync();
 
                 } catch (Exception ex)
                 {

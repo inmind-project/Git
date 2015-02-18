@@ -73,6 +73,26 @@ public class ASR
         wr.write(dataToSend);
     }
 
+    interface IAsrGetResponse
+    {
+        void gotResponse(AsrRes asrRes);
+    }
+
+    public void closeAndGetResponseAsync(IAsrGetResponse asrGetResponse)
+    {
+        Thread a = new Thread(() -> {
+            try
+            {
+                AsrRes asrRes = closeAndGetResponse();
+                asrGetResponse.gotResponse(asrRes);
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        });
+        a.start();
+    }
+
     public AsrRes closeAndGetResponse() throws IOException
     {
         AsrRes res = new AsrRes();
