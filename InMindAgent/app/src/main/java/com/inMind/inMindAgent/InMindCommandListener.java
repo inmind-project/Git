@@ -1,6 +1,7 @@
 package com.inMind.inMindAgent;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.inMind.pocketSphinxBridge.PocketSphinxSearcher;
 
@@ -33,14 +34,19 @@ public class InMindCommandListener
 
     public void stopListening()
     {
-        pocketSphinxSearcher.stopListening();
-        isListeningForCommand = false;
+        if (isListeningForCommand)
+        {
+            Log.d("listener","stopped listening for command.");
+            pocketSphinxSearcher.stopListening();
+            isListeningForCommand = false;
+        }
     }
 
     public void listenForInmindCommand()
     {
         if (!isListeningForCommand)
         {
+            Log.d("listener","listening for command.");
             pocketSphinxSearcher.startListeningForKeyword();
             isListeningForCommand = true;
         }

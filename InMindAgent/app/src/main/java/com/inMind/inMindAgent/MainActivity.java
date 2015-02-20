@@ -12,16 +12,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.speech.RecognitionListener;
-import android.speech.RecognizerIntent;
-import android.speech.SpeechRecognizer;
 import android.support.v7.app.ActionBarActivity;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -49,7 +45,7 @@ public class MainActivity extends ActionBarActivity
     private ImageButton startButton;
     private Button stopButton;
 
-    private Handler userNotifierHandler, talkHandler, launchHandler, ttsCompleteHandler, endRecHandler; // TODO: should
+    private Handler userNotifierHandler, talkHandler, launchHandler, ttsCompleteHandler, startStopRecHandler; // TODO: should
     // these all be
     // combined to
     // one handler?
@@ -167,7 +163,7 @@ public class MainActivity extends ActionBarActivity
             }
         });
 
-        endRecHandler = new Handler(new Handler.Callback()
+        startStopRecHandler = new Handler(new Handler.Callback()
         {
             @Override
             public boolean handleMessage(Message msg)
@@ -177,7 +173,10 @@ public class MainActivity extends ActionBarActivity
                 //msgToast.arg2 = 0; //not important
                 //msgToast.obj = "Wait...";
                 //userNotifierHandler.sendMessage(msgToast);
-                inmindCommandListener.listenForInmindCommand();
+                if (msg.what == 1)
+                    inmindCommandListener.stopListening();
+                if (msg.what == 0)
+                    inmindCommandListener.listenForInmindCommand();
                 return false;
             }
         });
@@ -221,7 +220,7 @@ public class MainActivity extends ActionBarActivity
             if (uniqueId == null)
                 uniqueId = "errorId";
             logicController = new LogicController(userNotifierHandler, talkHandler,
-                    launchHandler, endRecHandler, messageBroker, uniqueId);
+                    launchHandler, startStopRecHandler, messageBroker, uniqueId);
         }
 
         if (inmindCommandListener == null)
@@ -254,7 +253,7 @@ public class MainActivity extends ActionBarActivity
 
     void connectAudioToServer()
     {
-        inmindCommandListener.stopListening();
+        //inmindCommandListener.stopListening();
         logicController.ConnectToServer();
     }
 
@@ -379,7 +378,7 @@ public class MainActivity extends ActionBarActivity
             Log.d("Main", "Stop Clicked");
             // audioStreamer.stopStreaming();
             logicController.stopStreaming();
-            inmindCommandListener.stopListening();
+            //inmindCommandListener.stopListening();
         }
 
     };
