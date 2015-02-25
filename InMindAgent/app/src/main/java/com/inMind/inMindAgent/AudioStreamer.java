@@ -82,7 +82,7 @@ public class AudioStreamer
                     socket = new DatagramSocket();
                     Log.d("VS", "Socket Created.");
                     int minBufSize = AudioRecord.getMinBufferSize(Consts.sampleRate, channelConfig, audioFormat);
-                    //int minBufSize = Consts.udpBufferSize;
+                    //int minBufSize = 3584;//Consts.udpBufferSize;
 
                     Log.d("VS", "minBufSize:" + minBufSize);
                     byte[] buffer = new byte[minBufSize];
@@ -127,13 +127,15 @@ public class AudioStreamer
 
 
                         //reading data from MIC into buffer
-                        minBufSize = recorder.read(buffer, 0, buffer.length);
+                        int bytesRead = recorder.read(buffer, 0, buffer.length);
 
-                        //putting buffer in the packet
-                        packet = new DatagramPacket(buffer, buffer.length, destination, portNum);
-
-                        socket.send(packet);
-                        System.out.println("Send_Packet: " + minBufSize);
+                        if (bytesRead > 0)
+                        {
+                            //putting buffer in the packet
+                            packet = new DatagramPacket(buffer, buffer.length, destination, portNum);
+                            socket.send(packet);
+                            System.out.println("Send_Packet: " + minBufSize);
+                        }
                     }
 
                     socket.close();

@@ -38,19 +38,24 @@ public class LogicController
     private Handler userNotifierHandler;
     private Handler talkHandler;
     private Handler launchHandler;
-    private Handler startStopRecHandler;
+    syncNotifiers startStopRecNotifier;
     private boolean needToReconnect;
 
     private MessageController messageController;
     private Context context = null;
     MessageBroker messageBroker;
 
-    public LogicController(Handler userNotifierHandler, Handler talkHandler, Handler launchHandler, Handler startStopRecHandler, MessageBroker messageBroker, String uniqueId)
+    interface syncNotifiers
+    {
+        void startStopRec(boolean start);
+    }
+
+    public LogicController(Handler userNotifierHandler, Handler talkHandler, Handler launchHandler, syncNotifiers startStopRecNotifier, MessageBroker messageBroker, String uniqueId)
     {
         this.userNotifierHandler = userNotifierHandler;
         this.talkHandler = talkHandler;
         this.launchHandler = launchHandler;
-        this.startStopRecHandler = startStopRecHandler;
+        this.startStopRecNotifier = startStopRecNotifier;
         messageController = new MessageController();
         this.messageBroker = messageBroker;
         this.uniqueId = uniqueId;
@@ -68,7 +73,7 @@ public class LogicController
         if (tcpClient != null && audioStreamer != null && audioStreamer.isStreaming())
             return;
         closeConnection();
-        startStopRecHandler.sendEmptyMessage(1); //say that is starting the recording.
+        startStopRecNotifier.startStopRec(true);//say that is starting the recording.
         new connectTask().execute(uniqueId + Consts.commandChar + Consts.requestSendAudio + Consts.commandChar);
     }
 
@@ -126,7 +131,7 @@ public class LogicController
             if (m.group(1).equalsIgnoreCase(Consts.stopUdp))
             {
                 stopStreaming();
-                startStopRecHandler.sendEmptyMessage(0); //say that is stopping the recording.
+                startStopRecNotifier.startStopRec(false); //say that is stopping the recording.
             }
             else if (m.group(1).equalsIgnoreCase(Consts.connectUdp))
             {

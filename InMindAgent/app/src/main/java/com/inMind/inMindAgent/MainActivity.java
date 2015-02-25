@@ -45,11 +45,11 @@ public class MainActivity extends ActionBarActivity
     private ImageButton startButton;
     private Button stopButton;
 
-    private Handler userNotifierHandler, talkHandler, launchHandler, ttsCompleteHandler, startStopRecHandler; // TODO: should
+    private Handler userNotifierHandler, talkHandler, launchHandler, ttsCompleteHandler; // TODO: should
     // these all be
     // combined to
     // one handler?
-
+    private LogicController.syncNotifiers startStopRecNotifier;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -163,23 +163,17 @@ public class MainActivity extends ActionBarActivity
             }
         });
 
-        startStopRecHandler = new Handler(new Handler.Callback()
+        startStopRecNotifier = new LogicController.syncNotifiers()
         {
             @Override
-            public boolean handleMessage(Message msg)
+            public void startStopRec(boolean start)
             {
-                //Message msgToast = new Message();
-                //msgToast.arg1 = 1;
-                //msgToast.arg2 = 0; //not important
-                //msgToast.obj = "Wait...";
-                //userNotifierHandler.sendMessage(msgToast);
-                if (msg.what == 1)
+                if (start)
                     inmindCommandListener.stopListening();
-                if (msg.what == 0)
+                else
                     inmindCommandListener.listenForInmindCommand();
-                return false;
             }
-        });
+        };
 
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         //intentFilter.addAction(Intent.ACTION_SCREEN_ON);
@@ -220,7 +214,7 @@ public class MainActivity extends ActionBarActivity
             if (uniqueId == null)
                 uniqueId = "errorId";
             logicController = new LogicController(userNotifierHandler, talkHandler,
-                    launchHandler, startStopRecHandler, messageBroker, uniqueId);
+                    launchHandler, startStopRecNotifier, messageBroker, uniqueId);
         }
 
         if (inmindCommandListener == null)
