@@ -13,6 +13,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import InMind.Consts;
+
 /**
  * Created by Amos Azaria on 31-Dec-14.
  */
@@ -23,7 +25,6 @@ public class AudioStreamer
 
     public static DatagramSocket socket;
 
-    private int sampleRate = 44100;
     private int channelConfig = AudioFormat.CHANNEL_IN_MONO;
     private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
     private boolean status = false;
@@ -80,7 +81,8 @@ public class AudioStreamer
                     Log.d("VS", "Before Creating socket");
                     socket = new DatagramSocket();
                     Log.d("VS", "Socket Created.");
-                    int minBufSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat);
+                    int minBufSize = AudioRecord.getMinBufferSize(Consts.sampleRate, channelConfig, audioFormat);
+                    //int minBufSize = Consts.udpBufferSize;
 
                     Log.d("VS", "minBufSize:" + minBufSize);
                     byte[] buffer = new byte[minBufSize];
@@ -92,7 +94,7 @@ public class AudioStreamer
                     Log.d("VS", "Address retrieved");
 
 
-                    recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, minBufSize * 10);
+                    recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, Consts.sampleRate, channelConfig, audioFormat, minBufSize * 10);
                     Log.d("VS", "Recorder initialized");
 
                     recorder.startRecording();

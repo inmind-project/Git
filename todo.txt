@@ -28,4 +28,4 @@ tasks teams times and places on the user.
 (relevent interuptions).
 
 Talk to justin (the first consumer of the email understanding component).
-NELL markup.
+NELL markup (by next week).

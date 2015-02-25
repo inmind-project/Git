@@ -55,7 +55,6 @@ public class AudioTopDirector
         AudioReceiver streamAudioServer = new AudioReceiver(new AudioReceiver.StreamingAlerts()
         {
             ASR asr = new ASR();
-            Path obtainedFile = null;
 
             @Override
             public void firstAudioArriving()
@@ -73,14 +72,14 @@ public class AudioTopDirector
             int validGoogleCallId = 0;
 
             @Override
-            public boolean audioArrived(byte[] audioReceived)
+            public boolean audioArrived(byte[] audioReceived, int length)
             {
                 boolean retGetMoreAudio = true;
                 try
                 {
-                    appendToFile(audioReceived, audioReceived.length, filePath);
-                    allAudioFromBeginning.write(audioReceived);
-                    SignalInfoProvider.SignalInfo signalInfo = signalInfoProvider.obtainSampleInfo(audioReceived);
+                    appendToFile(audioReceived, length, filePath);
+                    allAudioFromBeginning.write(audioReceived, 0, length);
+                    SignalInfoProvider.SignalInfo signalInfo = signalInfoProvider.obtainSampleInfo(audioReceived, length);
 
 
                     IInteractionManager.ActionToTake actionToTake = interactionManager.updatedAudioInfo(signalInfo.offSetFromFirst,signalInfo.sampleLength,signalInfo.vad, signalInfo.finalPause);
@@ -154,12 +153,12 @@ public class AudioTopDirector
 
             private void dealWithAsrResponse(ASR.AsrRes asrRes, int myGoogleCallId)
             {
-                if (obtainedFile != null) //write json response text file
+                if (filePath != null) //write json response text file
                 {
                     PrintWriter pw = null;
                     try
                     {
-                        pw = new PrintWriter(obtainedFile.toString() + ".txt");
+                        pw = new PrintWriter(filePath.toString() + ".txt");
                         pw.print(asrRes.fullJsonRes);
                         pw.flush();
                         pw.close();

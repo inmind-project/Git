@@ -11,6 +11,7 @@ class AudioReceiver
 
     static final int timeout = 1000; //in milliseconds
     static final long maxRecordingTimeLength = 60 * 1000; //in milliseconds
+    static public final int udpBufferSize = 4096;
 
 
     static SourceDataLine sourceDataLine;
@@ -25,7 +26,7 @@ class AudioReceiver
 
         void firstAudioArriving(); //called when first audio is arriving (will be followed by audioArrived.
 
-        boolean audioArrived(byte[] audioReceived); //audio received ready for decoding, return whether should continue waiting for more audio.
+        boolean audioArrived(byte[] audioReceived, int length); //audio received ready for decoding, return whether should continue waiting for more audio.
 
         void audioEnded(); //audio stopped, no additional changes will be made.
 
@@ -62,7 +63,7 @@ class AudioReceiver
              * than 9728.
              */
 
-            byte[] receiveData = new byte[4096];
+            byte[] receiveData = new byte[udpBufferSize];
 
 
 
@@ -96,7 +97,7 @@ class AudioReceiver
                     receivedAudioAlready = true;
                 }
 
-                shouldWaitForMore = streamingAlerts.audioArrived(audioReceived);
+                shouldWaitForMore = streamingAlerts.audioArrived(audioReceived, receivePacket.getLength());
 
             }
             if (streamingAlerts != null)
