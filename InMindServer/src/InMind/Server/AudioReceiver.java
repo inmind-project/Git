@@ -18,6 +18,7 @@ class AudioReceiver
 
     StreamingAlerts streamingAlerts = null;
     boolean receivedAudioAlready = false;
+    boolean shouldWaitForAudio = true;
 
 
     public interface StreamingAlerts
@@ -26,9 +27,9 @@ class AudioReceiver
 
         void firstAudioArriving(); //called when first audio is arriving (will be followed by audioArrived.
 
-        boolean audioArrived(byte[] audioReceived, int length); //audio received ready for decoding, return whether should continue waiting for more audio.
+        void audioArrived(byte[] audioReceived, int length); //audio received ready for decoding.
 
-        void audioEnded(); //audio stopped, no additional changes will be made.
+        void stoppedListeningForAudio(); //audio stopped, no additional changes will be made.
 
         void timedOut();//connection timed out.
         //void cancelAndRestartAudio(); //cancel call, will be followed by audioArrived, with all audio from beginning.
@@ -36,9 +37,14 @@ class AudioReceiver
         //void tryMovingOn();//will be called when audio is assumed to end (call Google ASR)
     }
 
-    public AudioReceiver(StreamingAlerts streamingAlerts, IInteractionManager interactionManager)
+    public AudioReceiver(StreamingAlerts streamingAlerts)
     {
         this.streamingAlerts = streamingAlerts;
+    }
+
+    public void closeConnection()
+    {
+        shouldWaitForAudio = false;
     }
 
     public void runServer(int udpPort)
@@ -74,9 +80,8 @@ class AudioReceiver
 
             long expiringTime = System.currentTimeMillis() + maxRecordingTimeLength;
 
-            boolean shouldWaitForMore = true;
 
-            while (System.currentTimeMillis() < expiringTime && shouldWaitForMore)
+            while (System.currentTimeMillis() < expiringTime && shouldWaitForAudio)
             {
                 //System.out.println("Waiting!");
                 try
@@ -97,11 +102,11 @@ class AudioReceiver
                     receivedAudioAlready = true;
                 }
 
-                shouldWaitForMore = streamingAlerts.audioArrived(audioReceived, receivePacket.getLength());
+                streamingAlerts.audioArrived(audioReceived, receivePacket.getLength()); //TODO: should be async
 
             }
             if (streamingAlerts != null)
-                streamingAlerts.audioEnded();
+                streamingAlerts.stoppedListeningForAudio();
             System.out.println("receive complete!");
 
             serverSocket.close();

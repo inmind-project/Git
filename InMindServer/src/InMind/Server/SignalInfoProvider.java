@@ -45,6 +45,9 @@ public class SignalInfoProvider
         signalInfo.offSetFromFirst = totalTimeFromStart;
         signalInfo.sampleLength = length * 1000.0 / Consts.sampleRate;
         totalTimeFromStart += signalInfo.sampleLength;
+
+        System.out.println("vad:" + signalInfo.vad + ", finalPause:" + signalInfo.finalPause + ", sampleLength: " + signalInfo.sampleLength + ", offSetFromFirst:" + signalInfo.offSetFromFirst);
+
         return signalInfo;
     }
 

@@ -91,7 +91,7 @@ public class InMindLogic
                         tcpServer.sendMessage(Consts.connectUdp + Consts.commandChar + portToUse);
 
 
-                        AudioTopDirector audioTopDirector = new AudioTopDirector(portToUse, new InteractionManager(), new AudioTopDirector.IControllingOrders()
+                        AudioTopDirector audioTopDirector = new AudioTopDirector(portToUse, new AudioTopDirector.IControllingOrders()
                         {
                             @Override
                             public void dealWithAsrRes(ASR.AsrRes asrRes)
