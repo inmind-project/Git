@@ -56,6 +56,7 @@ public class AudioStreamer
         status = false;
         if (recorder != null)
         {
+            recorder.stop();
             recorder.release();
             recorder = null;
         }
@@ -125,16 +126,18 @@ public class AudioStreamer
                     while (status == true)
                     {
 
-
-                        //reading data from MIC into buffer
-                        int bytesRead = recorder.read(buffer, 0, buffer.length);
-
-                        if (bytesRead > 0)
+                        if (recorder != null)
                         {
-                            //putting buffer in the packet
-                            packet = new DatagramPacket(buffer, buffer.length, destination, portNum);
-                            socket.send(packet);
-                            System.out.println("Send_Packet: " + minBufSize);
+                            //reading data from MIC into buffer
+                            int bytesRead = recorder.read(buffer, 0, buffer.length);
+
+                            if (bytesRead > 0)
+                            {
+                                //putting buffer in the packet
+                                packet = new DatagramPacket(buffer, buffer.length, destination, portNum);
+                                socket.send(packet);
+                                System.out.println("Send_Packet: " + minBufSize);
+                            }
                         }
                     }
 

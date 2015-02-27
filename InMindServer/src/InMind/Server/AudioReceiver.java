@@ -42,7 +42,7 @@ class AudioReceiver
         this.streamingAlerts = streamingAlerts;
     }
 
-    public void closeConnection()
+    public void stopListening()
     {
         shouldWaitForAudio = false;
     }

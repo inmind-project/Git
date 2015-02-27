@@ -30,7 +30,9 @@ public class AudioTopDirector
     static final String fileStart = "InputAt";
     Path filePath;
     ASR asr;
-    AudioReceiver streamAudioServer;
+    AudioReceiver audioReceiver;
+
+    boolean sentCloseAudioConnection;
 
     interface IControllingOrders
     {
@@ -46,6 +48,7 @@ public class AudioTopDirector
         this.interactionManager = new InteractionManager(new IMCommandExecutor());
         signalInfoProvider = new SignalInfoProvider();
         this.udpPort = udpPort;
+        sentCloseAudioConnection = false;
     }
 
 
@@ -53,6 +56,7 @@ public class AudioTopDirector
     {
         boolean hasValidGoogleCall = false;
         int validGoogleCallId = 0;
+        ASR.AsrRes latestValidRes = null;
 
         @Override
         public void takeAction(IInteractionManager.ActionToTake actionToTake)
@@ -65,7 +69,7 @@ public class AudioTopDirector
                 case none:
                     break;
                 case commit:
-                    streamAudioServer.closeConnection();
+                    audioReceiver.stopListening();
                     //controllingOrders.closeAudioConnection();
                     break;
                 case goToGoogle:
@@ -106,11 +110,25 @@ public class AudioTopDirector
             boolean wasNotCanceled = myGoogleCallId == validGoogleCallId;
             if (wasNotCanceled)
             {
-                interactionManager.stop();
-                streamAudioServer.closeConnection();
-                //controllingOrders.closeAudioConnection();
-                controllingOrders.dealWithAsrRes(asrRes);
+                latestValidRes = asrRes;
+                moveOnWithResponse();
             }
+        }
+
+        private void moveOnWithResponse()
+        {
+            interactionManager.stop();
+            //we first want the server to stop listening so we won't get stuck in waiting (until timeout).
+            audioReceiver.stopListening();
+            //we need to send the user a message (over tcp) to close audio connection (udp) before closing tcp connection.
+            if (!sentCloseAudioConnection)
+            {
+                //due to no synchronization method, in theory, closeAudioConnection might be sent twice, but who cares?
+                sentCloseAudioConnection = true;
+                controllingOrders.closeAudioConnection();
+            }
+            //this will send a response and close tcp connection
+            controllingOrders.dealWithAsrRes(latestValidRes);
         }
 
         private void invalidateOldCallIfExistsAndStreamNew()
@@ -162,7 +180,7 @@ public class AudioTopDirector
         filePath = Paths.get(folderPath.toString(), fileStart + (new SimpleDateFormat("ddMMyy-hhmmss.SSS").format(new Date())) + ".raw");
         delIfExists(filePath);
 
-        streamAudioServer = new AudioReceiver(new AudioReceiver.StreamingAlerts()
+        audioReceiver = new AudioReceiver(new AudioReceiver.StreamingAlerts()
         {
             @Override
             public void firstAudioArriving()
@@ -190,8 +208,14 @@ public class AudioTopDirector
                     IMEvent imEventVad = new IMEvent(IMEvent.IMEventType.vad);
                     imEventVad.feature.put(IMEvent.featureVad, (signalInfo.vad == 1) ? "true":"false");
                     imEventVad.feature.put(IMEvent.featureFinalPause, ((Double)signalInfo.finalPause).toString());
-                    imEventVad.feature.put(IMEvent.featureDuration, ((Double)signalInfo.sampleLength).toString());
+                    imEventVad.feature.put(IMEvent.featureDurationFromBeginning, ((Double) signalInfo.offSetFromFirst).toString());
                     interactionManager.updatedAudioInfo(imEventVad);//signalInfo.offSetFromFirst, signalInfo.sampleLength, signalInfo.vad, signalInfo.finalPause);
+
+                    IMEvent imEventAsr = new IMEvent(IMEvent.IMEventType.asr);
+                    imEventAsr.feature.put(IMEvent.featureVad, (signalInfo.vad == 1) ? "true":"false");
+                    imEventAsr.feature.put(IMEvent.featureFinalPause, ((Double)signalInfo.finalPause).toString());
+                    imEventAsr.feature.put(IMEvent.featureDurationFromBeginning, ((Double) signalInfo.offSetFromFirst).toString());
+                    interactionManager.updatedAudioInfo(imEventAsr);
 
                 } catch (Exception e)
                 {
@@ -206,10 +230,11 @@ public class AudioTopDirector
             {
                 try
                 {
-                    //if (asr.isConnectionOpen())
-                    //{
+                    if (!sentCloseAudioConnection)
+                    {
+                        sentCloseAudioConnection = true;
                         controllingOrders.closeAudioConnection();
-                    //}
+                    }
                 } catch (Exception e)
                 {
                     e.printStackTrace();
@@ -226,6 +251,6 @@ public class AudioTopDirector
         });
 
 
-        streamAudioServer.runServer(udpPort);
+        audioReceiver.runServer(udpPort);
     }
 }

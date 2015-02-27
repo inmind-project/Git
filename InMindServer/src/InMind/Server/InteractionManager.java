@@ -185,7 +185,7 @@ public class InteractionManager extends AInteractionManager
             // check if we have been waiting for a partial for too long
             // check if pause is long enough for action threshold/listen threshold
             if (s2sState.get("user.speaking").equals("false") &&
-                    Double.valueOf(eEvent.feature.get(IMEvent.featureDuration)) > iMinUttDuration)
+                    Double.valueOf(eEvent.feature.get(IMEvent.featureDurationFromBeginning)) > iMinUttDuration)
             {
                 // check action threshold
                 if (Double.valueOf(eEvent.feature.get(IMEvent.featureFinalPause)) > iActionThreshold &&

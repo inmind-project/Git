@@ -73,7 +73,7 @@ public class LogicController
         if (tcpClient != null && audioStreamer != null && audioStreamer.isStreaming())
             return;
         closeConnection();
-        startStopRecNotifier.startStopRec(true);//say that is starting the recording.
+        startStopRecNotifier.startStopRec(true);//say that is starting the recording. must be called before starting.
         new connectTask().execute(uniqueId + Consts.commandChar + Consts.requestSendAudio + Consts.commandChar);
     }
 
@@ -90,7 +90,10 @@ public class LogicController
     public void stopStreaming()
     {
         if (audioStreamer != null)
+        {
             audioStreamer.stopStreaming();
+            audioStreamer = null;
+        }
     }
 
     public void changeInitIpAddr(String newIpAddr)
@@ -131,7 +134,7 @@ public class LogicController
             if (m.group(1).equalsIgnoreCase(Consts.stopUdp))
             {
                 stopStreaming();
-                startStopRecNotifier.startStopRec(false); //say that is stopping the recording.
+                startStopRecNotifier.startStopRec(false); //say that is stopping the recording. must be called AFTER stopping.
             }
             else if (m.group(1).equalsIgnoreCase(Consts.connectUdp))
             {

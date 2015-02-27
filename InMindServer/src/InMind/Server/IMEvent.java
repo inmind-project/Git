@@ -14,7 +14,7 @@ public class IMEvent {
 
     final static String featureVad = "VAD"; //"true" or "false"
     final static String featureFinalPause = "final_pause"; //double. final pause in milliseconds.
-    final static String featureDuration = "duration"; //double. Duration of this sample.
+    final static String featureDurationFromBeginning = "duration"; //double. Duration of this sample.
 
 
     IMEvent(IMEventType mType)
