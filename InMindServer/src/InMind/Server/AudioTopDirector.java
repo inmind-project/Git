@@ -80,8 +80,9 @@ public class AudioTopDirector
                     invalidateOldCallIfExistsAndStreamNew();
                     break;
                 case moveOn:
+                    if (latestValidRes != null)
+                        moveOnWithResponse();
                     break;
-
             }
             } catch (Exception ex)
             {
@@ -111,7 +112,8 @@ public class AudioTopDirector
             if (wasNotCanceled)
             {
                 latestValidRes = asrRes;
-                moveOnWithResponse();
+                interactionManager.finalResponseObtained(null);//expects an event but not clear what it should contain.
+                //moveOnWithResponse();
             }
         }
 
@@ -142,7 +144,7 @@ public class AudioTopDirector
                 {
                     asr.beginTransmission();
                     if (asr.isConnectionOpen())
-                        asr.sendDataAsync(allAudioFromBeginning.getRawData());
+                        asr.sendDataAsync(allAudioFromBeginning.getRawData(), allAudioFromBeginning.size());
                 } catch (Exception e)
                 {
                     e.printStackTrace();
@@ -203,18 +205,20 @@ public class AudioTopDirector
                     appendToFile(audioReceived, length, filePath);
                     allAudioFromBeginning.write(audioReceived, 0, length);
                     if (asr.isConnectionOpen())
-                        asr.sendDataAsync(audioReceived);
+                        asr.sendDataAsync(audioReceived, length);
                     SignalInfoProvider.SignalInfo signalInfo = signalInfoProvider.obtainSampleInfo(audioReceived, length);
                     IMEvent imEventVad = new IMEvent(IMEvent.IMEventType.vad);
                     imEventVad.feature.put(IMEvent.featureVad, (signalInfo.vad == 1) ? "true":"false");
                     imEventVad.feature.put(IMEvent.featureFinalPause, ((Double)signalInfo.finalPause).toString());
                     imEventVad.feature.put(IMEvent.featureDurationFromBeginning, ((Double) signalInfo.offSetFromFirst).toString());
+                    imEventVad.feature.put(IMEvent.featureDurationOfSample, ((Double) signalInfo.sampleLength).toString());
                     interactionManager.updatedAudioInfo(imEventVad);//signalInfo.offSetFromFirst, signalInfo.sampleLength, signalInfo.vad, signalInfo.finalPause);
 
                     IMEvent imEventAsr = new IMEvent(IMEvent.IMEventType.asr);
                     imEventAsr.feature.put(IMEvent.featureVad, (signalInfo.vad == 1) ? "true":"false");
                     imEventAsr.feature.put(IMEvent.featureFinalPause, ((Double)signalInfo.finalPause).toString());
                     imEventAsr.feature.put(IMEvent.featureDurationFromBeginning, ((Double) signalInfo.offSetFromFirst).toString());
+                    imEventAsr.feature.put(IMEvent.featureDurationOfSample, ((Double) signalInfo.sampleLength).toString());
                     interactionManager.updatedAudioInfo(imEventAsr);
 
                 } catch (Exception e)

@@ -13,12 +13,17 @@ public class InteractionManager extends AInteractionManager
     // internal states
     Map<String,String> s2sState;
 
+    //Amos: I Added this. I'm not sure why you use a hash-map and not member variables, but you can add this to your hash-map if you want.
+    double activityDuration = 0;
 
     // CONSTANT VALUES
     final int iMaxUttDuration = 30000;
     final int iMinUttDuration = 1000;
     final int iActionThreshold = 300;
     final int iListenThreshold = 1000;
+    //Amos added
+    final int iMinActivityDuration = 500;
+
 
     InteractionManager(IIMRequiredAction imRequiredAction)
     {
@@ -74,6 +79,7 @@ public class InteractionManager extends AInteractionManager
        // This is called when we reset the IM for a new session (dialog)
         s2sState.clear();
         initStates();
+        activityDuration = 0;
     }
 
     @Override
@@ -149,6 +155,7 @@ public class InteractionManager extends AInteractionManager
             }
             // update user speaking states
             s2sState.put("user.speaking", "true");
+            activityDuration += Double.valueOf(eEvent.feature.get(IMEvent.featureDurationOfSample));
         }
     }
 
@@ -185,7 +192,8 @@ public class InteractionManager extends AInteractionManager
             // check if we have been waiting for a partial for too long
             // check if pause is long enough for action threshold/listen threshold
             if (s2sState.get("user.speaking").equals("false") &&
-                    Double.valueOf(eEvent.feature.get(IMEvent.featureDurationFromBeginning)) > iMinUttDuration)
+                    (Double.valueOf(eEvent.feature.get(IMEvent.featureDurationFromBeginning)) > iMinUttDuration) &&
+                    activityDuration > iMinActivityDuration)
             {
                 // check action threshold
                 if (Double.valueOf(eEvent.feature.get(IMEvent.featureFinalPause)) > iActionThreshold &&

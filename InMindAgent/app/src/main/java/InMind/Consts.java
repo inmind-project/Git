@@ -6,7 +6,7 @@ package InMind;
 public class Consts
 {
     public static final int serverPort = 4493;
-    static public final int sampleRate = 44100;//16000;
+    static public final int sampleRate = 16000;//44100;//16000;
 
     static public final String commandChar = "^";
     static public final String messageSeparatorForPattern = "\\^";

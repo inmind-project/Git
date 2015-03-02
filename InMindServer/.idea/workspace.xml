@@ -36,7 +36,7 @@
       <file leaf-file-name="AudioReceiver.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/InMind/Server/AudioReceiver.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="351" max-vertical-offset="2363">
+            <state vertical-scroll-proportion="0.0" vertical-offset="453" max-vertical-offset="2363">
               <caret line="83" column="82" selection-start-line="83" selection-start-column="64" selection-end-line="83" selection-end-column="82" />
               <folding>
                 <element signature="e#1365#1366#0" expanded="true" />
@@ -51,8 +51,8 @@
       <file leaf-file-name="AInteractionManager.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/InMind/Server/AInteractionManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1224">
-              <caret line="22" column="6" selection-start-line="22" selection-start-column="6" selection-end-line="22" selection-end-column="6" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="521" max-vertical-offset="1224">
+              <caret line="58" column="6" selection-start-line="58" selection-start-column="6" selection-end-line="58" selection-end-column="6" />
               <folding>
                 <element signature="e#383#384#0" expanded="true" />
                 <element signature="e#439#440#0" expanded="true" />
@@ -64,18 +64,18 @@
       <file leaf-file-name="IMEvent.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/InMind/Server/IMEvent.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="544">
-              <caret line="16" column="52" selection-start-line="16" selection-start-column="52" selection-end-line="16" selection-end-column="52" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="561">
+              <caret line="17" column="59" selection-start-line="17" selection-start-column="59" selection-end-line="17" selection-end-column="59" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="InteractionManager.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="InteractionManager.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/InMind/Server/InteractionManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="2480" max-vertical-offset="4148">
-              <caret line="167" column="16" selection-start-line="167" selection-start-column="16" selection-end-line="167" selection-end-column="16" />
+            <state vertical-scroll-proportion="0.40446305" vertical-offset="3144" max-vertical-offset="4284">
+              <caret line="203" column="60" selection-start-line="203" selection-start-column="34" selection-end-line="203" selection-end-column="60" />
               <folding />
             </state>
           </provider>
@@ -94,18 +94,18 @@
       <file leaf-file-name="ASR.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/InMind/Server/ASR.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="204" max-vertical-offset="2771">
-              <caret line="49" column="0" selection-start-line="49" selection-start-column="0" selection-end-line="49" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="2026" max-vertical-offset="2805">
+              <caret line="154" column="60" selection-start-line="154" selection-start-column="60" selection-end-line="154" selection-end-column="60" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AudioTopDirector.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="AudioTopDirector.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/InMind/Server/AudioTopDirector.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.9133858" vertical-offset="1871" max-vertical-offset="4403">
-              <caret line="151" column="0" selection-start-line="151" selection-start-column="0" selection-end-line="151" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1055" max-vertical-offset="4471">
+              <caret line="84" column="26" selection-start-line="84" selection-start-column="26" selection-end-line="84" selection-end-column="26" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -123,21 +123,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="InMindLogic.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/InMind/Server/InMindLogic.java">
+      <file leaf-file-name="Consts.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/InMind/Consts.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1255" max-vertical-offset="2754">
-              <caret line="93" column="123" selection-start-line="93" selection-start-column="123" selection-end-line="93" selection-end-column="123" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="578">
+              <caret line="27" column="1" selection-start-line="27" selection-start-column="1" selection-end-line="27" selection-end-column="1" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Consts.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/InMind/Consts.java">
+      <file leaf-file-name="InMindLogic.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/InMind/Server/InMindLogic.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="578">
-              <caret line="8" column="47" selection-start-line="8" selection-start-column="47" selection-end-line="8" selection-end-column="47" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1255" max-vertical-offset="2754">
+              <caret line="93" column="123" selection-start-line="93" selection-start-column="123" selection-end-line="93" selection-end-column="123" />
               <folding />
             </state>
           </provider>
@@ -175,17 +175,17 @@
         <option value="$PROJECT_DIR$/src/InMind/Server/AudioReciever.java" />
         <option value="$PROJECT_DIR$/src/InMind/Server/DealWithAudio.java" />
         <option value="$PROJECT_DIR$/src/InMind/Server/UserConversation.java" />
-        <option value="$PROJECT_DIR$/src/InMind/Server/ASR.java" />
-        <option value="$PROJECT_DIR$/src/InMind/Consts.java" />
         <option value="$PROJECT_DIR$/src/InMind/Server/Event.java" />
         <option value="$PROJECT_DIR$/src/InMind/Server/SimpleInteractionManager.java" />
         <option value="$PROJECT_DIR$/src/InMind/Server/IInteractionManager.java" />
         <option value="$PROJECT_DIR$/src/InMind/Server/AInteractionManager.java" />
         <option value="$PROJECT_DIR$/src/InMind/Server/InMindLogic.java" />
         <option value="$PROJECT_DIR$/src/InMind/Server/SignalInfoProvider.java" />
-        <option value="$PROJECT_DIR$/src/InMind/Server/InteractionManager.java" />
-        <option value="$PROJECT_DIR$/src/InMind/Server/IMEvent.java" />
         <option value="$PROJECT_DIR$/src/InMind/Server/AudioReceiver.java" />
+        <option value="$PROJECT_DIR$/src/InMind/Server/ASR.java" />
+        <option value="$PROJECT_DIR$/src/InMind/Consts.java" />
+        <option value="$PROJECT_DIR$/src/InMind/Server/IMEvent.java" />
+        <option value="$PROJECT_DIR$/src/InMind/Server/InteractionManager.java" />
         <option value="$PROJECT_DIR$/src/InMind/Server/AudioTopDirector.java" />
       </list>
     </option>
@@ -600,7 +600,7 @@
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.14239483" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19093852" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19479166" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -659,30 +659,30 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/InMind/Server/AudioTopDirector.java</url>
-          <line>155</line>
+          <line>157</line>
           <properties />
           <option name="timeStamp" value="44" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/InMind/Server/AudioTopDirector.java</url>
-          <line>68</line>
-          <properties />
-          <option name="timeStamp" value="45" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/InMind/Server/InteractionManager.java</url>
-          <line>190</line>
+          <line>198</line>
           <properties />
           <option name="timeStamp" value="46" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/InMind/Server/InteractionManager.java</url>
-          <line>179</line>
+          <line>186</line>
           <properties />
           <option name="timeStamp" value="48" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/InMind/Server/AudioTopDirector.java</url>
+          <line>79</line>
+          <properties />
+          <option name="timeStamp" value="49" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="49" />
+      <option name="time" value="50" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
@@ -698,19 +698,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/InMind/Server/AudioReceiver.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1018" max-vertical-offset="2788">
-          <caret line="81" column="58" selection-start-line="81" selection-start-column="32" selection-end-line="81" selection-end-column="58" />
-          <folding>
-            <element signature="e#1365#1366#0" expanded="true" />
-            <element signature="e#1419#1420#0" expanded="true" />
-            <element signature="e#1458#1459#0" expanded="true" />
-            <element signature="e#1500#1501#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/InMind/Server/InMindLogic.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1112" max-vertical-offset="1768">
@@ -1185,38 +1172,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/InMind/Server/ASR.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="204" max-vertical-offset="2771">
-          <caret line="49" column="0" selection-start-line="49" selection-start-column="0" selection-end-line="49" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/InMind/Consts.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="578">
-          <caret line="8" column="47" selection-start-line="8" selection-start-column="47" selection-end-line="8" selection-end-column="47" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/InMind/Server/SimpleInteractionManager.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1190">
           <caret line="17" column="2" selection-start-line="17" selection-start-column="2" selection-end-line="17" selection-end-column="2" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/InMind/Server/AInteractionManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1224">
-          <caret line="22" column="6" selection-start-line="22" selection-start-column="6" selection-end-line="22" selection-end-column="6" />
-          <folding>
-            <element signature="e#383#384#0" expanded="true" />
-            <element signature="e#439#440#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1228,27 +1188,49 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/InMind/Server/IMEvent.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="544">
-          <caret line="16" column="52" selection-start-line="16" selection-start-column="52" selection-end-line="16" selection-end-column="52" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/InMind/Server/InteractionManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="2480" max-vertical-offset="4148">
-          <caret line="167" column="16" selection-start-line="167" selection-start-column="16" selection-end-line="167" selection-end-column="16" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/InMind/Server/InMindLogic.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1153" max-vertical-offset="2754">
           <caret line="93" column="123" selection-start-line="93" selection-start-column="123" selection-end-line="93" selection-end-column="123" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Programs/Java/jdk1.8.0_20/jre/lib/rt.jar!/com/sun/xml/internal/ws/util/ByteArrayBuffer.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.5495251" vertical-offset="1074" max-vertical-offset="1870">
+          <caret line="99" column="21" selection-start-line="99" selection-start-column="21" selection-end-line="99" selection-end-column="21" />
+          <folding>
+            <element signature="e#2599#2600#0" expanded="true" />
+            <element signature="e#2632#2633#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/InMind/Server/ASR.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2026" max-vertical-offset="2805">
+          <caret line="154" column="60" selection-start-line="154" selection-start-column="60" selection-end-line="154" selection-end-column="60" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/InMind/Consts.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="578">
+          <caret line="27" column="1" selection-start-line="27" selection-start-column="1" selection-end-line="27" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/InMind/Server/AInteractionManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="521" max-vertical-offset="1224">
+          <caret line="58" column="6" selection-start-line="58" selection-start-column="6" selection-end-line="58" selection-end-column="6" />
+          <folding>
+            <element signature="e#383#384#0" expanded="true" />
+            <element signature="e#439#440#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1265,13 +1247,29 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/InMind/Server/IMEvent.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="561">
+          <caret line="17" column="59" selection-start-line="17" selection-start-column="59" selection-end-line="17" selection-end-column="59" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/InMind/Server/AudioTopDirector.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.9133858" vertical-offset="1871" max-vertical-offset="4403">
-          <caret line="151" column="0" selection-start-line="151" selection-start-column="0" selection-end-line="151" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="1055" max-vertical-offset="4471">
+          <caret line="84" column="26" selection-start-line="84" selection-start-column="26" selection-end-line="84" selection-end-column="26" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/InMind/Server/InteractionManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.40446305" vertical-offset="3144" max-vertical-offset="4284">
+          <caret line="203" column="60" selection-start-line="203" selection-start-column="34" selection-end-line="203" selection-end-column="60" />
+          <folding />
         </state>
       </provider>
     </entry>

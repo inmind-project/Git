@@ -53,12 +53,12 @@ public class ASR
         wr = new DataOutputStream(con.getOutputStream());
     }
 
-    public void sendDataAsync(byte[] dataToSend)
+    public void sendDataAsync(byte[] dataToSend, int length)
     {
         Thread a = new Thread(() -> {
             try
             {
-                sendData(dataToSend);
+                sendData(dataToSend, length);
             } catch (IOException e)
             {
                 e.printStackTrace();
@@ -68,9 +68,10 @@ public class ASR
     }
 
 
-    public void sendData(byte[] dataToSend) throws IOException
+    public void sendData(byte[] dataToSend, int length) throws IOException
     {
-        wr.write(dataToSend);
+        wr.write(dataToSend, 0, length);
+        wr.flush();
     }
 
     interface IAsrGetResponse
@@ -150,7 +151,8 @@ public class ASR
         {
             ASR asr = new ASR();
             asr.beginTransmission();
-            asr.sendData(Files.readAllBytes(audioFile));
+            byte[] fileAsByteArr = Files.readAllBytes(audioFile);
+            asr.sendData(fileAsByteArr, fileAsByteArr.length);
             AsrRes asrRes = asr.closeAndGetResponse();
             PrintWriter pw = new PrintWriter(audioFile.toString() + ".txt");
             pw.print(asrRes.fullJsonRes);
