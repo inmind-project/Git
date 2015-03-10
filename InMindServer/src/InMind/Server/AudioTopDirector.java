@@ -1,5 +1,12 @@
 package InMind.Server;
 
+import InMind.Server.SignalInfo.ASignalInfoProvider;
+import InMind.Server.SignalInfo.SimpleSignalInfoProvider;
+import InMind.Server.SignalInfo.SphinxSignalInfoProvider;
+import InMind.Server.asr.ASR;
+import InMind.Server.interactionManager.AInteractionManager;
+import InMind.Server.interactionManager.IMEvent;
+import InMind.Server.interactionManager.InteractionManager;
 import com.sun.xml.internal.ws.util.ByteArrayBuffer;
 
 import java.io.FileNotFoundException;
@@ -20,8 +27,8 @@ import static InMind.Utils.delIfExists;
  */
 public class AudioTopDirector
 {
-    IInteractionManager interactionManager;
-    SignalInfoProvider signalInfoProvider;
+    AInteractionManager interactionManager;
+    ASignalInfoProvider signalInfoProvider;
     IControllingOrders controllingOrders;
     int udpPort;
     ByteArrayBuffer allAudioFromBeginning;
@@ -46,7 +53,7 @@ public class AudioTopDirector
         allAudioFromBeginning = new ByteArrayBuffer();
         this.controllingOrders = controllingOrders;
         this.interactionManager = new InteractionManager(new IMCommandExecutor());
-        signalInfoProvider = new SignalInfoProvider();
+        signalInfoProvider = new SphinxSignalInfoProvider();
         this.udpPort = udpPort;
         sentCloseAudioConnection = false;
     }
@@ -59,10 +66,11 @@ public class AudioTopDirector
         ASR.AsrRes latestValidRes = null;
 
         @Override
-        public void takeAction(IInteractionManager.ActionToTake actionToTake)
+        public void takeAction(AInteractionManager.ActionToTake actionToTake)
         {
             try
             {
+                System.out.println("received command from IM: " + actionToTake.toString());
 
             switch (actionToTake)
             {
@@ -70,6 +78,7 @@ public class AudioTopDirector
                     break;
                 case commit:
                     audioReceiver.stopListening();
+                    signalInfoProvider.endStream();
                     //controllingOrders.closeAudioConnection();
                     break;
                 case goToGoogle:
@@ -107,7 +116,7 @@ public class AudioTopDirector
                     e.printStackTrace();
                 }
             }
-            System.out.println(asrRes.text);
+            System.out.println("Google Asr response: " + asrRes.text);
             boolean wasNotCanceled = myGoogleCallId == validGoogleCallId;
             if (wasNotCanceled)
             {
@@ -122,6 +131,7 @@ public class AudioTopDirector
             interactionManager.stop();
             //we first want the server to stop listening so we won't get stuck in waiting (until timeout).
             audioReceiver.stopListening();
+            signalInfoProvider.endStream();
             //we need to send the user a message (over tcp) to close audio connection (udp) before closing tcp connection.
             if (!sentCloseAudioConnection)
             {
@@ -189,6 +199,7 @@ public class AudioTopDirector
             {
                 try
                 {
+                    signalInfoProvider.startNewStream();
                     asr.beginTransmission();
                 } catch (Exception e)
                 {
@@ -206,7 +217,7 @@ public class AudioTopDirector
                     allAudioFromBeginning.write(audioReceived, 0, length);
                     if (asr.isConnectionOpen())
                         asr.sendDataAsync(audioReceived, length);
-                    SignalInfoProvider.SignalInfo signalInfo = signalInfoProvider.obtainSampleInfo(audioReceived, length);
+                    SimpleSignalInfoProvider.SignalInfo signalInfo = signalInfoProvider.obtainSampleInfo(audioReceived, length);
                     IMEvent imEventVad = new IMEvent(IMEvent.IMEventType.vad);
                     imEventVad.feature.put(IMEvent.featureVad, (signalInfo.vad == 1) ? "true":"false");
                     imEventVad.feature.put(IMEvent.featureFinalPause, ((Double)signalInfo.finalPause).toString());

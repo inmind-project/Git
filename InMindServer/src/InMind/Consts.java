@@ -7,6 +7,10 @@ public class Consts
 {
     public static final int serverPort = 4493;
     static public final int sampleRate = 16000;//44100;//16000;
+    static public final int sampleSizeBits = 16; //should not be changed
+    static public final int channels = 1; //should not be changed
+    static public final boolean isSigned = true; //should not be changed
+    static public final boolean bigEndian = false; //should not be changed
 
     static public final String commandChar = "^";
     static public final String messageSeparatorForPattern = "\\^";

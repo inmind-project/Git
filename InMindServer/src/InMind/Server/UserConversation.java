@@ -2,6 +2,7 @@ package InMind.Server;
 
 import InMind.Consts;
 import InMind.DialogFunctions.FunctionInvoker;
+import InMind.Server.asr.ASR;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
