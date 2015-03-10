@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="3rdParty">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/3rdParty" />
+      <root url="file://$PROJECT_DIR$/lib" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

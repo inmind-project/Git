@@ -3,7 +3,6 @@
     <output-path>$PROJECT_DIR$</output-path>
     <root id="archive" name="InMindServer.jar">
       <element id="module-output" name="InMindServer" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/3rdParty/json-20141113.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

@@ -1,13 +1,5 @@
 package com.company;
 
-import edu.cmu.sphinx.decoder.ResultListener;
-import edu.cmu.sphinx.frontend.util.Microphone;
-import edu.cmu.sphinx.recognizer.Recognizer;
-import edu.cmu.sphinx.result.Result;
-import edu.cmu.sphinx.util.props.ConfigurationManager;
-import edu.cmu.sphinx.util.props.PropertyException;
-import edu.cmu.sphinx.util.props.PropertySheet;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -24,61 +16,59 @@ import java.util.regex.Pattern;
 
 public class Main {
 
-    public static void main1(String[] args) throws Exception
+    public static void main(String[] args) throws Exception
     {
-        ConfigurationManager cm;
-
-
-
-        cm = new ConfigurationManager(Main.class.getResource("hellongram.config.xml"));
-
-        // allocate the recognizer
-        System.out.println("Loading...");
-        Recognizer recognizer = (Recognizer) cm.lookup("recognizer");
-        recognizer.allocate();
-
-        recognizer.addResultListener(new ResultListener()
-        {
-            @Override
-            public void newResult(Result result)
-            {
-                System.out.println(result.getBestResultNoFiller());
-            }
-
-            @Override
-            public void newProperties(PropertySheet propertySheet) throws PropertyException
-            {
-
-            }
-        });
-
-        // start the microphone or exit if the programm if this is not possible
-        Microphone microphone = (Microphone) cm.lookup("microphone");
-        if (!microphone.startRecording()) {
-            System.out.println("Cannot start microphone.");
-            recognizer.deallocate();
-            System.exit(1);
-        }
-
-
-        // loop the recognition until the programm exits.
-        while (true) {
-            System.out.println("Start speaking. Press Ctrl-C to quit.\n");
-
-            //Thread.sleep(1000);
-
-
-            Result result = recognizer.recognize();
-
-    //        if (result != null) {
-  //              String resultText = result.getBestFinalResultNoFiller();
-//                System.out.println("You said: " + resultText + '\n');
-            //} else {
-      //          System.out.println("I can't hear what you said.\n");
-            //}
-        }
+        System.out.println("hello world");
+        //oldSphinx();
 
     }
+
+//    private static void oldSphinx()
+//    {
+//        ConfigurationManager cm;
+//
+//
+//        cm = new ConfigurationManager(Main.class.getResource("hellongram.config.xml"));
+//
+//        // allocate the recognizer
+//        System.out.println("Loading...");
+//        Recognizer recognizer = (Recognizer) cm.lookup("recognizer");
+//        recognizer.allocate();
+//
+//        recognizer.addResultListener(new ResultListener()
+//        {
+//            @Override
+//            public void newResult(Result result)
+//            {
+//                System.out.println(result.getBestResultNoFiller());
+//            }
+//
+//            @Override
+//            public void newProperties(PropertySheet propertySheet) throws PropertyException
+//            {
+//
+//            }
+//        });
+//
+//        // start the microphone or exit if the programm if this is not possible
+//        Microphone microphone = (Microphone) cm.lookup("microphone");
+//        if (!microphone.startRecording()) {
+//            System.out.println("Cannot start microphone.");
+//            recognizer.deallocate();
+//            System.exit(1);
+//        }
+//
+//
+//        // loop the recognition until the programm exits.
+//        while (true) {
+//            System.out.println("Start speaking. Press Ctrl-C to quit.\n");
+//
+//            //Thread.sleep(1000);
+//
+//
+//            Result result = recognizer.recognize();
+//        }
+//    }
 
     private static void dontknow() throws IOException
     {
