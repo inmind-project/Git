@@ -16,6 +16,7 @@ public class FunctionInvoker
     static final String sayStr = Consts.sayCommand + Consts.commandChar;
 
     //returns a list of commands to the client. May return null.
+    @SuppressWarnings("unchecked")
     static public List<String> toInvoke(String dialogFileBase, String funName, Map<String, Object> fullInfo, String userId, String userText)
     {
         List<String> toSend = null;
@@ -23,7 +24,10 @@ public class FunctionInvoker
         {
             Package pack = FunctionInvoker.class.getPackage();
             Method method = Class.forName(pack.getName() + "." + dialogFileBase).getMethod(funName, Map.class, String.class, String.class);
-            toSend = (List<String>) method.invoke(null, fullInfo, userId, userText);
+            if (method != null)
+            {
+                toSend = (List<String>)method.invoke(null, fullInfo, userId, userText);
+            }
         } catch (IllegalAccessException e)
         {
             e.printStackTrace();

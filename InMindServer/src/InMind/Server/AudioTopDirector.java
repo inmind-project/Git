@@ -2,7 +2,6 @@ package InMind.Server;
 
 import InMind.Server.SignalInfo.ASignalInfoProvider;
 import InMind.Server.SignalInfo.SimpleSignalInfoProvider;
-import InMind.Server.SignalInfo.SphinxSignalInfoProvider;
 import InMind.Server.asr.ASR;
 import InMind.Server.interactionManager.AInteractionManager;
 import InMind.Server.interactionManager.IMEvent;
@@ -53,7 +52,7 @@ public class AudioTopDirector
         allAudioFromBeginning = new ByteArrayBuffer();
         this.controllingOrders = controllingOrders;
         this.interactionManager = new InteractionManager(new IMCommandExecutor());
-        signalInfoProvider = new SphinxSignalInfoProvider();
+        signalInfoProvider = new SimpleSignalInfoProvider();//new SphinxSignalInfoProvider();
         this.udpPort = udpPort;
         sentCloseAudioConnection = false;
     }

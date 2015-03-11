@@ -1,7 +1,5 @@
 package InMind.Server;
 
-import InMind.Server.SignalInfo.SphinxSignalInfoProvider;
-
 /**
  * Created by Amos Azaria on 31-Dec-14.
  */
@@ -12,7 +10,7 @@ public class Main
     {
 
         InMindLogic logic = new InMindLogic();
-        SphinxSignalInfoProvider.staticInitialize();
+        //SphinxSignalInfoProvider.staticInitialize();
         logic.runServer();
     }
 }

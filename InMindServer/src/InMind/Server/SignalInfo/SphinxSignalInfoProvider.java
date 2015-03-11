@@ -8,6 +8,9 @@ import javax.sound.sampled.AudioFormat;
 
 /**
  * Created by Amos Azaria on 09-Mar-15.
+ *
+ * This Class uses Sphinx to determine whether a user is speacking or not.
+ * Unfortunately, this seems not to perform as well as the simple threshold method in SimpleSignalInfoProvider
  */
 public class SphinxSignalInfoProvider extends SimpleSignalInfoProvider
 {

@@ -215,7 +215,7 @@
 
     <component name="speechClassifier"
                 type="edu.cmu.sphinx.frontend.endpoint.SpeechClassifier">
-        <property name="threshold" value="30"/>
+        <property name="threshold" value="20"/>
     </component>
 
     <component name="inMindDataProcessor" type="InMind.Server.SignalInfo.InMindDataProcessor"/>
