@@ -16,8 +16,8 @@ public class SimpleSignalInfoProvider extends ASignalInfoProvider
 
 
     //final int silentLengthNeeded = 500;  //in milliseconds
-    final int considerSilent = 3000;
-    final int considerSpeech = 4000;//3000;
+    final int considerSilent = 2500;
+    final int considerSpeech = 3500;//3000;
     final int minimalTalk = Consts.sampleRate / 10000; //require at least 0.001 sec of speech
 
 

@@ -37,7 +37,7 @@ public class firstHello
         return null;
     }
 
-    public static List<String> getAgentName(Map<String, Object> fullInfo, String userId)
+    public static List<String> getAgentName(Map<String, Object> fullInfo, String userId, String userText)
     {
         //TODO: should get from the DB.
         List<String> toSayList = new LinkedList<String>();
