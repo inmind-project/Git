@@ -66,10 +66,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AsrOnly.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="AsrOnly.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/InMind/DialogFunctions/AsrOnly.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.569378" vertical-offset="255" max-vertical-offset="1683">
+            <state vertical-scroll-proportion="0.0" vertical-offset="255" max-vertical-offset="1683">
               <caret line="36" column="5" selection-start-line="36" selection-start-column="5" selection-end-line="36" selection-end-column="5" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -88,16 +88,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SphinxSignalInfoProvider.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/InMind/Server/SignalInfo/SphinxSignalInfoProvider.java">
+      <file leaf-file-name="MANIFEST.MF" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/META-INF/MANIFEST.MF">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="136" max-vertical-offset="2720">
-              <caret line="12" column="19" selection-start-line="12" selection-start-column="19" selection-end-line="12" selection-end-column="19" />
-              <folding>
-                <element signature="imports" expanded="false" />
-                <element signature="e#3276#3277#0" expanded="false" />
-                <element signature="e#3324#3325#0" expanded="false" />
-              </folding>
+            <state vertical-scroll-proportion="0.13556619" vertical-offset="0" max-vertical-offset="627">
+              <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -229,7 +225,6 @@
         <option value="$PROJECT_DIR$/src/InMind/Server/interactionManager/InteractionManager.java" />
         <option value="$PROJECT_DIR$/src/InMind/Server/SignalInfo/ASignalInfoProvider.java" />
         <option value="$PROJECT_DIR$/src/InMind/Server/SignalInfo/InMindByteDataSource.java" />
-        <option value="$PROJECT_DIR$/src/META-INF/MANIFEST.MF" />
         <option value="$PROJECT_DIR$/src/InMind/DialogFunctions/FunctionInvoker.java" />
         <option value="$PROJECT_DIR$/src/InMind/Server/SignalInfo/hellongram.config.xml" />
         <option value="$PROJECT_DIR$/src/InMind/Server/AudioTopDirector.java" />
@@ -239,6 +234,7 @@
         <option value="$PROJECT_DIR$/src/InMind/Server/SignalInfo/SimpleSignalInfoProvider.java" />
         <option value="$PROJECT_DIR$/src/InMind/Consts.java" />
         <option value="$PROJECT_DIR$/src/InMind/DialogFunctions/AsrOnly.java" />
+        <option value="$PROJECT_DIR$/src/META-INF/MANIFEST.MF" />
       </list>
     </option>
   </component>
@@ -596,7 +592,7 @@
     </configuration>
     <configuration default="true" type="JarApplication" factoryName="JAR Application">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <option name="JAR_PATH" value="$PROJECT_DIR$/lib/json-20141113.jar" />
+      <option name="JAR_PATH" value="$PROJECT_DIR$/lib/activemq-all-5.11.1.jar" />
       <envs />
       <method />
     </configuration>
@@ -682,7 +678,7 @@
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25339368" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25339368" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32918552" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20194384" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -1246,14 +1242,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/META-INF/MANIFEST.MF">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="187">
-          <caret line="2" column="104" selection-start-line="2" selection-start-column="104" selection-end-line="2" selection-end-column="104" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/InMind/Server/SignalInfo/hellongram.config.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="3290" max-vertical-offset="5185">
@@ -1384,11 +1372,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/InMind/DialogFunctions/AsrOnly.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.569378" vertical-offset="255" max-vertical-offset="1683">
+        <state vertical-scroll-proportion="0.0" vertical-offset="255" max-vertical-offset="1683">
           <caret line="36" column="5" selection-start-line="36" selection-start-column="5" selection-end-line="36" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/META-INF/MANIFEST.MF">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.13556619" vertical-offset="0" max-vertical-offset="627">
+          <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
