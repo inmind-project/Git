@@ -48,7 +48,7 @@ public class SimpleSignalInfoProvider extends ASignalInfoProvider
         signalInfo.sampleLength = currLength * 1000.0 / Consts.sampleRate;
         totalTimeFromStart += signalInfo.sampleLength;
 
-        System.out.println("vad:" + signalInfo.vad + ", finalPause:" + signalInfo.finalPause + ", sampleLength: " + signalInfo.sampleLength + ", offSetFromFirst:" + signalInfo.offSetFromFirst);
+        //System.out.println("vad:" + signalInfo.vad + ", finalPause:" + signalInfo.finalPause + ", sampleLength: " + signalInfo.sampleLength + ", offSetFromFirst:" + signalInfo.offSetFromFirst);
 
         return signalInfo;
     }

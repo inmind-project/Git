@@ -1,9 +1,10 @@
 pattern,classAndFileBaseName
+.*,AsrOnly
 .*(?: |^)bus(?: |$).*,myBus
 .*(?: |^)weather(?: |$).*,myWeather
 (?:Will | would )?(you )?(please )?Marry me,marryMe
 .* play .*(with you|guess).*,guessNum
 knock knock,knockKnock
 Hello,firstHello
-start .*,rapport
+start rapport,rapport
 .*,socialTalk

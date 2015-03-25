@@ -29,4 +29,8 @@ public class Consts
     //client requests
     static public final String requestSendAudio = "RequestSendAudio";
     static public final String sendingText = "SendingText";
+
+    //connections to other servers
+    static public final String asrStr = "ASR";
+    static public final String asrCancel = "cancel";
 }
