@@ -30,8 +30,7 @@ public class GCalendar
     /**
      * Application name.
      */
-    private static final String APPLICATION_NAME =
-            "Google Calendar API Java Quickstart";
+    private static final String APPLICATION_NAME = "Inmind Calendar";
 
     /**
      * Directory to store user credentials for this application.
@@ -47,8 +46,7 @@ public class GCalendar
     /**
      * Global instance of the JSON factory.
      */
-    private static final JsonFactory JSON_FACTORY =
-            JacksonFactory.getDefaultInstance();
+    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
     /**
      * Global instance of the HTTP transport.
@@ -58,8 +56,7 @@ public class GCalendar
     /**
      * Global instance of the scopes required by this quickstart.
      */
-    private static final List<String> SCOPES =
-            Arrays.asList(CalendarScopes.CALENDAR_READONLY);
+    private static final List<String> SCOPES = Arrays.asList(CalendarScopes.CALENDAR_READONLY);
 
     static
     {
