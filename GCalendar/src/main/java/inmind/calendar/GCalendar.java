@@ -37,7 +37,7 @@ public class GCalendar
      * Directory to store user credentials for this application.
      */
     private static final java.io.File DATA_STORE_DIR = new java.io.File(
-            System.getProperty("user.home"), ".credentials/calendar-api-quickstart1");
+            System.getProperty("user.home"), ".credentials/ENCinmind");
 
     /**
      * Global instance of the {@link FileDataStoreFactory}.
