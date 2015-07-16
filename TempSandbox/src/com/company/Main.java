@@ -1,8 +1,6 @@
 package com.company;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-
-import javax.jms.*;
+import javax.mail.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -14,50 +12,103 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 public class Main {
+
+    static final String username = "amospam2@gmail.com";
+    static final String password = "Azaria12";
+    static final int emailsToFetch = 5;
+
+
+//    static class GMailAuthenticator extends Authenticator {
+//        String user;
+//        String pw;
+//        public GMailAuthenticator (String username, String password)
+//        {
+//            super();
+//            this.user = username;
+//            this.pw = password;
+//        }
+//        public PasswordAuthentication getPasswordAuthentication()
+//        {
+//            return new PasswordAuthentication(user, pw);
+//        }
+//    }
 
     public static void main(String[] args) throws Exception
     {
-        System.out.println("hello world");
-        //oldSphinx();
-        activem(args);
-
+        Properties props = new Properties();
+        props.setProperty("mail.store.protocol", "imaps");
+        try {
+            Session session = Session.getInstance(props, null);//new GMailAuthenticator(username,password));
+            //session.setDebug(true);
+            Store store = session.getStore();
+            store.connect("imap.gmail.com", username, password);
+            Folder inbox = store.getFolder("INBOX");
+            inbox.open(Folder.READ_ONLY);
+            for (int idx = inbox.getMessageCount() - emailsToFetch; idx < inbox.getMessageCount(); idx++)
+            {
+                System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                System.out.println("EMAIL INDEX:" + idx);
+                Message msg = inbox.getMessage(idx);
+                Address[] in = msg.getFrom();
+                for (Address address : in)
+                {
+                    System.out.println("FROM:" + address.toString());
+                }
+                String bodyStr = "Error!";
+                Object msgContent = msg.getContent();
+                if (msgContent instanceof String)
+                    bodyStr = (String)msgContent;
+                else if (msgContent instanceof Multipart)
+                {
+                    BodyPart bp = ((Multipart)msgContent).getBodyPart(0);
+                    bodyStr = bp.getContent().toString();
+                }
+                System.out.println("SENT DATE:" + msg.getSentDate());
+                System.out.println("SUBJECT:" + msg.getSubject());
+                System.out.println("CONTENT:" + bodyStr);
+            }
+        } catch (Exception mex) {
+            mex.printStackTrace();
+        }
     }
 
 
-    public static void activem(String[] args) throws Exception {
-        thread(new HelloWorldProducer(), false);
+//    public static void activem(String[] args) throws Exception {
 //        thread(new HelloWorldProducer(), false);
-        Thread.sleep(1000);
-        thread(new HelloWorldConsumer(), false);
-
-//        thread(new HelloWorldConsumer(), false);
-//        thread(new HelloWorldProducer(), false);
-//        thread(new HelloWorldConsumer(), false);
-//        thread(new HelloWorldProducer(), false);
+////        thread(new HelloWorldProducer(), false);
 //        Thread.sleep(1000);
 //        thread(new HelloWorldConsumer(), false);
-//        thread(new HelloWorldProducer(), false);
-//        thread(new HelloWorldConsumer(), false);
-//        thread(new HelloWorldConsumer(), false);
-//        thread(new HelloWorldProducer(), false);
-//        thread(new HelloWorldProducer(), false);
-//        Thread.sleep(1000);
-//        thread(new HelloWorldProducer(), false);
-//        thread(new HelloWorldConsumer(), false);
-//        thread(new HelloWorldConsumer(), false);
-//        thread(new HelloWorldProducer(), false);
-//        thread(new HelloWorldConsumer(), false);
-//        thread(new HelloWorldProducer(), false);
-//        thread(new HelloWorldConsumer(), false);
-//        thread(new HelloWorldProducer(), false);
-//        thread(new HelloWorldConsumer(), false);
-//        thread(new HelloWorldConsumer(), false);
-//        thread(new HelloWorldProducer(), false);
-    }
+//
+////        thread(new HelloWorldConsumer(), false);
+////        thread(new HelloWorldProducer(), false);
+////        thread(new HelloWorldConsumer(), false);
+////        thread(new HelloWorldProducer(), false);
+////        Thread.sleep(1000);
+////        thread(new HelloWorldConsumer(), false);
+////        thread(new HelloWorldProducer(), false);
+////        thread(new HelloWorldConsumer(), false);
+////        thread(new HelloWorldConsumer(), false);
+////        thread(new HelloWorldProducer(), false);
+////        thread(new HelloWorldProducer(), false);
+////        Thread.sleep(1000);
+////        thread(new HelloWorldProducer(), false);
+////        thread(new HelloWorldConsumer(), false);
+////        thread(new HelloWorldConsumer(), false);
+////        thread(new HelloWorldProducer(), false);
+////        thread(new HelloWorldConsumer(), false);
+////        thread(new HelloWorldProducer(), false);
+////        thread(new HelloWorldConsumer(), false);
+////        thread(new HelloWorldProducer(), false);
+////        thread(new HelloWorldConsumer(), false);
+////        thread(new HelloWorldConsumer(), false);
+////        thread(new HelloWorldProducer(), false);
+//    }
 
     public static void thread(Runnable runnable, boolean daemon) {
         Thread brokerThread = new Thread(runnable);
@@ -65,92 +116,95 @@ public class Main {
         brokerThread.start();
     }
 
-    public static class HelloWorldProducer implements Runnable {
-        public void run() {
-            try {
-                // Create a ConnectionFactory
-                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://128.2.210.187:61616");//"vm://localhost");
+//    public static class HelloWorldProducer implements Runnable {
+//        public void run() {
+//            try {
+//                // Create a ConnectionFactory
+//                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://128.2.210.187:61616");//"vm://localhost");
+//
+//                // Create a Connection
+//                Connection connection = connectionFactory.createConnection();
+//                connection.start();
+//
+//                // Create a Session
+//                Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+//
+//                // Create the destination (Topic or Queue)
+//                Destination destination = session.createTopic("asrinput");//.createQueue("TEST.FOO");
+//
+//                // Create a MessageProducer from the Session to the Topic or Queue
+//                MessageProducer producer = session.createProducer(destination);
+//                producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+//
+//                // Create a messages
+//                //String text = "Hello world! From: " + Thread.currentThread().getName() + " : " + this.hashCode();
+//                String text = "fdkasjd543tre43efh^ASR^Hello world";
+//                TextMessage message = session.createTextMessage(text);
+//
+//                // Tell the producer to send the message
+//                System.out.println("Sent message: "+ text + ". " + message.hashCode() + " : " + Thread.currentThread().getName());
+//                producer.send(message);
+//
+//                // Clean up
+//                session.close();
+//                connection.close();
+//            }
+//            catch (Exception e) {
+//                System.out.println("Caught: " + e);
+//                e.printStackTrace();
+//            }
+//        }
+//    }
+//
+//    public static class HelloWorldConsumer implements Runnable, ExceptionListener
+//    {
+//        public void run() {
+//            try {
+//
+//                // Create a ConnectionFactory
+//                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://128.2.210.187:61616");
+//
+//                // Create a Connection
+//                Connection connection = connectionFactory.createConnection();
+//                connection.start();
+//
+//                connection.setExceptionListener(this);
+//
+//                // Create a Session
+//                Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+//
+//                // Create the destination (Topic or Queue)
+//                Destination destination = session.createTopic("nlgoutput");
+//
+//                // Create a MessageConsumer from the Session to the Topic or Queue
+//                MessageConsumer consumer = session.createConsumer(destination);
+//
+//                // Wait for a message
+//                Message message = consumer.receive(1000);
+//
+//                if (message instanceof TextMessage) {
+//                    TextMessage textMessage = (TextMessage) message;
+//                    String text = textMessage.getText();
+//                    System.out.println("Received: " + text);
+//                } else {
+//                    System.out.println("Received: " + message);
+//                }
+//
+//                consumer.close();
+//                session.close();
+//                connection.close();
+//            } catch (Exception e) {
+//                System.out.println("Caught: " + e);
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        public synchronized void onException(JMSException ex) {
+//            System.out.println("JMS Exception occured.  Shutting down client.");
+//        }
+//    }
 
-                // Create a Connection
-                Connection connection = connectionFactory.createConnection();
-                connection.start();
 
-                // Create a Session
-                Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-
-                // Create the destination (Topic or Queue)
-                Destination destination = session.createTopic("asrinput");//.createQueue("TEST.FOO");
-
-                // Create a MessageProducer from the Session to the Topic or Queue
-                MessageProducer producer = session.createProducer(destination);
-                producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-
-                // Create a messages
-                //String text = "Hello world! From: " + Thread.currentThread().getName() + " : " + this.hashCode();
-                String text = "fdkasjd543tre43efh^ASR^Hello world";
-                TextMessage message = session.createTextMessage(text);
-
-                // Tell the producer to send the message
-                System.out.println("Sent message: "+ text + ". " + message.hashCode() + " : " + Thread.currentThread().getName());
-                producer.send(message);
-
-                // Clean up
-                session.close();
-                connection.close();
-            }
-            catch (Exception e) {
-                System.out.println("Caught: " + e);
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public static class HelloWorldConsumer implements Runnable, ExceptionListener {
-        public void run() {
-            try {
-
-                // Create a ConnectionFactory
-                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://128.2.210.187:61616");
-
-                // Create a Connection
-                Connection connection = connectionFactory.createConnection();
-                connection.start();
-
-                connection.setExceptionListener(this);
-
-                // Create a Session
-                Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-
-                // Create the destination (Topic or Queue)
-                Destination destination = session.createTopic("nlgoutput");
-
-                // Create a MessageConsumer from the Session to the Topic or Queue
-                MessageConsumer consumer = session.createConsumer(destination);
-
-                // Wait for a message
-                Message message = consumer.receive(1000);
-
-                if (message instanceof TextMessage) {
-                    TextMessage textMessage = (TextMessage) message;
-                    String text = textMessage.getText();
-                    System.out.println("Received: " + text);
-                } else {
-                    System.out.println("Received: " + message);
-                }
-
-                consumer.close();
-                session.close();
-                connection.close();
-            } catch (Exception e) {
-                System.out.println("Caught: " + e);
-                e.printStackTrace();
-            }
-        }
-
-        public synchronized void onException(JMSException ex) {
-            System.out.println("JMS Exception occured.  Shutting down client.");
-        }
-    }
 
 //    private static void oldSphinx()
 //    {
