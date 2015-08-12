@@ -1,5 +1,7 @@
 package InMind.DialogFunctions;
 
+import InMind.Server.asr.ASR;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +12,7 @@ import java.util.Map;
 public class myBus
 {
 
-    public static List<String> getBusInfo(Map<String, Object> fullInfo, String userId, String userText)
+    public static List<String> getBusInfo(Map<String, Object> fullInfo, String userId, ASR.AsrRes userText)
     {
         final String sourceTag = "source";
         final String targetTag = "target";

@@ -1,5 +1,7 @@
 package InMind.DialogFunctions;
 
+import InMind.Server.asr.ASR;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +11,7 @@ import java.util.Map;
  */
 public class myWeather
 {
-    public static List<String> getWeatherInfo(Map<String, Object> fullInfo, String userId, String userText)
+    public static List<String> getWeatherInfo(Map<String, Object> fullInfo, String userId, ASR.AsrRes userText)
     {
         final String locationTag = "location";
         List<String> ret = new LinkedList<String>();

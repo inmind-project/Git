@@ -1,5 +1,7 @@
 package InMind.DialogFunctions;
 
+import InMind.Server.asr.ASR;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
@@ -27,11 +29,14 @@ public class toInstructable
     static private final String emailParm = "email";
     static private final String realPwd = "realPwd";
     static public final String successContains = "successfully";
+    static public final String multiAltSentenceConcat = "^";
+    static public final String userNotRegistered = "user not registered";
 
-    public static List<String> toInstructable(Map<String, Object> fullInfo, String userId, String userText)
+    public static List<String> toInstructable(Map<String, Object> fullInfo, String userId, ASR.AsrRes userText)
     {
         try
         {
+            boolean retryingToRegister = fullInfo.get("state").equals("registerUser");
             //split userId to username and password //would actually be more efficient to just loop through all characters...
             String username = IntStream.range(0, userId.length()).filter(i -> (i % 2) == 0).mapToObj(i -> (Character.toString(userId.charAt(i)))).collect(Collectors.joining(""));
             String enctyptionPwd = IntStream.range(0, userId.length()).filter(i -> (i % 2) == 1).mapToObj(i -> (Character.toString(userId.charAt(i)))).collect(Collectors.joining(""));
@@ -58,10 +63,27 @@ public class toInstructable
             parameters.put(userIdParam, username); //use username as userId for now
             parameters.put(usernameParm, username);
             parameters.put(encPwd, enctyptionPwd);
-            parameters.put(userSaysParam, userText);
+            String bestPossibleSentences = userText.text;
+            for (int i = 0; i < userText.alternatives.size() && i < 2; i++) //add upto 2 alternatives
+            {
+                bestPossibleSentences = bestPossibleSentences + multiAltSentenceConcat + userText.alternatives.get(i);
+            }
+            parameters.put(userSaysParam, bestPossibleSentences);
             String response = callServer(parameters);
+            if (response.equals(userNotRegistered))
+            {
+                if (retryingToRegister) //avoid unending recursion
+                {
+                    return Collections.singletonList(FunctionInvoker.sayStr+"Could not register on instructable server.");
+                }
+                else
+                {
+                    fullInfo.put("state", "registerUser");
+                    return toInstructable(fullInfo, userId, userText);
+                }
+            }
             String[] res = response.split("\n");
-            return Arrays.asList(res).stream().map(s -> FunctionInvoker.sayStr +s).collect(Collectors.toList());
+            return Arrays.asList(res).stream().filter(s->!s.isEmpty()).map(s -> FunctionInvoker.sayStr + s).collect(Collectors.toList());
         } catch (Exception ex)
         {
             ex.printStackTrace();
@@ -70,7 +92,7 @@ public class toInstructable
 
     }
 
-    public static List<String> saveEmailPassword(Map<String, Object> fullInfo, String userId, String userText)
+    public static List<String> saveEmailPassword(Map<String, Object> fullInfo, String userId, ASR.AsrRes userText)
     {
         try
         {

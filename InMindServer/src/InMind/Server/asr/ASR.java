@@ -1,6 +1,7 @@
 package InMind.Server.asr;
 
 import InMind.Consts;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -8,6 +9,8 @@ import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by Amos Azaria on 16-Dec-14.
@@ -23,6 +26,7 @@ public class ASR
         public String text;
         public double confidence;
         public String fullJsonRes;
+        public List<String> alternatives; //only alternatives (not including "text")
     }
 
     public ASR()
@@ -123,15 +127,29 @@ public class ASR
         //System.out.println("Google response: " + response.toString());
         res.fullJsonRes = response.toString();
         //remove first empty result (13 chars): {"result":[]}
+        List<String> alternatives = new LinkedList<>();
         try
         {
             JSONObject jsonObj = new JSONObject(response.toString().substring(13));
-            JSONObject bestRes = jsonObj.getJSONArray("result").getJSONObject(0).getJSONArray("alternative").getJSONObject(0);
-            res.text = bestRes.getString("transcript");
-            res.confidence = bestRes.getDouble("confidence");
+            JSONArray results = jsonObj.getJSONArray("result").getJSONObject(0).getJSONArray("alternative");
+            for (int i=0; i<results.length(); i++)
+            {
+                JSONObject result = results.getJSONObject(i);
+                if (i == 0)
+                {
+                    res.text = result.getString("transcript");
+                    if (result.has("confidence"))
+                        res.confidence = result.getDouble("confidence");
+                }
+                else
+                {
+                    alternatives.add(result.getString("transcript"));
+                }
+            }
+            res.alternatives = alternatives;
         } catch (org.json.JSONException ex)
         {
-            System.out.println("Error parsing JSon, possibly only confidence missing.");
+            System.out.println("Error parsing JSon.");
         }
 
         // print result

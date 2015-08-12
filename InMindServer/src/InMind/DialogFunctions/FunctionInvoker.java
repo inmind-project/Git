@@ -1,6 +1,7 @@
 package InMind.DialogFunctions;
 
 import InMind.Consts;
+import InMind.Server.asr.ASR;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -17,27 +18,18 @@ public class FunctionInvoker
 
     //returns a list of commands to the client. May return null.
     @SuppressWarnings("unchecked")
-    static public List<String> toInvoke(String dialogFileBase, String funName, Map<String, Object> fullInfo, String userId, String userText)
+    static public List<String> toInvoke(String dialogFileBase, String funName, Map<String, Object> fullInfo, String userId, ASR.AsrRes asrRes)
     {
         List<String> toSend = null;
         try
         {
             Package pack = FunctionInvoker.class.getPackage();
-            Method method = Class.forName(pack.getName() + "." + dialogFileBase).getMethod(funName, Map.class, String.class, String.class);
+            Method method = Class.forName(pack.getName() + "." + dialogFileBase).getMethod(funName, Map.class, String.class, ASR.AsrRes.class);
             if (method != null)
             {
-                toSend = (List<String>)method.invoke(null, fullInfo, userId, userText);
+                toSend = (List<String>)method.invoke(null, fullInfo, userId, asrRes);
             }
-        } catch (IllegalAccessException e)
-        {
-            e.printStackTrace();
-        } catch (InvocationTargetException e)
-        {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e)
-        {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e)
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e)
         {
             e.printStackTrace();
         }

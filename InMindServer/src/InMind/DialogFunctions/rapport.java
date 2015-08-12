@@ -1,6 +1,7 @@
 package InMind.DialogFunctions;
 
 import InMind.Consts;
+import InMind.Server.asr.ASR;
 import InMind.ServerMessagingConsts;
 
 import java.io.*;
@@ -17,7 +18,7 @@ public class rapport
 {
     static final String ip = "128.2.176.24";
     static final int port = 9096;
-    public static List<String> forwardToRapport(Map<String, Object> fullInfo, String userId, String userText)
+    public static List<String> forwardToRapport(Map<String, Object> fullInfo, String userId, ASR.AsrRes userText)
     {
         List<String> ret = new LinkedList<String>();
 
@@ -34,7 +35,7 @@ public class rapport
                 socket = new Socket(serverAddr, port);
                 PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
                 //send message to rapport server
-                out.println(userId + Consts.commandChar + userText);
+                out.println(userId + Consts.commandChar + userText.text);
 
                 //wait for "handling/notHandling" response
                 //receive the message which the server sends back

@@ -1,5 +1,7 @@
 package InMind.DialogFunctions;
 
+import InMind.Server.asr.ASR;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -14,7 +16,7 @@ import java.util.Random;
 public class firstHello
 {
     static final String agentNameKey = "agentName";
-    public static List<String> hello(Map<String, Object> fullInfo, String userId, String userText)
+    public static List<String> hello(Map<String, Object> fullInfo, String userId, ASR.AsrRes userText)
     {
         List<String> toSayList = new LinkedList<String>();
         String agentName = null;
@@ -31,13 +33,13 @@ public class firstHello
         return toSayList;
     }
 
-    public static List<String> saveName(Map<String, Object> fullInfo, String userId, String userText)
+    public static List<String> saveName(Map<String, Object> fullInfo, String userId, ASR.AsrRes userText)
     {
         //TODO: should save the name to the DB as the user name.
         return null;
     }
 
-    public static List<String> getAgentName(Map<String, Object> fullInfo, String userId, String userText)
+    public static List<String> getAgentName(Map<String, Object> fullInfo, String userId, ASR.AsrRes userText)
     {
         //TODO: should get from the DB.
         List<String> toSayList = new LinkedList<String>();

@@ -1,6 +1,7 @@
 package InMind.DialogFunctions;
 
 import InMind.Consts;
+import InMind.Server.asr.ASR;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import javax.jms.*;
@@ -28,9 +29,9 @@ public class AsrOnly
     static final int distractionPort = 61616;
     static final String distractionOutTopic = "asrinput";
 
-    public static List<String> forwardToDistraction(Map<String, Object> fullInfo, String userId, String userText)
+    public static List<String> forwardToDistraction(Map<String, Object> fullInfo, String userId, ASR.AsrRes userText)
     {
-        String messageToSend = userId+ Consts.commandChar + Consts.asrStr + Consts.commandChar + userText;
+        String messageToSend = userId+ Consts.commandChar + Consts.asrStr + Consts.commandChar + userText.text;
         Thread brokerThread = new Thread(new AsrMessageSender(distractionIp,distractionPort,distractionOutTopic, messageToSend));
         brokerThread.start();
         return new LinkedList<String>();

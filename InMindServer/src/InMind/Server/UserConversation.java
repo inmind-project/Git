@@ -25,9 +25,6 @@ import java.util.regex.Pattern;
  */
 public class UserConversation
 {
-    public static final String dontRenewConnectionStr = "dontRenew";
-
-
     static final String cvsSplitBy = ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
     static final String basePath = "..\\Configurations\\";
     static final String dialogReturn = "return";
@@ -37,10 +34,10 @@ public class UserConversation
     static final String conditionsAndSetChar = ";";
     static final String setEquality = "=";
 
-
     static final String stateName = "state";
     static final String callFunName = "callfun";
     static final String callFunRepeat = "repeat";
+    static final String dontRenewConnectionStr = "dontRenew";
 
 
     String dialogFileBase = "";
@@ -110,7 +107,7 @@ public class UserConversation
                     toSend = tmpPrevMessages;
                 } else
                 {
-                    toSend = FunctionInvoker.toInvoke(dialogFileBase, fullInfo.get(callFunName).toString(), fullInfo, userId, userText); //TODO: add userId
+                    toSend = FunctionInvoker.toInvoke(dialogFileBase, fullInfo.get(callFunName).toString(), fullInfo, userId, asrRes); //TODO: add userId
                 }
                 sendToUser(messageSender, toSend, true);
                 fullInfo.remove(callFunName); //remove it so it won't be called again next time.
