@@ -6,6 +6,7 @@ first column (condition): conditions to be met (can be empty)
 second column (pattern): regular expression to be matched (and used) - cannot be empty, use .* to match everything
 	- %1 - group #1 etc.
 	- %r1 - group #1 with reflection, e.g. I am -> you are, You're -> I'm etc.
+	- case insensitive
 third column (Say): a sentence to be said to the user (will send a message Say^sentence to the user)
 fourth column (Set): set state and other variables.
 	- state="finish" - finish what you are doing and then clear dialog and reset back to top level.

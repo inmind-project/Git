@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
  */
 public class UserConversation
 {
+    public static final String dontRenewConnectionStr = "dontRenew";
 
 
     static final String cvsSplitBy = ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
@@ -132,7 +133,7 @@ public class UserConversation
 
         }
 
-        boolean renewConnection = !dialogFileBase.isEmpty();
+        boolean renewConnection = !dialogFileBase.isEmpty() && !fullInfo.containsKey(dontRenewConnectionStr);
         return renewConnection;
     }
 
@@ -184,7 +185,7 @@ public class UserConversation
                 // use comma as separator
                 String[] row = line.split(cvsSplitBy, -1);
 
-                Pattern p = Pattern.compile((row[csvPattern]), Pattern.CASE_INSENSITIVE);
+                Pattern p = Pattern.compile(removeExtraQuotes(row[csvPattern]), Pattern.CASE_INSENSITIVE);
                 Matcher m = p.matcher(userSentence);
                 if (m.matches())
                 {
@@ -506,7 +507,7 @@ public class UserConversation
         if (valStr.startsWith("\"") && valStr.endsWith("\"")) //if is surrounded by quotes, this is a string (no referring to other strings allowed).
             return removeExtraQuotes(valStr);
 
-        //dealing with numeric
+        //dealing with numeric (no quotes)
 
         Object requiredVal;
         if (fullInfo.containsKey(valStr)) //check if referring to a different variable

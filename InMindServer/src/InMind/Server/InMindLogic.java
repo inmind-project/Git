@@ -82,7 +82,7 @@ public class InMindLogic
                     {
                         asrRes = new ASR.AsrRes();
                         asrRes.confidence = 1;
-                        asrRes.text = m.group(2).trim();//TODO: might want to remove punctuation.
+                        asrRes.text = m.group(3).trim();//TODO: might want to remove punctuation.
                         dealWithText(userId, asrRes);
                     }
 

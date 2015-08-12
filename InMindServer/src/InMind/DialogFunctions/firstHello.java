@@ -31,7 +31,7 @@ public class firstHello
         return toSayList;
     }
 
-    public static List<String> saveName(Map<String, Object> fullInfo, String userId)
+    public static List<String> saveName(Map<String, Object> fullInfo, String userId, String userText)
     {
         //TODO: should save the name to the DB as the user name.
         return null;

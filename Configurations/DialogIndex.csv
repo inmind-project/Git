@@ -1,5 +1,4 @@
 pattern,classAndFileBaseName
-.*,AsrOnly
 .*(?: |^)bus(?: |$).*,myBus
 .*(?: |^)weather(?: |$).*,myWeather
 (?:Will | would )?(you )?(please )?Marry me,marryMe
@@ -7,4 +6,5 @@ pattern,classAndFileBaseName
 knock knock,knockKnock
 Hello,firstHello
 start rapport,rapport
+.*,toInstructable
 .*,socialTalk

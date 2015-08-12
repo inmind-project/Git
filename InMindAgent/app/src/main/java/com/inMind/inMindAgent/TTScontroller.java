@@ -16,7 +16,7 @@ import android.util.Log;
 public class TTScontroller
 {
 
-    final boolean alwaysUseFlite = true;
+    final boolean alwaysUseFlite = false;
 
     TextToSpeech ttobj;
     Context appContect;

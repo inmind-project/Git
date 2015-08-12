@@ -1,15 +1,30 @@
 package com.company;
 
+import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.mail.*;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.AlgorithmParameters;
+import java.security.spec.KeySpec;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -18,11 +33,6 @@ import java.util.regex.Pattern;
 
 
 public class Main {
-
-    static final String username = "amospam2@gmail.com";
-    static final String password = "Azaria12";
-    static final int emailsToFetch = 5;
-
 
 //    static class GMailAuthenticator extends Authenticator {
 //        String user;
@@ -39,8 +49,204 @@ public class Main {
 //        }
 //    }
 
+    static private final String USER_AGENT = "Mozilla/5.0";
+
     public static void main(String[] args) throws Exception
     {
+        String email = "inmindenc@gmail.com";
+        //Pattern pattern = Pattern.compile("(^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$)", Pattern.CASE_INSENSITIVE);
+        Pattern p = Pattern.compile("(^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$)", Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(email);
+        System.out.println(m.matches());
+
+
+//        String userId = "fdsadfgssdf3482ds98cvc98ew";
+//        String first = IntStream.range(0, userId.length()).filter(i->(i%2)==0).mapToObj(i -> (Character.toString(userId.charAt(i)))).collect(Collectors.joining(""));
+//        String second = IntStream.range(0,userId.length()).filter(i->(i%2)==1).mapToObj(i -> (Character.toString(userId.charAt(i)))).collect(Collectors.joining(""));
+//
+//        System.out.println(first + " " + second);
+
+
+
+//        String originalPassword = "Azaria12";
+//        StAndIV encryptedValue = encryptOrDecrypt(true, originalPassword, null);
+//        System.out.println(encryptedValue.st);
+//
+//        StAndIV backToOrg = encryptOrDecrypt(false, encryptedValue.st, encryptedValue.iv);
+//        System.out.println(backToOrg.st);
+
+        //piazza();
+        //Callable<Integer> r = () -> 7 + 3;
+        //System.out.println(r.call());
+        //r.run();
+
+    }
+
+    static class StAndIV
+    {
+        public String st;
+        public String iv;
+    }
+
+    private static StAndIV encryptOrDecrypt(boolean enc, String encOrDec, String ivs) throws Exception
+    {
+        byte[] input;
+        if (enc)
+            input = encOrDec.getBytes(StandardCharsets.UTF_8);
+        else
+            input = new BASE64Decoder().decodeBuffer(encOrDec);
+        char[] password = "4328s38".toCharArray();
+        byte[] salt = "siel234n".getBytes(StandardCharsets.UTF_8);
+        //byte[] salt = new byte[]{4,6,2,6,8,3,5,7};
+        //SecureRandom.
+
+
+        /* Derive the key, given password and salt. */
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        KeySpec spec = new PBEKeySpec(password, salt, 65536, 128);
+        SecretKey tmp = factory.generateSecret(spec);
+        SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
+
+        //SecretKeySpec key = new SecretKeySpec(keyBytes, "DES");
+        //IvParameterSpec ivSpec = new IvParameterSpec(ivBytes);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+
+        if (enc)
+        {
+            cipher.init(Cipher.ENCRYPT_MODE, secret);//key, ivSpec);
+
+
+            AlgorithmParameters params = cipher.getParameters();
+            byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
+
+            byte[] encVal = cipher.doFinal(input);
+            String encryptedValue = new BASE64Encoder().encode(encVal);
+            StAndIV stAndIV = new StAndIV();
+            stAndIV.st = encryptedValue;
+            stAndIV.iv = new BASE64Encoder().encode(iv);
+            return stAndIV;
+        }
+        else
+        {
+            byte[] iv =  new BASE64Decoder().decodeBuffer(ivs);
+
+            cipher.init(Cipher.DECRYPT_MODE, secret,new IvParameterSpec(iv));
+
+            String plaintext = new String(cipher.doFinal(input), "UTF-8");;
+            StAndIV stAndIV = new StAndIV();
+            stAndIV.st = plaintext;
+            return stAndIV;
+        }
+    }
+
+    private static void piazza() throws IOException
+    {
+        //login
+        String url = "https://piazza.com/logic/api?method=user.login";
+
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+        //using post
+        con.setRequestMethod("POST");
+        con.setRequestProperty("User-Agent", USER_AGENT);
+        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+        String parameters =  "{\"method\":\"user.login\",\"params\":{\"email\":\"inmindenc@gmail.com\",\"pass\":\"CNEdnimni\"}}";
+
+        // Send post request
+        con.setDoOutput(true);
+        DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+        wr.writeBytes(parameters);
+        wr.flush();
+        wr.close();
+        int responseCode = con.getResponseCode();
+        String cookie = con.getHeaderField("Set-Cookie");
+        if (responseCode == 200)
+        {
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            while ((inputLine = in.readLine()) != null)
+            {
+                System.out.println(inputLine + "\n");
+            }
+        }
+        else
+        {
+            System.out.println("S: error. (response code is: " + responseCode + ")");
+        }
+
+
+        //post something!
+        String postUrl = "https://piazza.com/logic/api?content.answer";//"https://piazza.com/logic/api?content.create";
+
+        URL obj2 = new URL(postUrl);
+        HttpURLConnection con2 = (HttpURLConnection) obj2.openConnection();
+
+        //using post
+        con2.setRequestMethod("POST");
+        con2.setRequestProperty("User-Agent", USER_AGENT);
+        con2.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+        con2.setRequestProperty("Cookie",cookie);
+
+        String parameters2 =  "{\"method\":\"content.answer\",\"params\":{\"content\":\"automatically generated2\",\"type\":\"s_answer\",\"cid\":\"icp4mkg3ypu6tx\",\"revision\":0,\"anonymous\":\"no\"}}";//"{\"method\":\"content.create\",\"params\":{\"nid\":\"ic53erv8juk488\",\"type\":\"question\",\"subject\":\"Amos testing (automatically created)\",\"content\": \"nothing\",\"folder:\":\"other\"}}";
+
+        // Send post request
+        con2.setDoOutput(true);
+        DataOutputStream wr2 = new DataOutputStream(con2.getOutputStream());
+        wr2.writeBytes(parameters2);
+        wr2.flush();
+        wr2.close();
+        int responseCode2 = con2.getResponseCode();
+        if (responseCode2 == 200)
+        {
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con2.getInputStream()));
+            String inputLine;
+            while ((inputLine = in.readLine()) != null)
+            {
+                System.out.println(inputLine + "\n");
+            }
+        }
+        else
+        {
+            System.out.println("S: error. (response code is: " + responseCode2 + ")");
+        }
+    }
+
+    private static void mySqlConnection()
+    {
+        String url = "jdbc:mysql://localhost:3306/instructable_kb";
+        String username = "root";
+        String password = "InMind7";
+
+        System.out.println("Connecting database...");
+
+        MysqlDataSource dataSource = new MysqlDataSource();
+        dataSource.setDatabaseName("instructable_kb");
+        dataSource.setUser(username);
+        dataSource.setPassword(password);
+        dataSource.setPort(3306);
+        dataSource.setServerName("localhost");
+
+        try
+        {
+            Connection connection = dataSource.getConnection();//DriverManager.getConnection(url, username, password);
+            System.out.println("Database connected!");
+            Statement stmt = connection.createStatement();
+            stmt.execute("insert into concepts (user_id,concept_name) values ('all','temp3')");
+        } catch (SQLException e) {
+            throw new IllegalStateException("Cannot connect the database!", e);
+        }
+    }
+
+    public static void testEmail()
+    {
+        final String username = "amospam2@gmail.com";
+        final String password = "Azaria12";
+        final int emailsToFetch = 5;
+
         Properties props = new Properties();
         props.setProperty("mail.store.protocol", "imaps");
         try {
