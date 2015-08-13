@@ -7,7 +7,7 @@ condition,pattern,Say,Set,Additional Command
 ,(?:please )?expand(?: article)?(?: please)?,I see you like this article!,"state=""finish""",News^expand
 ,(please )?read( me)?( the| this)?( news)?( article)?,,"state=""finish""",News^read
 ,(?:could you )?(?:please )?(?:repeat|say that again|what)(?: did you say)?,,"callfun=""repeat"";state=""finish""",
-,Thank you,You are welcome!,"state=""finish""",
+,Thank you|Thanks,You are welcome!,"state=""finish""",
 ,(?:Hi|Hello),"Hello, how are you today?","state=""finish""",
 ,(?:I am |I'm )?(good|ok|o.k.|okay|not bad|fine)(?: thank you| thanks)?,Good! I'm glad to hear that!,"state=""finish""",
 ,I want (.*),What would it mean to you if you got %r1?,"state=""finish""",
@@ -20,7 +20,6 @@ condition,pattern,Say,Set,Additional Command
 ,Because (.*),What other reasons come to mind?,"state=""finish""",
 ,(.*) sorry (.*),There are many times when no apology is needed.,"state=""finish""",
 ,I think (.*),But you're not sure %r1?,"state=""finish""",
-,Yes,"Ok, if you say so.","state=""finish""",
 ,(?:You're|You are) (.*),Why do you think I am %r1?,"state=""finish""",
 ,I feel (.*),Do you often feel %r1?,"state=""finish""",
 ,really,You sound surprised!,"state=""finish""",
@@ -29,3 +28,4 @@ condition,pattern,Say,Set,Additional Command
 ,(?:Tell me |Say )(?:that )?(.*),%r1,"state=""finish""",
 ,.*how.* you,I'm good. Thanks for asking.,"state=""finish""",
 ,(I )?(don't know|do not know|can't think|cannot think).*,That's ok with me.,"state=""finish""",
+,.*,,"state=""return""",

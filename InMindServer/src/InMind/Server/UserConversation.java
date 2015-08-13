@@ -284,7 +284,10 @@ public class UserConversation
                 if (!startConsidering)
                 {
                     if (row[csvFile].equals(considerOnlyAfterMe))
+                    {
                         startConsidering = true;
+                        continue;
+                    }
                 }
 
                 if (startConsidering)
