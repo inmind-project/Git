@@ -26,7 +26,7 @@ public class ASR
         public String text;
         public double confidence;
         public String fullJsonRes;
-        public List<String> alternatives; //only alternatives (not including "text")
+        public List<String> alternatives = new LinkedList<>(); //only alternatives (not including "text")
     }
 
     public ASR()
