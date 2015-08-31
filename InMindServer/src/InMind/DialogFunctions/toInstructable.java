@@ -70,7 +70,7 @@ public class toInstructable
             }
             parameters.put(userSaysParam, bestPossibleSentences);
             String response = callServer(parameters);
-            if (response.equals(userNotRegistered))
+            if (response.trim().equals(userNotRegistered))
             {
                 if (retryingToRegister) //avoid unending recursion
                 {
