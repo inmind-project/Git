@@ -14,7 +14,7 @@ import java.net.UnknownHostException;
 public class TCPClient
 {
 
-    static final int connectionTimeout = 2500; // in milliseconds
+    static final int connectionTimeout = 3000; // in milliseconds
 
     private String serverMessage;
     String ipAddr;

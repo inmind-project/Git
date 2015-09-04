@@ -10,6 +10,7 @@
         app:showAsAction="never"/>
     <item android:id="@+id/action_toDesk" android:title="changeToDeskIp"></item>
     <item android:id="@+id/action_toLap" android:title="changeToLapIp"></item>
+    <item android:id="@+id/action_changeIp" android:title="changeIp"></item>
 
 </menu>
 <!-- From: file:/C:/InMind/Git/InMindAgent/app/src/main/res/menu/main.xml -->

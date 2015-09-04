@@ -409,31 +409,31 @@ public final class R {
 		public static final int list_item = 0x7f090025;
 		public static final int middle = 0x7f090015;
 		public static final int never = 0x7f090019;
-		public static final int news_action_settings = 0x7f09005f;
-		public static final int news_action_switchview = 0x7f09005e;
-		public static final int news_btnDislike = 0x7f090057;
-		public static final int news_btnLike = 0x7f090056;
-		public static final int news_btnShareFb = 0x7f090052;
-		public static final int news_btnShareMore = 0x7f090055;
-		public static final int news_btnShareTumblr = 0x7f090054;
-		public static final int news_btnShareTwitter = 0x7f090053;
-		public static final int news_content_frame = 0x7f090059;
-		public static final int news_drawer_layout = 0x7f090058;
-		public static final int news_feat = 0x7f090050;
-		public static final int news_feat2 = 0x7f090051;
-		public static final int news_img = 0x7f09004e;
-		public static final int news_itemtext = 0x7f090046;
-		public static final int news_left_drawer = 0x7f09005a;
-		public static final int news_newslist = 0x7f090048;
-		public static final int news_pB1 = 0x7f090044;
-		public static final int news_publisher = 0x7f09004c;
-		public static final int news_rank = 0x7f090049;
-		public static final int news_reason = 0x7f09004b;
-		public static final int news_score = 0x7f09004d;
-		public static final int news_summary = 0x7f09004f;
-		public static final int news_swipe_container = 0x7f090047;
-		public static final int news_title = 0x7f09004a;
-		public static final int news_wv = 0x7f090045;
+		public static final int news_action_settings = 0x7f090061;
+		public static final int news_action_switchview = 0x7f090060;
+		public static final int news_btnDislike = 0x7f090058;
+		public static final int news_btnLike = 0x7f090057;
+		public static final int news_btnShareFb = 0x7f090053;
+		public static final int news_btnShareMore = 0x7f090056;
+		public static final int news_btnShareTumblr = 0x7f090055;
+		public static final int news_btnShareTwitter = 0x7f090054;
+		public static final int news_content_frame = 0x7f09005a;
+		public static final int news_drawer_layout = 0x7f090059;
+		public static final int news_feat = 0x7f090051;
+		public static final int news_feat2 = 0x7f090052;
+		public static final int news_img = 0x7f09004f;
+		public static final int news_itemtext = 0x7f090047;
+		public static final int news_left_drawer = 0x7f09005b;
+		public static final int news_newslist = 0x7f090049;
+		public static final int news_pB1 = 0x7f090045;
+		public static final int news_publisher = 0x7f09004d;
+		public static final int news_rank = 0x7f09004a;
+		public static final int news_reason = 0x7f09004c;
+		public static final int news_score = 0x7f09004e;
+		public static final int news_summary = 0x7f090050;
+		public static final int news_swipe_container = 0x7f090048;
+		public static final int news_title = 0x7f09004b;
+		public static final int news_wv = 0x7f090046;
 		public static final int none = 0x7f09000e;
 		public static final int normal = 0x7f09000a;
 		public static final int progress_circular = 0x7f090005;
@@ -489,18 +489,18 @@ public final class R {
 		public static final int abc_search_dropdown_item_icons_2line = 0x7f030014;
 		public static final int abc_search_view = 0x7f030015;
 		public static final int abc_simple_dropdown_hint = 0x7f030016;
-		public static final int news_activity_browser = 0x7f030018;
-		public static final int news_def_list_item = 0x7f030019;
-		public static final int news_drawer_list_item = 0x7f03001a;
-		public static final int news_fragment_flipview = 0x7f03001b;
-		public static final int news_fragment_listview = 0x7f03001c;
-		public static final int news_list_item = 0x7f03001d;
-		public static final int news_list_item_flat = 0x7f03001e;
-		public static final int news_main = 0x7f03001f;
-		public static final int support_simple_spinner_dropdown_item = 0x7f030020;
+		public static final int news_activity_browser = 0x7f030019;
+		public static final int news_def_list_item = 0x7f03001a;
+		public static final int news_drawer_list_item = 0x7f03001b;
+		public static final int news_fragment_flipview = 0x7f03001c;
+		public static final int news_fragment_listview = 0x7f03001d;
+		public static final int news_list_item = 0x7f03001e;
+		public static final int news_list_item_flat = 0x7f03001f;
+		public static final int news_main = 0x7f030020;
+		public static final int support_simple_spinner_dropdown_item = 0x7f030021;
 	}
 	public static final class menu {
-		public static final int news_main = 0x7f0d0002;
+		public static final int news_main = 0x7f0d0003;
 	}
 	public static final class string {
 		public static final int abc_action_bar_home_description = 0x7f0b0000;
@@ -541,7 +541,7 @@ public final class R {
 		public static final int news_trackLocEnabled = 0x7f0b0027;
 		public static final int news_trackLocation_summary = 0x7f0b0028;
 		public static final int news_trackLocation_title = 0x7f0b0029;
-		public static final int title_activity_news_adapter = 0x7f0b002b;
+		public static final int title_activity_news_adapter = 0x7f0b002c;
 	}
 	public static final class style {
 		public static final int AppTheme = 0x7f0c0001;

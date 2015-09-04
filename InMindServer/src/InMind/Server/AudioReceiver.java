@@ -9,7 +9,7 @@ import java.net.SocketTimeoutException;
 class AudioReceiver
 {
 
-    static final int timeout = 1000; //in milliseconds
+    static final int timeout = 1500;//1000; //in milliseconds
     static final long maxRecordingTimeLength = 60 * 1000; //in milliseconds
     static public final int udpBufferSize = 4096;
 

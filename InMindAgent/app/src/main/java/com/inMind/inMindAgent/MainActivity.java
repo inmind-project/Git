@@ -42,7 +42,7 @@ public class MainActivity extends ActionBarActivity
     LogicController logicController;
     InMindCommandListener inmindCommandListener;
 
-    private ImageButton startButton;
+    private ImageButton startButton, startFromCircle;
     private Button stopButton;
 
     private Handler userNotifierHandler, talkHandler, launchHandler, ttsCompleteHandler; // TODO: should
@@ -233,9 +233,11 @@ public class MainActivity extends ActionBarActivity
         }
 
         startButton = (ImageButton) findViewById(R.id.button_rec);
+        startFromCircle  = (ImageButton) findViewById(R.id.image_recording);
         stopButton = (Button) findViewById(R.id.button_stop);
 
         startButton.setOnClickListener(startListener);
+        startFromCircle.setOnClickListener(startListener);
         stopButton.setOnClickListener(stopListener);
 
         // minBufSize += 2048;
@@ -335,20 +337,39 @@ public class MainActivity extends ActionBarActivity
         {
             return true;
         }
-        if (id == R.id.action_toDesk)
+        else if (id == R.id.action_toDesk)
         {
             if (logicController != null)
                 logicController.changeInitIpAddr("128.2.213.163");
             return true;
         }
-        if (id == R.id.action_toLap)
+        else if (id == R.id.action_toLap)
         {
             if (logicController != null)
                 logicController.changeInitIpAddr("128.2.209.220");
             return true;
         }
+        else if (id == R.id.action_changeIp)
+        {
+            Intent intent = new Intent(this, IpEditActivity.class);
+            intent.putExtra("ip",logicController.tcpIpAddr);
+            startActivityForResult(intent,1);
+        }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == 1) {
+            if(resultCode == RESULT_OK){
+                logicController.changeInitIpAddr(data.getStringExtra("ip"));
+            }
+            if (resultCode == RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
+        }
+    }//onActivityResult
 
     /**
      * Called when the user clicks the send button

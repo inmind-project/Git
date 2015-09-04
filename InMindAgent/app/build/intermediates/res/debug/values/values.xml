@@ -191,6 +191,7 @@
     <string name="news_trackLocation_title">Enable Location Tracker</string>
     <!-- From: file:/C:/InMind/Git/InMindAgent/app/src/main/res/values/strings.xml -->
     <eat-comment/>
+    <string name="title_activity_ip_edit">IpEditActivity</string>
     <string name="title_activity_main">MainActivity</string>
     <!-- From: file:/C:/InMind/Git/InMindAgent/app/build/intermediates/exploded-aar/InMindAgent/middleware/unspecified/res/values/values.xml -->
     <eat-comment/>

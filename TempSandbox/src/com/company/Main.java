@@ -53,11 +53,15 @@ public class Main {
 
     public static void main(String[] args) throws Exception
     {
-        String email = "inmindenc@gmail.com";
-        //Pattern pattern = Pattern.compile("(^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$)", Pattern.CASE_INSENSITIVE);
-        Pattern p = Pattern.compile("(^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$)", Pattern.CASE_INSENSITIVE);
-        Matcher m = p.matcher(email);
-        System.out.println(m.matches());
+
+        for (int i = 0; i < 100; i++)
+            System.out.println(NameGenerator.generateNewName());
+
+//        String email = "inmindenc@gmail.com";
+//        //Pattern pattern = Pattern.compile("(^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$)", Pattern.CASE_INSENSITIVE);
+//        Pattern p = Pattern.compile("(^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$)", Pattern.CASE_INSENSITIVE);
+//        Matcher m = p.matcher(email);
+//        System.out.println(m.matches());
 
 
 //        String userId = "fdsadfgssdf3482ds98cvc98ew";

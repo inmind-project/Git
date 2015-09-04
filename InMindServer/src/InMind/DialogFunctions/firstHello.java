@@ -52,9 +52,6 @@ public class firstHello
     class nameGenerator
     {
 
-
-
-
         static int minLen = 5;
         static int maxLen = 9;
         static String year = "1980";
