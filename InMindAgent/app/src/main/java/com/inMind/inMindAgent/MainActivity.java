@@ -45,7 +45,7 @@ public class MainActivity extends ActionBarActivity
     private ImageButton startButton, startFromCircle;
     private Button stopButton;
 
-    private Handler userNotifierHandler, talkHandler, launchHandler, ttsCompleteHandler; // TODO: should
+    private Handler userNotifierHandler, talkHandler, launchHandler, jsonHandler, ttsCompleteHandler; // TODO: should
     // these all be
     // combined to
     // one handler?
@@ -158,6 +158,22 @@ public class MainActivity extends ActionBarActivity
                         }
                     }
 
+                }
+                return false;
+            }
+        });
+
+        jsonHandler = new Handler(new Handler.Callback()
+        {
+
+            @Override
+            public boolean handleMessage(Message msg)
+            {
+                String toSay = msg.obj.toString();
+                ttsCont.speakThis(toSay);
+                if (msg.arg1 == 1) //toast
+                {
+                    toastWithTimer(toSay, true);
                 }
                 return false;
             }

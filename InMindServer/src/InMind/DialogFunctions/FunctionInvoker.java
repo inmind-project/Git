@@ -15,6 +15,7 @@ public class FunctionInvoker
 {
 
     static final String sayStr = Consts.sayCommand + Consts.commandChar;
+    static final String execJson = Consts.execJson + Consts.commandChar;
 
     //returns a list of commands to the client. May return null.
     @SuppressWarnings("unchecked")
