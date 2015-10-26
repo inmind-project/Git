@@ -93,3 +93,5 @@ googleASR.txt
 *.class
 GCalendar/.idea/
 EmailClient/.idea/
+InMindAgent/app/build/
+InMindAgent/.idea/
