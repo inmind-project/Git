@@ -44,7 +44,7 @@ public class toInstructable
                 parameters.put(usernameParm, username);
                 parameters.put(encPwd, enctyptionPwd);
                 String url = "http://localhost:" + portToUse + "/" + contextRealtimeAgent;
-                String response = dialogUtils.callServer(url, parameters);
+                String response = dialogUtils.callServer(url, parameters, false);
                 if (!response.contains(successContains))
                 {
                     //check if already set email/password, if not ask for it
@@ -66,7 +66,7 @@ public class toInstructable
             }
             parameters.put(userSaysParam, bestPossibleSentences);
             String url = "http://localhost:" + portToUse + "/" + contextRealtimeAgent;
-            String response = dialogUtils.callServer(url, parameters);
+            String response = dialogUtils.callServer(url, parameters, false);
             if (response.trim().equals(userNotRegistered))
             {
                 if (retryingToRegister) //avoid unending recursion
@@ -108,7 +108,7 @@ public class toInstructable
             parameters.put(emailParm, email);
             parameters.put(realPwd, password);
             String url = "http://localhost:" + portToUse + "/" + contextRealtimeAgent;
-            String response = dialogUtils.callServer(url, parameters);
+            String response = dialogUtils.callServer(url, parameters, false);
             return Collections.singletonList(FunctionInvoker.sayStr+response);
         } catch (Exception ex)
         {

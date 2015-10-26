@@ -1,12 +1,16 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
 
     defaultConfig {
+        minSdkVersion 17
+
         applicationId "com.inMind.inMindAgent"
-        targetSdkVersion 21
+        targetSdkVersion 22
+        manifestPlaceholders - [providerLabel: applicationId]
     }
 
     buildTypes {
@@ -18,29 +22,29 @@ android {
     packagingOptions {
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
     }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:21.0.3'
-    compile project(':commons')
-    compile project(':news')
+    compile 'com.android.support:appcompat-v7:22.2.0'
     compile project(':middleware')
 
-    // libs required by the commons project
-    compile 'uk.com.robust-it:cloning:1.9.1'
-    compile 'com.google.code.gson:gson:2.3'
-    compile ('com.googlecode.json-simple:json-simple:1.1.1') {
-        exclude module: 'junit'
-    }
-
-    // libs required by the news reader project
-    compile 'de.greenrobot:eventbus:2.4.0'
-    compile 'commons-codec:commons-codec:1.6'
-    compile 'org.apache.httpcomponents:httpcore:4.3.2'
-
-
-    // libs required by the middleware project
-    compile 'com.google.guava:guava:18.0'
+//    // libs required by the commons project
+//    compile 'uk.com.robust-it:cloning:1.9.1'
+//    compile 'com.google.code.gson:gson:2.3'
+//    compile ('com.googlecode.json-simple:json-simple:1.1.1') {
+//        exclude module: 'junit'
+//    }
+//
+//    // libs required by the news reader project
+//    compile 'de.greenrobot:eventbus:2.4.0'
+//    compile 'commons-codec:commons-codec:1.6'
+//    compile 'org.apache.httpcomponents:httpcore:4.3.2'
+//
+//
+//    // libs required by the middleware project
+//    compile 'com.google.guava:guava:18.0'
 }

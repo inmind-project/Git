@@ -12,7 +12,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.yahoo.inmind.middleware.control.MessageBroker;
+import com.yahoo.inmind.comm.generic.control.MessageBroker;
 
 /*
  * This class is in-charge of all connections to the server. 
@@ -38,7 +38,6 @@ public class LogicController
     private Handler userNotifierHandler;
     private Handler talkHandler;
     private Handler launchHandler;
-    private Handler jsonHandler;
     syncNotifiers startStopRecNotifier;
     private boolean needToReconnect;
 
@@ -51,12 +50,11 @@ public class LogicController
         void startStopRec(boolean start);
     }
 
-    public LogicController(Handler userNotifierHandler, Handler talkHandler, Handler launchHandler, Handler jsonHandler, syncNotifiers startStopRecNotifier, MessageBroker messageBroker, String uniqueId)
+    public LogicController(Handler userNotifierHandler, Handler talkHandler, Handler launchHandler, syncNotifiers startStopRecNotifier, MessageBroker messageBroker, String uniqueId)
     {
         this.userNotifierHandler = userNotifierHandler;
         this.talkHandler = talkHandler;
         this.launchHandler = launchHandler;
-        this.jsonHandler = jsonHandler;
         this.startStopRecNotifier = startStopRecNotifier;
         messageController = new MessageController();
         this.messageBroker = messageBroker;
@@ -171,26 +169,21 @@ public class LogicController
                 msgLaunch.obj = m.group(2).trim();
                 launchHandler.sendMessage(msgLaunch);
             }
-            else if (m.group(1).equalsIgnoreCase(Consts.execJson))
+            else //not basic command, check with middleware
             {
-                Message msgJson = new Message();
-                msgJson.arg1 = 1;
-                msgJson.obj = m.group(2).trim();
-                jsonHandler.sendMessage(msgJson);
-            }
-
-            String command = m.group(1);
-            String args = null;
-            if (m.groupCount() > 1)
-                args = m.group(2);
-            try
-            {
-                messageController.dealWithMessage(command, args, messageBroker, talkHandler);
-            }
-            catch (Exception ex)
-            {
-                Log.e("messageController.dealWithMessage", "command=" + command + " args=" + args + " " + ex.toString());
-                //ex.printStackTrace();
+                String command = m.group(1);
+                String args = null;
+                if (m.groupCount() > 1)
+                    args = m.group(2);
+                try
+                {
+                    messageController.dealWithMessage(command, args, messageBroker, talkHandler);
+                }
+                catch (Exception ex)
+                {
+                    Log.e("messageController.dealWithMessage", "command=" + command + " args=" + args + " " + ex.toString());
+                    //ex.printStackTrace();
+                }
             }
         }
     }

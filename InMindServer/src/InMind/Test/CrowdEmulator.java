@@ -1,12 +1,10 @@
 package InMind.Test;
 
 import InMind.DialogFunctions.dialogUtils;
-import InMind.ParameterFilter;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
@@ -27,43 +25,50 @@ public class CrowdEmulator
         HttpContext httpContext = server.createContext("/", new com.sun.net.httpserver.HttpHandler()
         {
             @Override
-            public void handle(HttpExchange httpExchange) throws IOException
+            public void handle(HttpExchange httpExchange)
             {
-                Map<String, Object> parameters = (Map<String, Object>) httpExchange.getAttribute(ParameterFilter.parametersStr);
-                String response = "ok";
-                httpExchange.sendResponseHeaders(200, response.length());
-                OutputStream os = httpExchange.getResponseBody();
-                os.write(response.getBytes());
-                os.close();
-
-                System.out.println("received call, messageType=" + parameters.get("messageType"));
-                if (parameters.get("messageType").equals("userSays"))
+                try
                 {
-                    String userText = (String)parameters.get("userText");
-                    System.out.println("userSays=" + userText);
-                    try
+
+                    Map<String, Object> parameters = dialogUtils.bodyAsParms(httpExchange);
+                    String response = "ok";
+                    httpExchange.sendResponseHeaders(200, response.length());
+                    OutputStream os = httpExchange.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+
+                    System.out.println("received call, messageType=" + parameters.get("messageType"));
+                    if (parameters.get("messageType").equals("userSays"))
                     {
-                        Map<String, String> retParameters = new HashMap<>();
-                        if (userText.equalsIgnoreCase("yes"))
+                        String userText = (String) parameters.get("userText");
+                        System.out.println("userSays=" + userText);
+                        try
                         {
-                            retParameters.put("messageType", "execRule");
-                            retParameters.put("content", jsonString);
-                        }
-                        else
+                            Map<String, String> retParameters = new HashMap<>();
+                            if (userText.equalsIgnoreCase("yes"))
+                            {
+                                retParameters.put("messageType", "execRule");
+                                retParameters.put("content", jsonString);
+                            }
+                            else
+                            {
+                                retParameters.put("messageType", "say");
+                                retParameters.put("content", "Is that because that you keep dropping it?");
+                            }
+                            retParameters.put("userId", (String) parameters.get("userId"));
+                            dialogUtils.callServer("http://localhost:" + 1607 + "/crowdListener", retParameters, true);
+                        } catch (Exception ex)
                         {
-                            retParameters.put("messageType", "say");
-                            retParameters.put("content", "Is that because that you keep dropping it?");
+                            ex.printStackTrace();
                         }
-                        retParameters.put("userId", (String)parameters.get("userId"));
-                        dialogUtils.callServer("http://localhost:" + 1607 + "/crowdListener", retParameters);
-                    } catch (Exception ex)
-                    {
-                        ex.printStackTrace();
                     }
+                } catch (Exception ex)
+                {
+                    ex.printStackTrace();
                 }
             }
         });
-        httpContext.getFilters().add(new ParameterFilter());
+        //httpContext.getFilters().add(new ParameterFilter());
         server.start();
     }
 }

@@ -1,10 +1,9 @@
 package com.inMind.inMindAgent;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 import com.inMind.inMindAgent.InMindCommandListener.InmindCommandInterface;
-import com.yahoo.inmind.middleware.control.MessageBroker;
+import com.yahoo.inmind.comm.generic.control.MessageBroker;
 
 import InMind.simpleUtils;
 
@@ -29,7 +28,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -45,7 +43,7 @@ public class MainActivity extends ActionBarActivity
     private ImageButton startButton, startFromCircle;
     private Button stopButton;
 
-    private Handler userNotifierHandler, talkHandler, launchHandler, jsonHandler, ttsCompleteHandler; // TODO: should
+    private Handler userNotifierHandler, talkHandler, launchHandler, ttsCompleteHandler; // TODO: should
     // these all be
     // combined to
     // one handler?
@@ -158,22 +156,6 @@ public class MainActivity extends ActionBarActivity
                         }
                     }
 
-                }
-                return false;
-            }
-        });
-
-        jsonHandler = new Handler(new Handler.Callback()
-        {
-
-            @Override
-            public boolean handleMessage(Message msg)
-            {
-                String toSay = msg.obj.toString();
-                ttsCont.speakThis(toSay);
-                if (msg.arg1 == 1) //toast
-                {
-                    toastWithTimer(toSay, true);
                 }
                 return false;
             }

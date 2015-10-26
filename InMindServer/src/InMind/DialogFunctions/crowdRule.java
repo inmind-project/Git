@@ -1,6 +1,5 @@
 package InMind.DialogFunctions;
 
-import InMind.ParameterFilter;
 import InMind.Server.asr.ASR;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
@@ -52,7 +51,8 @@ public class crowdRule
                 {
                     try
                     {
-                        Map<String, Object> parameters = (Map<String, Object>) httpExchange.getAttribute(ParameterFilter.parametersStr);
+                        Map<String,Object> parameters = dialogUtils.bodyAsParms(httpExchange);
+                        //Map<String, Object> parameters = (Map<String, Object>) httpExchange.getAttribute(ParameterFilter.parametersStr);
                         String response;
                         if (!parameters.containsKey("userId"))
                             response = "Error! no 'userId' found";
@@ -87,7 +87,7 @@ public class crowdRule
                     }
                 }
             });
-            httpContext.getFilters().add(new ParameterFilter());
+            //httpContext.getFilters().add(new ParameterFilter());
             server.setExecutor(null); // creates a default executor
             server.start();
         } catch (Exception ex)
@@ -105,7 +105,7 @@ public class crowdRule
             Map<String, String> parameters = new HashMap<>();
             parameters.put("userId", userId);
             parameters.put("messageType", "initiate");
-            String response = dialogUtils.callServer("http://" + ip + ":" + crowdPort, parameters);
+            String response = dialogUtils.callServer("http://" + ip + ":" + crowdPort, parameters, true);
             return Collections.singletonList(FunctionInvoker.sayStr + "Great! Go ahead!");//response);
         } catch (Exception ex)
         {
@@ -124,7 +124,7 @@ public class crowdRule
             parameters.put("userId", userId);
             parameters.put("messageType", "userSays");
             parameters.put("userText", userText.text);
-            String callResponse = dialogUtils.callServer("http://" + ip + ":" + crowdPort, parameters);
+            String callResponse = dialogUtils.callServer("http://" + ip + ":" + crowdPort, parameters, true);
             //if response is ok
             //create a listener:
             //listens on userId so should work also with multiple users.

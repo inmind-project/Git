@@ -1,1 +1,1 @@
-include ':app', ':commons', ':middleware', ':news'
+include ':app', ':middleware'

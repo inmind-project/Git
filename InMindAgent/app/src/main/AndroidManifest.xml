@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.inMind.inMindAgent"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.0"
+    xmlns:tools="http://schemas.android.com/tools" >
 
     <uses-sdk
         android:minSdkVersion="19"
@@ -12,10 +13,10 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
-    <android:uses-permission
+    <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" />
-    <android:uses-permission
+    <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" />
 
@@ -24,7 +25,8 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:launchMode="singleTask"
-        android:theme="@style/Theme.AppCompat.Light" >
+        android:theme="@style/Theme.AppCompat.Light"
+        tools:replace="android:icon,android:theme">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >

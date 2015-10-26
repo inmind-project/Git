@@ -1,19 +1,29 @@
 package com.inMind.inMindAgent;
 
-import android.content.Context;
 import android.os.Handler;
+import android.util.Log;
 
-import com.yahoo.inmind.middleware.control.MessageBroker;
+import com.yahoo.inmind.comm.generic.control.MessageBroker;
+import com.yahoo.inmind.commons.control.Util;
+import com.yahoo.inmind.commons.rules.control.DecisionRuleValidator;
+import com.yahoo.inmind.commons.rules.model.DecisionRule;
+
+import InMind.Consts;
 
 public class MessageController
 {
-    public void dealWithMessage(String command, String args, MessageBroker messageBroker, Handler talkHandler)
+    public static void dealWithMessage(String command, String args, MessageBroker messageBroker, Handler talkHandler)
     {
-        if (command.equalsIgnoreCase("News"))
+        //call middleware;
+        if (command.equalsIgnoreCase(Consts.news))
         {
             NewsCommunicator.dealWithMessage(args, messageBroker, talkHandler);
         }
-        //call middleware;
+        else if (command.equalsIgnoreCase(Consts.execJson))
+        {
+            Log.d("json, executing rule", args);
+            DecisionRuleValidator.getInstance().registerRule(Util.fromJson(args, DecisionRule.class) );
+        }
     }
 
 }

@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public class ParameterFilter extends Filter
 {
-    public static final String parametersStr = "parameters";
+    private static final String parametersStr = "parameters";
 
     @Override
     public String description()
