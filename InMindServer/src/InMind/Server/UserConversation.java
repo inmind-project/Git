@@ -28,13 +28,13 @@ public class UserConversation
     static final String cvsSplitBy = ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
     static final String basePath = "..\\Configurations\\";
     static final String dialogReturn = "return";
-    static final String dialogFinish = "finish";
+    public static final String dialogFinish = "finish";
 
     static final String cstExtension = "csv";
     static final String conditionsAndSetChar = ";";
     static final String setEquality = "=";
 
-    static final String stateName = "state";
+    public static final String stateName = "state";
     static final String callFunName = "callfun";
     static final String callFunRepeat = "repeat";
     static final String dontRenewConnectionStr = "dontRenew";
@@ -101,17 +101,18 @@ public class UserConversation
             //check if need to call a function (callfun)
             if (fullInfo.containsKey(callFunName) && !fullInfo.get(callFunName).toString().isEmpty())
             {
+                String funToCall = fullInfo.get(callFunName).toString();
+                fullInfo.remove(callFunName); //remove it so it won't be called again next time.
+
                 List<String> toSend;
-                if (fullInfo.get(callFunName).toString().equals(callFunRepeat))
+                if (funToCall.equals(callFunRepeat))
                 {
                     toSend = tmpPrevMessages;
                 } else
                 {
-                    toSend = FunctionInvoker.toInvoke(dialogFileBase, fullInfo.get(callFunName).toString(), fullInfo, userId, asrRes); //TODO: add userId
+                    toSend = FunctionInvoker.toInvoke(dialogFileBase, funToCall, fullInfo, userId, asrRes); //TODO: add userId
                 }
                 sendToUser(messageSender, toSend, true);
-                fullInfo.remove(callFunName); //remove it so it won't be called again next time.
-
             }
 
             if (fullInfo.get(stateName).equals(dialogReturn))

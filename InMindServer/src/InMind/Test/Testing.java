@@ -16,7 +16,9 @@ public class Testing
         {
             Map<String, String> retParameters = new HashMap<>();
             retParameters.put("userId", "my userId");
-            dialogUtils.callServer("https://talkingtothecrowd.org:" + 1606 + "/Ugxe8mCBxzxh21V5Vuh4AaABAQ", retParameters, true);
+            //dialogUtils.callServer("https://talkingtothecrowd.org:" + 1606 + "/Ugxe8mCBxzxh21V5Vuh4AaABAQ", retParameters, true);
+            String response = dialogUtils.callServer("http://45.55.172.104:" + 1606 + "/", retParameters, true);
+            System.out.println(response);
         } catch (Exception ex)
         {
             ex.printStackTrace();

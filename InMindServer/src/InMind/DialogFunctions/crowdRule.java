@@ -1,5 +1,6 @@
 package InMind.DialogFunctions;
 
+import InMind.Server.UserConversation;
 import InMind.Server.asr.ASR;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
@@ -31,7 +32,7 @@ public class crowdRule
         SayOrJSonType sayOrJSonType;
         public String content;
     }
-    static final String ip = "localhost";//"45.55.172.104";
+    static final String ip = "localhost";//"45.55.172.104";//"localhost";//"45.55.172.104";
     static final int crowdPort = 1606;
     static final int listenPort = 1607;
     static final long maxWaitForCrowd = 10*60*1000;
@@ -105,13 +106,15 @@ public class crowdRule
             Map<String, String> parameters = new HashMap<>();
             parameters.put("userId", userId);
             parameters.put("messageType", "initiate");
-            String response = dialogUtils.callServer("http://" + ip + ":" + crowdPort, parameters, true);
-            return Collections.singletonList(FunctionInvoker.sayStr + "Great! Go ahead!");//response);
+            String response = dialogUtils.callServer("http://" + ip + ":" + crowdPort + "/", parameters, true);
+            if (response.contains("ok"))
+                return Collections.singletonList(FunctionInvoker.sayStr + "Great! Go ahead!");//response);
         } catch (Exception ex)
         {
             ex.printStackTrace();
-            return Collections.singletonList(FunctionInvoker.sayStr+"Could not initialize crowd rule server.");
         }
+        fullInfo.put(UserConversation.stateName,UserConversation.dialogFinish);
+        return Collections.singletonList(FunctionInvoker.sayStr+"Could not initialize crowd rule server.");
     }
 
     public static List<String> forwardToCrowdRule(Map<String, Object> fullInfo, String userId, ASR.AsrRes userText)
@@ -124,32 +127,35 @@ public class crowdRule
             parameters.put("userId", userId);
             parameters.put("messageType", "userSays");
             parameters.put("userText", userText.text);
-            String callResponse = dialogUtils.callServer("http://" + ip + ":" + crowdPort, parameters, true);
-            //if response is ok
-            //create a listener:
-            //listens on userId so should work also with multiple users.
-            if (!notifiers.containsKey(userId))
-                notifiers.put(userId, new Object());
-            synchronized (notifiers.get(userId))
+            String callResponse = dialogUtils.callServer("http://" + ip + ":" + crowdPort + "/", parameters, true);
+            String responseForUser = FunctionInvoker.sayStr + "Sorry, but there seems to be a problem...";
+            if (callResponse.contains("ok"))
             {
-                notifiers.get(userId).wait(maxWaitForCrowd);
-            }
-            String responseForUser;
-            if (contents.containsKey(userId))
-            {
-                SayOrJSon sayOrJSon = contents.get(userId);
-                if (sayOrJSon.sayOrJSonType == SayOrJSon.SayOrJSonType.say)
+                //if response is ok
+                //create a listener:
+                //listens on userId so should work also with multiple users.
+                if (!notifiers.containsKey(userId))
+                    notifiers.put(userId, new Object());
+                synchronized (notifiers.get(userId))
                 {
-                    responseForUser = FunctionInvoker.sayStr + sayOrJSon.content;//FunctionInvoker.execJson + contents.get(userId);
+                    notifiers.get(userId).wait(maxWaitForCrowd);
+                }
+                if (contents.containsKey(userId))
+                {
+                    SayOrJSon sayOrJSon = contents.get(userId);
+                    if (sayOrJSon.sayOrJSonType == SayOrJSon.SayOrJSonType.say)
+                    {
+                        responseForUser = FunctionInvoker.sayStr + sayOrJSon.content;//FunctionInvoker.execJson + contents.get(userId);
+                    }
+                    else
+                        responseForUser = FunctionInvoker.execJson + sayOrJSon.content;
+
+                    contents.remove(userId);
                 }
                 else
-                    responseForUser = FunctionInvoker.execJson + sayOrJSon.content;
-
-                contents.remove(userId);
-            }
-            else
-            {
-                responseForUser = FunctionInvoker.sayStr + "Sorry, but I got no answer...";
+                {
+                    responseForUser = FunctionInvoker.sayStr + "Sorry, but I got no answer...";
+                }
             }
             return Collections.singletonList(responseForUser);
         } catch (Exception ex)

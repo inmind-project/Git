@@ -44,13 +44,6 @@
         <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\objenesis-2.1-34388bd594bdd15fa82cc72de279c303cde2503b.jar" />
     </item>
     <item
-        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.httpcomponents\httpcore\4.3.2\31fbbff1ddbf98f3aa7377c94d33b0447c646b6e\httpcore-4.3.2.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="31fbbff1ddbf98f3aa7377c94d33b0447c646b6e">
-        <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\httpcore-4.3.2-ab8361ce1aa8bec17389998f46eba4aecb1fe111.jar" />
-    </item>
-    <item
         jar="C:\InMind\Git\InMindAgent\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-location\7.5.0\classes.jar"
         jumboMode="false"
         revision="22.0.1"
@@ -100,6 +93,13 @@
         <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\cloning-1.9.2-be6413a8452b5c4c356a2e80349a6d7d952529b2.jar" />
     </item>
     <item
+        jar="C:\InMind\Git\InMindAgent\app\build\intermediates\exploded-aar\com.awareframework\aware-core\3.7.7\libs\zbar.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="0a7b88ba1496a0b4af76069ad40dacd3897149e0">
+        <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\zbar-ceca1b5f72164dd48000bbe5a5f419b12d3e062a.jar" />
+    </item>
+    <item
         jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.code.gson\gson\2.3.1\ecb6e1f8e4b0e84c4b886c2f14a1500caf309757\gson-2.3.1.jar"
         jumboMode="false"
         revision="22.0.1"
@@ -112,13 +112,6 @@
         revision="22.0.1"
         sha1="82edcaec6c7b4599eaeaaf11167ceea41db42f33">
         <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\httpclient-android-4.3.5-b41106a74c09a74e79b2f1f2265c065675b55274.jar" />
-    </item>
-    <item
-        jar="C:\InMind\Git\InMindAgent\app\build\intermediates\exploded-aar\com.awareframework\aware-core\3.7.1\classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="b67fef0f9fc88575debc3899c31ee429a92885a7">
-        <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\classes-6eddec8f8df143f370136743ef2580541c7ba4f9.jar" />
     </item>
     <item
         jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\org.objenesis\objenesis\2.1\87c0ea803b69252868d09308b4618f766f135a96\objenesis-2.1.jar"
@@ -138,7 +131,7 @@
         jar="C:\InMind\Git\InMindAgent\app\build\intermediates\exploded-aar\InMindAgent\middleware\unspecified\classes.jar"
         jumboMode="false"
         revision="22.0.1"
-        sha1="9acc90270d9139cba012c73ce72cdf793f89199b">
+        sha1="68c12807ccff589c3ff2b5b81f96fc6733be3652">
         <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\classes-5803b751b01554ee8448b4bc2b40d33774ff73b5.jar" />
     </item>
     <item
@@ -149,11 +142,11 @@
         <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\classes-8498cd7a3ade62d678026ff5658bcf6a315117bb.jar" />
     </item>
     <item
-        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.httpcomponents\httpcore\4.3.2\31fbbff1ddbf98f3aa7377c94d33b0447c646b6e\httpcore-4.3.2.jar"
+        jar="C:\InMind\Git\InMindAgent\app\build\intermediates\exploded-aar\com.awareframework\aware-core\3.7.7\classes.jar"
         jumboMode="false"
         revision="22.0.1"
-        sha1="31fbbff1ddbf98f3aa7377c94d33b0447c646b6e">
-        <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\httpcore-4.3.2-ab8361ce1aa8bec17389998f46eba4aecb1fe111.jar" />
+        sha1="83f9122c5295b734117fac37dd69459cb15c2a07">
+        <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\classes-67a8276e2ca248bfa4c05da53a8e34e5c5f7c6f2.jar" />
     </item>
     <item
         jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.commons\commons-lang3\3.0\8873bd0bb5cb9ee37f1b04578eb7e26fcdd44cb0\commons-lang3-3.0.jar"
@@ -170,25 +163,11 @@
         <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\classes-5803b751b01554ee8448b4bc2b40d33774ff73b5.jar" />
     </item>
     <item
-        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\de.greenrobot\eventbus\2.4.0\ddd166d01b3158d1c00576d29f7ed15c030df719\eventbus-2.4.0.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="ddd166d01b3158d1c00576d29f7ed15c030df719">
-        <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\eventbus-2.4.0-456d8056aede02ad394d819ab84d08fac8666a12.jar" />
-    </item>
-    <item
         jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.http-client\google-http-client-gson\1.20.0\9204765f39000f6109c927ac66c7963bf9c7df19\google-http-client-gson-1.20.0.jar"
         jumboMode="false"
         revision="22.0.1"
         sha1="9204765f39000f6109c927ac66c7963bf9c7df19">
         <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\google-http-client-gson-1.20.0-abeabcc6dadd36bf5b73056a7ee09231a2cefaf0.jar" />
-    </item>
-    <item
-        jar="C:\InMind\Git\InMindAgent\app\build\intermediates\exploded-aar\com.awareframework\aware-core\3.7.1\libs\zbar.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="0a7b88ba1496a0b4af76069ad40dacd3897149e0">
-        <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\zbar-6d89c02b8857ce5a3eb92c4851e92b321b2bfe25.jar" />
     </item>
     <item
         jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.oauth-client\google-oauth-client\1.20.0\1d086ac5756475ddf451af2e2df6e288d18608ca\google-oauth-client-1.20.0.jar"
@@ -217,13 +196,6 @@
         revision="22.0.1"
         sha1="97f7e239e86ef994de894818fdd8a71d2e89d6aa">
         <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\classes-514af9935921ed393e992fe81ba371e6a8dce7e7.jar" />
-    </item>
-    <item
-        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.guava\guava\18.0\cce0823396aa693798f8882e64213b1772032b09\guava-18.0.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="cce0823396aa693798f8882e64213b1772032b09">
-        <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\guava-18.0-282a2bb23954d3314fa50afb3651d2cae31b0a1b.jar" />
     </item>
     <item
         jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.httpcomponents\httpmime\4.3.5\1dd0d38df9c6d21e893f2e52403f1cd99e91cd81\httpmime-4.3.5.jar"
@@ -310,11 +282,11 @@
         <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\json-simple-1.1.1-ad8986034f131de54f4652745f3a33423d46db79.jar" />
     </item>
     <item
-        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.guava\guava\18.0\cce0823396aa693798f8882e64213b1772032b09\guava-18.0.jar"
+        jar="C:\InMind\Git\InMindAgent\app\build\intermediates\exploded-aar\com.awareframework\aware-core\3.7.7\libs\mqtt-client-0.4.0.jar"
         jumboMode="false"
-        revision="21.1.2"
-        sha1="cce0823396aa693798f8882e64213b1772032b09">
-        <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\guava-18.0-282a2bb23954d3314fa50afb3651d2cae31b0a1b.jar" />
+        revision="22.0.1"
+        sha1="02315d1759d01e52495e040e6e538aaa2e91c7f6">
+        <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\mqtt-client-0.4.0-713f3588166e571bc50fbea5882b8ef6ab836f1a.jar" />
     </item>
     <item
         jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.api-client\google-api-client-gson\1.20.0\ace1924800ca8c256f6a3f63e72ee13e1b458d36\google-api-client-gson-1.20.0.jar"
@@ -331,13 +303,6 @@
         <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\classes-106212a5b5e4e76bd8df1ed0eeca692c3ffa265c.jar" />
     </item>
     <item
-        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\de.greenrobot\eventbus\2.4.0\ddd166d01b3158d1c00576d29f7ed15c030df719\eventbus-2.4.0.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="ddd166d01b3158d1c00576d29f7ed15c030df719">
-        <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\eventbus-2.4.0-456d8056aede02ad394d819ab84d08fac8666a12.jar" />
-    </item>
-    <item
         jar="C:\InMind\Git\InMindAgent\app\libs\poketSphinx_jni_so.jar"
         jumboMode="false"
         revision="22.0.1"
@@ -350,13 +315,6 @@
         revision="21.1.2"
         sha1="2155857af4ed1121f1d62a42a9011f0ac83b649f">
         <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\poketSphinx_jni_so-7815c477450dbebf4db7453a7db207fb90a48ae9.jar" />
-    </item>
-    <item
-        jar="C:\InMind\Git\InMindAgent\app\build\intermediates\exploded-aar\com.awareframework\aware-core\3.7.1\libs\mqtt-client-0.4.0.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="02315d1759d01e52495e040e6e538aaa2e91c7f6">
-        <dex dex="C:\InMind\Git\InMindAgent\app\build\intermediates\pre-dexed\debug\mqtt-client-0.4.0-f6979e7ab381ddbb9ec0533610163f01fdfc646a.jar" />
     </item>
 
 </items>

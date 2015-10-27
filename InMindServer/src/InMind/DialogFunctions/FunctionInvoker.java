@@ -3,7 +3,6 @@ package InMind.DialogFunctions;
 import InMind.Consts;
 import InMind.Server.asr.ASR;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +29,7 @@ public class FunctionInvoker
             {
                 toSend = (List<String>)method.invoke(null, fullInfo, userId, asrRes);
             }
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e)
+        } catch (Exception e)//IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e)
         {
             e.printStackTrace();
         }
