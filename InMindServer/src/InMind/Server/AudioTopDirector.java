@@ -4,7 +4,6 @@ import InMind.Server.SignalInfo.ASignalInfoProvider;
 import InMind.Server.SignalInfo.SimpleSignalInfoProvider;
 import InMind.Server.asr.ASR;
 import InMind.Server.interactionManager.AInteractionManager;
-import InMind.Server.interactionManager.IMEvent;
 import InMind.Server.interactionManager.InteractionManager;
 import com.sun.xml.internal.ws.util.ByteArrayBuffer;
 
@@ -90,6 +89,8 @@ public class AudioTopDirector
                 case moveOn:
                     if (latestValidRes != null)
                         moveOnWithResponse();
+                    else
+                        System.out.println("Error! received 'moveOn', but no validRes is present!");
                     break;
             }
             } catch (Exception ex)
@@ -120,7 +121,7 @@ public class AudioTopDirector
             if (wasNotCanceled)
             {
                 latestValidRes = asrRes;
-                interactionManager.finalResponseObtained(null);//expects an event but not clear what it should contain.
+                interactionManager.finalResponseObtained();//null);//expects an event but not clear what it should contain.
                 //moveOnWithResponse();
             }
         }
@@ -217,19 +218,20 @@ public class AudioTopDirector
                     if (asr.isConnectionOpen())
                         asr.sendDataAsync(audioReceived, length);
                     SimpleSignalInfoProvider.SignalInfo signalInfo = signalInfoProvider.obtainSampleInfo(audioReceived, length);
-                    IMEvent imEventVad = new IMEvent(IMEvent.IMEventType.vad);
-                    imEventVad.feature.put(IMEvent.featureVad, (signalInfo.vad == 1) ? "true":"false");
-                    imEventVad.feature.put(IMEvent.featureFinalPause, ((Double)signalInfo.finalPause).toString());
-                    imEventVad.feature.put(IMEvent.featureDurationFromBeginning, ((Double) signalInfo.offSetFromFirst).toString());
-                    imEventVad.feature.put(IMEvent.featureDurationOfSample, ((Double) signalInfo.sampleLength).toString());
-                    interactionManager.updatedAudioInfo(imEventVad);//signalInfo.offSetFromFirst, signalInfo.sampleLength, signalInfo.vad, signalInfo.finalPause);
-
-                    IMEvent imEventAsr = new IMEvent(IMEvent.IMEventType.asr);
-                    imEventAsr.feature.put(IMEvent.featureVad, (signalInfo.vad == 1) ? "true":"false");
-                    imEventAsr.feature.put(IMEvent.featureFinalPause, ((Double)signalInfo.finalPause).toString());
-                    imEventAsr.feature.put(IMEvent.featureDurationFromBeginning, ((Double) signalInfo.offSetFromFirst).toString());
-                    imEventAsr.feature.put(IMEvent.featureDurationOfSample, ((Double) signalInfo.sampleLength).toString());
-                    interactionManager.updatedAudioInfo(imEventAsr);
+                    interactionManager.updatedAudioInfo(signalInfo);
+//                    IMEvent imEventVad = new IMEvent(IMEvent.IMEventType.vad);
+//                    imEventVad.feature.put(IMEvent.featureVad, (signalInfo.vad == 1) ? "true":"false");
+//                    imEventVad.feature.put(IMEvent.featureFinalPause, ((Double)signalInfo.finalPause).toString());
+//                    imEventVad.feature.put(IMEvent.featureDurationFromBeginning, ((Double) signalInfo.offSetFromFirst).toString());
+//                    imEventVad.feature.put(IMEvent.featureDurationOfSample, ((Double) signalInfo.sampleLength).toString());
+//                    interactionManager.updatedAudioInfo(imEventVad);//signalInfo.offSetFromFirst, signalInfo.sampleLength, signalInfo.vad, signalInfo.finalPause);
+//
+//                    IMEvent imEventAsr = new IMEvent(IMEvent.IMEventType.asr);
+//                    imEventAsr.feature.put(IMEvent.featureVad, (signalInfo.vad == 1) ? "true":"false");
+//                    imEventAsr.feature.put(IMEvent.featureFinalPause, ((Double)signalInfo.finalPause).toString());
+//                    imEventAsr.feature.put(IMEvent.featureDurationFromBeginning, ((Double) signalInfo.offSetFromFirst).toString());
+//                    imEventAsr.feature.put(IMEvent.featureDurationOfSample, ((Double) signalInfo.sampleLength).toString());
+//                    interactionManager.updatedAudioInfo(imEventAsr);
 
                 } catch (Exception e)
                 {

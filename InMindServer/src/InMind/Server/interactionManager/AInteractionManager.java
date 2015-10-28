@@ -1,5 +1,7 @@
 package InMind.Server.interactionManager;
 
+import InMind.Server.SignalInfo.SimpleSignalInfoProvider;
+
 /**
  * Created by Amos Azaria on 17-Feb-15.
  */
@@ -8,7 +10,7 @@ public abstract class AInteractionManager implements IInteractionManager
 {
     /*
         Response indicates whether the server should proceed (none),
-        should go and aget Google ASR response (goToGoogle),
+        should go and get Google ASR response (goToGoogle),
         moveOn means the current Google message should be passed on to DM (moveOn)
         should cancel all actions from previous start (cancel),
         or should commit and end current stream of audio (commit)
@@ -41,7 +43,8 @@ interface IInteractionManager
     // 1. ping. a constant ping signal that wakes up the IM at high frequency (e.g 50ms)
     // 2. VAD. a VAD event contains the the output from VAD
     // 3. ASR. a partial ASR message from the pocket sphinx
-    void updatedAudioInfo(IMEvent eEvent);
+    //void updatedAudioInfo(IMEvent eEvent);
+    void updatedAudioInfo(SimpleSignalInfoProvider.SignalInfo signalInfo);
 
     /*
     will be called before the first information arrives
@@ -57,7 +60,7 @@ interface IInteractionManager
         Give the final response (Google) to IM after google request. The function returns
         a boolean that indicate if this final response should be used.
     */
-    void finalResponseObtained(IMEvent eEvent);
+    void finalResponseObtained();//IMEvent eEvent);
 
     /*
         User stopped streaming over the audio

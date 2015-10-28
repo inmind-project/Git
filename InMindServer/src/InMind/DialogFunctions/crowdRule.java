@@ -123,6 +123,11 @@ public class crowdRule
 
         try
         {
+            if (contents.containsKey(userId)) //this shouldn't really happen
+            {
+                System.out.println("For some reason userId:" + userId +", had an entry.");
+                contents.remove(userId);
+            }
             Map<String, String> parameters = new HashMap<>();
             parameters.put("userId", userId);
             parameters.put("messageType", "userSays");
@@ -136,21 +141,23 @@ public class crowdRule
                 //listens on userId so should work also with multiple users.
                 if (!notifiers.containsKey(userId))
                     notifiers.put(userId, new Object());
-                synchronized (notifiers.get(userId))
+                if (!contents.containsKey(userId))
                 {
-                    notifiers.get(userId).wait(maxWaitForCrowd);
+                    synchronized (notifiers.get(userId))
+                    {
+                        notifiers.get(userId).wait(maxWaitForCrowd);
+                    }
                 }
                 if (contents.containsKey(userId))
                 {
                     SayOrJSon sayOrJSon = contents.get(userId);
+                    contents.remove(userId);
                     if (sayOrJSon.sayOrJSonType == SayOrJSon.SayOrJSonType.say)
                     {
                         responseForUser = FunctionInvoker.sayStr + sayOrJSon.content;//FunctionInvoker.execJson + contents.get(userId);
                     }
                     else
                         responseForUser = FunctionInvoker.execJson + sayOrJSon.content;
-
-                    contents.remove(userId);
                 }
                 else
                 {

@@ -149,7 +149,7 @@ public class ASR
             res.alternatives = alternatives;
         } catch (org.json.JSONException ex)
         {
-            System.out.println("Error parsing JSon.");
+            System.out.println("Error parsing ASR JSon. json:" + res.fullJsonRes);
         }
 
         // print result
