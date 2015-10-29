@@ -37,7 +37,7 @@ public class InteractionManager extends AInteractionManager
         {
             goGetASRIfInitState();
         }
-        else if((dCurrentDuration>dMinUttDuration && dTotalVad > dMinVadDuration && signalInfo.finalPause > dStopSpeakingThreshold)) //enough speech and pause to initiate ASR call
+        else if(dCurrentDuration>dMinUttDuration && dTotalVad > dMinVadDuration && signalInfo.finalPause > dStopSpeakingThreshold) //enough speech and pause to initiate ASR call
         {
             goGetASRIfInitState();
         }
@@ -92,6 +92,9 @@ public class InteractionManager extends AInteractionManager
     @Override
     public void userStoppedStreaming()
     {
-        goGetASRIfInitState();
+        //if user stopped streaming, so there is no need to consider finalPause
+        if (dCurrentDuration > dMinUttDuration && dTotalVad > dMinVadDuration)
+            goGetASRIfInitState();
+        initialize();
     }
 }

@@ -42,7 +42,9 @@ public class AudioTopDirector
     interface IControllingOrders
     {
         void dealWithAsrRes(ASR.AsrRes asrRes);
+
         void cancelAllAction();
+
         void closeAudioConnection();
     }
 
@@ -70,29 +72,29 @@ public class AudioTopDirector
             {
                 System.out.println("received command from IM: " + actionToTake.toString());
 
-            switch (actionToTake)
-            {
-                case none:
-                    break;
-                case commit:
-                    audioReceiver.stopListening();
-                    signalInfoProvider.endStream();
-                    //controllingOrders.closeAudioConnection();
-                    break;
-                case goToGoogle:
-                    invalidateOldCallIfExistsAndStreamNew();
-                    getAsrResAsync();
-                    break;
-                case cancel:
-                    invalidateOldCallIfExistsAndStreamNew();
-                    break;
-                case moveOn:
-                    if (latestValidRes != null)
-                        moveOnWithResponse();
-                    else
-                        System.out.println("Error! received 'moveOn', but no validRes is present!");
-                    break;
-            }
+                switch (actionToTake)
+                {
+                    case none:
+                        break;
+                    case commit:
+                        audioReceiver.stopListening();
+                        signalInfoProvider.endStream();
+                        //controllingOrders.closeAudioConnection();
+                        break;
+                    case goToGoogle:
+                        invalidateOldCallIfExistsAndStreamNew();
+                        getAsrResAsync();
+                        break;
+                    case cancel:
+                        invalidateOldCallIfExistsAndStreamNew();
+                        break;
+                    case moveOn:
+                        if (latestValidRes != null)
+                            moveOnWithResponse();
+                        else
+                            System.out.println("Error! received 'moveOn', but no validRes is present!");
+                        break;
+                }
             } catch (Exception ex)
             {
                 ex.printStackTrace();
@@ -260,9 +262,9 @@ public class AudioTopDirector
             @Override
             public void timedOut()
             {
-                    //if (!hasValidGoogleCall)
-                        //getAsrResAsync();
-                    interactionManager.userStoppedStreaming();
+                //if (!hasValidGoogleCall)
+                //getAsrResAsync();
+                interactionManager.userStoppedStreaming();
             }
         });
 

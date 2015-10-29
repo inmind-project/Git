@@ -89,7 +89,7 @@ class AudioReceiver
                     serverSocket.receive(receivePacket);
                 } catch (SocketTimeoutException ex)
                 {
-                    System.out.println("Time out!");
+                    System.out.println("Audio receiver timed out!");
                     streamingAlerts.timedOut();
                     break;
                 }
