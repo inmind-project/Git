@@ -99,15 +99,27 @@ public class crowdRule
 
     public static List<String> initiateCrowd(Map<String, Object> fullInfo, String userId, ASR.AsrRes userText)
     {
+        return initiateEndCrowd(fullInfo, userId, userText, true);
+    }
+
+    public static List<String> endCrowd(Map<String, Object> fullInfo, String userId, ASR.AsrRes userText)
+    {
+        return initiateEndCrowd(fullInfo, userId, userText, false);
+    }
+
+    public static List<String> initiateEndCrowd(Map<String, Object> fullInfo, String userId, ASR.AsrRes userText, boolean init)
+    {
         List<String> ret = new LinkedList<String>();
 
         try
         {
             Map<String, String> parameters = new HashMap<>();
             parameters.put("userId", userId);
-            parameters.put("messageType", "initiate");
+            parameters.put("messageType", init ? "initiate" : "end");
             String response = dialogUtils.callServer("http://" + ip + ":" + crowdPort + "/", parameters, true);
-            if (response.contains("ok"))
+            if (!init)
+                return new LinkedList<>();
+            else if (response.contains("ok"))
                 return Collections.singletonList(FunctionInvoker.sayStr + "Great! Go ahead!");//response);
         } catch (Exception ex)
         {
@@ -133,7 +145,7 @@ public class crowdRule
             parameters.put("messageType", "userSays");
             parameters.put("userText", userText.text);
             String callResponse = dialogUtils.callServer("http://" + ip + ":" + crowdPort + "/", parameters, true);
-            String responseForUser = FunctionInvoker.sayStr + "Sorry, but there seems to be a problem...";
+            List<String> responseForUser = Collections.singletonList(FunctionInvoker.sayStr + "Sorry, but there seems to be a problem...");
             if (callResponse.contains("ok"))
             {
                 //if response is ok
@@ -154,17 +166,21 @@ public class crowdRule
                     contents.remove(userId);
                     if (sayOrJSon.sayOrJSonType == SayOrJSon.SayOrJSonType.say)
                     {
-                        responseForUser = FunctionInvoker.sayStr + sayOrJSon.content;//FunctionInvoker.execJson + contents.get(userId);
+                        responseForUser = Collections.singletonList(FunctionInvoker.sayStr + sayOrJSon.content);//FunctionInvoker.execJson + contents.get(userId);
                     }
                     else
-                        responseForUser = FunctionInvoker.execJson + sayOrJSon.content;
+                    {
+                        responseForUser = new LinkedList<>();
+                        responseForUser.add(FunctionInvoker.execJson + sayOrJSon.content);
+                        responseForUser.add(FunctionInvoker.sayStr + "Rule added successfully!");
+                    }
                 }
                 else
                 {
-                    responseForUser = FunctionInvoker.sayStr + "Sorry, but I got no answer...";
+                    responseForUser = Collections.singletonList(FunctionInvoker.sayStr + "Sorry, but I got no answer...");
                 }
             }
-            return Collections.singletonList(responseForUser);
+            return responseForUser;
         } catch (Exception ex)
         {
             ex.printStackTrace();
