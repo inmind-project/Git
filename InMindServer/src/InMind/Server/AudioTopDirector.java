@@ -77,8 +77,9 @@ public class AudioTopDirector
                     case none:
                         break;
                     case commit:
-                        audioReceiver.stopListening();
-                        signalInfoProvider.endStream();
+                        //ignoring, since I decide on my own when to commit.
+//                        audioReceiver.stopListening();
+//                        signalInfoProvider.endStream();
                         //controllingOrders.closeAudioConnection();
                         break;
                     case goToGoogle:

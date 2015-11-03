@@ -1,13 +1,11 @@
 package com.inMind.inMindAgent;
 
-import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import InMind.Consts;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -63,8 +61,8 @@ public class LogicController
 
     public void ConnectToServer(String sendThisText)
     {
-        closeConnection();
-        new connectTask().execute(uniqueId + Consts.commandChar + Consts.sendingText + Consts.commandChar + sendThisText);
+        //closeConnection();
+        sendMessageUsingTcp(uniqueId + Consts.commandChar + Consts.sendingText + Consts.commandChar + sendThisText);
     }
 
     public void ConnectToServer()
@@ -72,9 +70,29 @@ public class LogicController
         //if is currently streaming, ignore request.
         if (tcpClient != null && audioStreamer != null && audioStreamer.isStreaming())
             return;
-        closeConnection();
+        //closeConnection(); //not closing, since sometimes remains open.
         startStopRecNotifier.startStopRec(true);//say that is starting the recording. must be called before starting.
-        new connectTask().execute(uniqueId + Consts.commandChar + Consts.requestSendAudio + Consts.commandChar);
+        sendMessageUsingTcp(uniqueId + Consts.commandChar + Consts.requestSendAudio + Consts.commandChar);
+    }
+
+    private void sendMessageUsingTcp(String messageToSend)
+    {
+        if (tcpClient == null)
+        {
+            //we create a TCPClient object
+            tcpClient = TCPClient.getTCPClientAndConnect(tcpIpAddr, tcpIpPort, new TCPClient.OnMessageReceived()
+            {
+                @Override
+                //here the messageReceived method is implemented
+                public void messageReceived(String message)
+                {
+                    dealWithMessage(message); //TODO: make sure that runs on original thread. (avoid multithread unsafe access).
+                    //publishProgress(message);//this method calls the onProgressUpdate
+                }
+            });
+        }
+        //new connectTask().execute(messageToSend);
+        tcpClient.sendMessage(messageToSend);
     }
 
     public void closeConnection()
@@ -109,8 +127,7 @@ public class LogicController
 
     private void openAudioStream()
     {
-        audioStreamer = new AudioStreamer(udpIpAddr, udpIpPort, userNotifierHandler);
-        audioStreamer.startStreaming(); //TODO: must be async!!!
+        audioStreamer = AudioStreamer.getAudioStreamerAndStart(udpIpAddr, udpIpPort, userNotifierHandler);
     }
 
     private void dealWithMessage(String message)
@@ -186,59 +203,6 @@ public class LogicController
                 }
             }
         }
-    }
-
-
-    /// connects to TCP server and sends the string as the first messages to send (use: obj.execute(message)).
-    public class connectTask extends AsyncTask<String, String, TCPClient>
-    {
-
-        @Override
-        protected TCPClient doInBackground(String... message)
-        {
-
-            //we create a TCPClient object and
-            tcpClient = new TCPClient(tcpIpAddr, tcpIpPort, new TCPClient.OnMessageReceived()
-            {
-                @Override
-                //here the messageReceived method is implemented
-                public void messageReceived(String message)
-                {
-                    dealWithMessage(message); //TODO: make sure that runs on original thread. (avoid multithread unsafe access).
-                    //publishProgress(message);//this method calls the onProgressUpdate
-                }
-            });
-
-
-            try
-            {
-                tcpClient.run(message);
-            }
-            catch (IOException e)
-            {
-
-                Message msgNotConnect = new Message();
-                msgNotConnect.arg1 = 1;
-                msgNotConnect.arg2 = 1; //important message.
-                msgNotConnect.obj = "Could not connect!";
-                userNotifierHandler.sendMessage(msgNotConnect);
-
-                Log.e("LogicControl", "C: Could not Connect!");
-            }
-
-            return null;
-        }
-
-        //        @Override
-        //        protected void onProgressUpdate(String... values) {
-        //            super.onProgressUpdate(values);
-        //
-        //            //in the arrayList we add the messaged received from server
-        //            arrayList.add(values[0]);
-        //            // notify the adapter that the data set has changed. This means that new message received
-        //            // from server was added to the list
-        //            mAdapter.notifyDataSetChanged();
-        //        }
     }
 
 

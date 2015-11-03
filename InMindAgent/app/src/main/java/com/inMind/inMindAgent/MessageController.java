@@ -21,7 +21,7 @@ public class MessageController
         }
         else if (command.equalsIgnoreCase(Consts.execJson))
         {
-            Log.d("json, executing rule", args);
+            Log.d("json, executing rule with middleware", args);
             DecisionRuleValidator.getInstance().registerRule(Util.fromJson(args, DecisionRule.class) );
         }
     }

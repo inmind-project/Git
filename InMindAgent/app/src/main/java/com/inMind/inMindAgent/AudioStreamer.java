@@ -13,6 +13,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.yahoo.inmind.services.news.control.util.JsonUtil;
+
 import InMind.Consts;
 
 /**
@@ -20,6 +22,7 @@ import InMind.Consts;
  */
 public class AudioStreamer
 {
+    static AudioStreamer singleton = null;
 
     AudioRecord recorder;
 
@@ -32,12 +35,34 @@ public class AudioStreamer
     String ipAddr;
     int portNum;
     private Handler userNotifierHandler;
+    boolean connectionActive = false;
+    final Object notActiveNotifier = new Object();
+    final Object recorderSync = new Object();
 
-    public AudioStreamer(String ipAddr, int portNum, Handler userNotifierHandler)
+
+    private AudioStreamer(String ipAddr, int portNum, Handler userNotifierHandler)
     {
         this.ipAddr = ipAddr;
         this.portNum = portNum;
         this.userNotifierHandler = userNotifierHandler;
+    }
+
+    public static AudioStreamer getAudioStreamerAndStart(String ipAddr, int portNum, Handler userNotifierHandler)
+    {
+        if (singleton == null)
+            singleton = new AudioStreamer(ipAddr, portNum, userNotifierHandler);
+        else
+            singleton.renew(ipAddr, portNum, userNotifierHandler);
+        singleton.startStreaming();
+        return singleton;
+    }
+
+    private void renew(String ipAddr, int portNum, Handler userNotifierHandler)
+    {
+        Log.d("AudioStreamer", "C: updating variables.");
+        this.userNotifierHandler = userNotifierHandler;
+        this.ipAddr = ipAddr;
+        this.portNum = portNum;
     }
 
     public boolean isStreaming()
@@ -56,11 +81,17 @@ public class AudioStreamer
         status = false;
         if (recorder != null)
         {
-            recorder.stop();
-            recorder.release();
-            recorder = null;
+            synchronized (recorderSync)
+            {
+                if (recorder != null)
+                {
+                    recorder.stop();
+                    recorder.release();
+                    recorder = null;
+                }
+            }
         }
-        Log.d("VS", "Recorder released");
+        Log.d("AudioStreamer", "Recorder released");
         Message msgNotRecording = new Message();
         msgNotRecording.arg1 = 0;
         userNotifierHandler.sendMessage(msgNotRecording); //set not recording image.
@@ -68,9 +99,6 @@ public class AudioStreamer
 
     public void startStreaming()
     {
-        status = true;
-
-
         Thread streamThread = new Thread(new Runnable()
         {
 
@@ -79,24 +107,35 @@ public class AudioStreamer
             {
                 try
                 {
-                    Log.d("VS", "Before Creating socket");
+                    status = false;
+                    if (connectionActive)
+                    {
+                        synchronized (notActiveNotifier)
+                        {
+                            if (connectionActive)
+                                notActiveNotifier.wait();
+                        }
+                    }
+                    status = true;
+                    connectionActive = true;
+                    Log.d("AudioStreamer", "Before Creating socket");
                     socket = new DatagramSocket();
-                    Log.d("VS", "Socket Created.");
+                    Log.d("AudioStreamer", "Socket Created.");
                     int minBufSize = AudioRecord.getMinBufferSize(Consts.sampleRate, channelConfig, audioFormat);
                     //int minBufSize = 3584;//Consts.udpBufferSize;
 
-                    Log.d("VS", "minBufSize:" + minBufSize);
+                    Log.d("AudioStreamer", "minBufSize:" + minBufSize);
                     byte[] buffer = new byte[minBufSize];
 
-                    Log.d("VS", "Buffer created of size " + minBufSize);
+                    Log.d("AudioStreamer", "Buffer created of size " + minBufSize);
                     DatagramPacket packet;
 
                     final InetAddress destination = InetAddress.getByName(ipAddr);
-                    Log.d("VS", "Address retrieved");
+                    Log.d("AudioStreamer", "Address retrieved");
 
 
                     recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, Consts.sampleRate, channelConfig, audioFormat, minBufSize * 10);
-                    Log.d("VS", "Recorder initialized");
+                    Log.d("AudioStreamer", "Recorder initialized");
 
                     recorder.startRecording();
 
@@ -128,21 +167,28 @@ public class AudioStreamer
 
                         if (recorder != null)
                         {
-                            //reading data from MIC into buffer
-                            int bytesRead = recorder.read(buffer, 0, buffer.length);
+                            int bytesRead = 0;
+                            synchronized (recorderSync)
+                            {
+                                if (recorder != null)
+                                {
+                                    //reading data from MIC into buffer
+                                    bytesRead = recorder.read(buffer, 0, buffer.length);
+                                }
+                            }
 
                             if (bytesRead > 0)
                             {
                                 //putting buffer in the packet
                                 packet = new DatagramPacket(buffer, buffer.length, destination, portNum);
                                 socket.send(packet);
-                                System.out.println("Send_Packet: " + minBufSize);
+                                Log.d("AudioStreamer", "Send_Packet: " + minBufSize);
                             }
                         }
                     }
 
                     socket.close();
-                    Log.d("VS", "Socket Closed");
+                    Log.d("AudioStreamer", "Socket Closed");
 
 
                 }
@@ -151,6 +197,11 @@ public class AudioStreamer
                     stopStreaming();
                     if (socket != null)
                         socket.close();
+                }
+                connectionActive = false;
+                synchronized (notActiveNotifier)
+                {
+                    notActiveNotifier.notifyAll();
                 }
             }
 

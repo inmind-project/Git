@@ -6,7 +6,8 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
+
+import InMind.Consts;
 
 /**
  * Created by Amos Azaria on 01-Nov-14.
@@ -14,26 +15,72 @@ import java.net.UnknownHostException;
 public class TCPClient
 {
 
-    static final int connectionTimeout = 3000; // in milliseconds
+    static TCPClient singleton = null;
 
-    private String serverMessage;
+    static final int connectionTimeout = 1000; // in milliseconds
+
     String ipAddr;
     int portNum;
     private OnMessageReceived mMessageListener = null;
     private boolean mRun = false;
+    private boolean mConnected = false;
+    private boolean tryingToConnect = false;
 
+    final Object lock = new Object();
+    final Object waitingForStop = new Object();
+    final Object waitingForConnect = new Object();
     PrintWriter out;
     BufferedReader in;
+
+    private TCPClient(String ipAddr, int portNum, OnMessageReceived listener)
+    {
+        Log.d("TCP Client", "C: creating initial TCPClient.");
+        mMessageListener = listener;
+        this.ipAddr = ipAddr;
+        this.portNum = portNum;
+    }
 
     /**
      * Constructor of the class. OnMessagedReceived listens for the messages
      * received from server
      */
-    public TCPClient(String ipAddr, int portNum, OnMessageReceived listener)
+    public static TCPClient getTCPClientAndConnect(String ipAddr, int portNum, OnMessageReceived listener)
     {
-        mMessageListener = listener;
-        this.ipAddr = ipAddr;
-        this.portNum = portNum;
+        if (singleton == null)
+        {
+            singleton = new TCPClient(ipAddr, portNum, listener);
+        }
+        else
+        {
+            singleton.renew(ipAddr, portNum, listener);
+        }
+        singleton.connect();
+        return singleton;
+    }
+
+    private void renew(String ipAddr, int portNum, OnMessageReceived listener)
+    {
+        Log.d("TCP Client", "C: renewing connection.");
+        if (mRun)
+        {
+            mRun = false;
+            synchronized (waitingForStop)
+            {
+                try
+                {
+                    Log.d("TCP Client", "C: Waiting for close.");
+                    waitingForStop.wait();
+                    Log.d("TCP Client", "C: closed.");
+                }
+                catch (Exception ignored)
+                {
+                }
+            }
+        }
+        Log.d("TCP Client", "C: updating variables.");
+        singleton.mMessageListener = listener;
+        singleton.ipAddr = ipAddr;
+        singleton.portNum = portNum;
     }
 
     /**
@@ -43,10 +90,42 @@ public class TCPClient
      */
     public void sendMessage(String message)
     {
-        if (out != null && !out.checkError())
+        Log.d("TCP Client", "C: sending: " + message);
+        if (!tryingToConnect && !mConnected)
         {
-            out.println(message);
-            out.flush();
+            connect();
+            Log.e("TCP Client", "C: Error, tried sending message but not connected: " + message);
+            return;
+        }
+        if (tryingToConnect && !mConnected)
+        {
+            synchronized (waitingForConnect)
+            {
+                try
+                {
+                    Log.d("TCP Client", "C: waiting for connection.");
+                    waitingForConnect.wait();
+                }
+                catch (Exception ignored)
+                {
+                }
+            }
+        }
+        if (mConnected)
+        {
+            if (out != null && !out.checkError())
+            {
+                Log.d("TCP Client", "C: printing message. ");
+                out.println(message);
+                out.flush();
+                Log.d("TCP Client", "C: message flushed. ");
+            }
+            else
+                Log.e("TCP Client", "C: error printing message. ");
+        }
+        else
+        {
+            Log.e("TCP Client", "C: error, could not connect. ");
         }
     }
 
@@ -55,85 +134,133 @@ public class TCPClient
         mRun = false;
     }
 
-    //connects and sends messages
-    public void run(String[] messages) throws IOException
+    //connects
+    private void connect()
     {
-
-        mRun = true;
-
-        InetAddress serverAddr = InetAddress.getByName(ipAddr);
-        Log.d("TCP Client", "C: Connecting...");
-
-        // create a socket to make the connection with the server
-        Socket socket = new Socket();
-        socket.connect(new InetSocketAddress(serverAddr, portNum),
-                connectionTimeout);
-
-        Log.d("TCP Client", "C: Connected!");
-
-        try
+        Thread toRun = new Thread(new Runnable()
         {
-
-            // send the message to the server
-            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
-                    socket.getOutputStream())), true);
-
-            Log.d("TCP Client", "C: Sent.");
-
-            for (String message : messages)
+            @Override
+            public void run()
             {
-                if (!message.isEmpty())
+                mRun = true;
+
+                // create a socket to make the connection with the server
+                Socket socket = new Socket();
+                try
                 {
-                    out.println(message);
-                    out.flush();
+                    socket.setSoTimeout(connectionTimeout);
+                    InetAddress serverAddr = InetAddress.getByName(ipAddr);
+                    Log.d("TCP Client", "C: Connecting...");
+
+                    socket.connect(new InetSocketAddress(serverAddr, portNum),
+                            connectionTimeout);
+                }
+                catch (Exception ex)
+                {
+//            Message msgNotConnect = new Message();
+//            msgNotConnect.arg1 = 1;
+//            msgNotConnect.arg2 = 1; //important message.
+//            msgNotConnect.obj = "Could not connect!";
+                    mMessageListener.messageReceived(Consts.sayCommand + Consts.commandChar + "Could not connect.");
+                    mRun = false;
+                    Log.e("LogicControl", "C: Could not Connect!");
+                    tryingToConnect = false;
+                    synchronized (waitingForConnect)
+                    {
+                        waitingForConnect.notifyAll();
+                    }
+                    return;
+                }
+
+                Log.d("TCP Client", "C: Connected!");
+
+                try
+                {
+
+                    // send the message to the server
+                    out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
+                            socket.getOutputStream())), true);
+
+                    Log.d("TCP Client", "C: Sent.");
+
+//            for (String message : messages)
+//            {
+//                if (!message.isEmpty())
+//                {
+//                    out.println(message);
+//                    out.flush();
+//                }
+//            }
+
+                    // receive the message which the server sends back
+                    in = new BufferedReader(new InputStreamReader(
+                            socket.getInputStream()));
+
+                    // in this while the client listens for the messages sent by the
+                    // server
+                    String serverMessage = null;
+
+                    mConnected = true;
+                    tryingToConnect = false;
+                    synchronized (waitingForConnect)
+                    {
+                        waitingForConnect.notifyAll();
+                    }
+                    while (mRun)
+                    {
+                        Log.d("TCP Client", "inner loop.");
+                        try
+                        {
+                            serverMessage = in.readLine();
+                        }
+                        catch (Exception ignored)
+                        {
+                            Log.d("TCP Client", "C: Didn't receive a message");
+                        }
+
+                        if (serverMessage != null && mMessageListener != null)
+                        {
+                            Log.d("TCP Client", "Got a message." + serverMessage);
+
+                            // call the method messageReceived from MyActivity class
+                            mMessageListener.messageReceived(serverMessage);
+                            serverMessage = null;
+                        }
+                    }
+
+                    Log.d("RESPONSE FROM SERVER", "S: Received Message: '"
+                            + serverMessage + "'");
+
+                }
+                catch (Exception e)
+                {
+                    Log.e("TCP Client", "S: Error", e);
+                }
+                finally
+                {
+                    // the socket must be closed. It is not possible to reconnect to
+                    // this socket
+                    // after it is closed, which means a new socket instance has to be
+                    // created.
+                    try
+                    {
+                        socket.close();
+                    }
+                    catch (Exception e)
+                    {
+                        Log.e("TCP", "S: Could not close", e);
+                    }
+                    mConnected = false;
+                    tryingToConnect = false;
+                    synchronized (waitingForStop)
+                    {
+                        waitingForStop.notifyAll();
+                    }
                 }
             }
-
-            // receive the message which the server sends back
-            in = new BufferedReader(new InputStreamReader(
-                    socket.getInputStream()));
-
-            // in this while the client listens for the messages sent by the
-            // server
-            while (mRun)
-            {
-                serverMessage = in.readLine();
-
-                if (serverMessage != null && mMessageListener != null)
-                {
-                    Log.d("TCP Client", "Got a message." + serverMessage);
-                    // call the method messageReceived from MyActivity class
-                    mMessageListener.messageReceived(serverMessage);
-                }
-                serverMessage = null;
-
-            }
-
-            Log.d("RESPONSE FROM SERVER", "S: Received Message: '"
-                    + serverMessage + "'");
-
-        }
-        catch (Exception e)
-        {
-
-            Log.e("TCP", "S: Error", e);
-
-        }
-        finally
-        {
-            // the socket must be closed. It is not possible to reconnect to
-            // this socket
-            // after it is closed, which means a new socket instance has to be
-            // created.
-            try
-            {
-                socket.close();
-            }
-            catch (Exception e)
-            {
-                Log.e("TCP", "S: Could not close", e);
-            }
-        }
+        });
+        tryingToConnect = true;
+        toRun.start();
 
         // Log.e("TCP", "C: could not connect", e);
 

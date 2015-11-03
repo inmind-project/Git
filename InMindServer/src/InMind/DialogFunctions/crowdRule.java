@@ -1,6 +1,5 @@
 package InMind.DialogFunctions;
 
-import InMind.Server.UserConversation;
 import InMind.Server.asr.ASR;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
@@ -21,7 +20,11 @@ public class crowdRule
 
     static class SayOrJSon
     {
-        enum SayOrJSonType {say, execJson};
+        enum SayOrJSonType
+        {
+            say, execJson
+        }
+
 
         public SayOrJSon(SayOrJSonType sayOrJSonType, String content)
         {
@@ -32,13 +35,16 @@ public class crowdRule
         SayOrJSonType sayOrJSonType;
         public String content;
     }
+
     static final String ip = "localhost";//"45.55.172.104";//"localhost";//"45.55.172.104";
     static final int crowdPort = 1606;
     static final int listenPort = 1607;
-    static final long maxWaitForCrowd = 10*60*1000;
+    static final long maxWaitForCrowd = 10 * 60 * 1000;
     static HttpServer server;
-    static Map<String, Object> notifiers = new HashMap<>();
-    static Map<String, SayOrJSon> contents = new HashMap<>();
+    static final Object synchronizeUsers = new Object();
+    static Map<String, FunctionInvoker.IMessageSender> connectedUserHandles = new HashMap<>();
+    //static Map<String, Object> notifiers = new HashMap<>(); change to connectedUserIdHashSet
+    //static Map<String, SayOrJSon> contents = new HashMap<>(); remove
 
     static
     {
@@ -50,9 +56,12 @@ public class crowdRule
                 @Override
                 public void handle(HttpExchange httpExchange) throws IOException
                 {
+                    String userId = null;
+                    SayOrJSon sayOrJSon = null;
+                    FunctionInvoker.IMessageSender messageSender = null;
                     try
                     {
-                        Map<String,Object> parameters = dialogUtils.bodyAsParms(httpExchange);
+                        Map<String, Object> parameters = dialogUtils.bodyAsParms(httpExchange);
                         //Map<String, Object> parameters = (Map<String, Object>) httpExchange.getAttribute(ParameterFilter.parametersStr);
                         String response;
                         if (!parameters.containsKey("userId"))
@@ -65,23 +74,37 @@ public class crowdRule
                             response = "Error! 'messageType' must be 'say' or 'execRule'";
                         else
                         {
-                            String userId = (String) parameters.get("userId");
-                            contents.put(userId, new SayOrJSon(parameters.get("messageType").equals("say") ? SayOrJSon.SayOrJSonType.say : SayOrJSon.SayOrJSonType.execJson, (String) parameters.get("content")));
-                            if (notifiers.containsKey(userId))
+                            userId = (String) parameters.get("userId");
+                            synchronized (synchronizeUsers)
                             {
-                                synchronized (notifiers.get(userId))
+                                if (!connectedUserHandles.containsKey(userId))
+                                    response = "Error! user not connected!";
+                                else
                                 {
-                                    notifiers.get(userId).notify();
+                                    messageSender = connectedUserHandles.get(userId);
+                                    sayOrJSon = new SayOrJSon(parameters.get("messageType").equals("say") ? SayOrJSon.SayOrJSonType.say : SayOrJSon.SayOrJSonType.execJson, (String) parameters.get("content"));
+                                    response = "ok";
+//                                contents.put(userId, new SayOrJSon(parameters.get("messageType").equals("say") ? SayOrJSon.SayOrJSonType.say : SayOrJSon.SayOrJSonType.execJson, (String) parameters.get("content")));
+//                                if (notifiers.containsKey(userId))
+//                                {
+//                                    synchronized (notifiers.get(userId))
+//                                    {
+//                                        notifiers.get(userId).notify();
+//                                    }
+//                                    response = "ok";
+//                                }
+//                                else
+//                                    response = "error! notifier not found";
                                 }
-                                response = "ok";
                             }
-                            else
-                                response = "error! notifier not found";
                         }
                         httpExchange.sendResponseHeaders(200, response.length());
                         OutputStream os = httpExchange.getResponseBody();
                         os.write(response.getBytes());
                         os.close();
+
+                        if (messageSender != null && sayOrJSon != null)
+                            sendMessageToUser(messageSender, sayOrJSon);
                     } catch (Exception ex)
                     {
                         ex.printStackTrace();
@@ -118,15 +141,28 @@ public class crowdRule
             parameters.put("messageType", init ? "initiate" : "end");
             String response = dialogUtils.callServer("http://" + ip + ":" + crowdPort + "/", parameters, true);
             if (!init)
+            {
+                synchronized (synchronizeUsers)
+                {
+                    if (connectedUserHandles.containsKey(userId))
+                        connectedUserHandles.remove(userId);
+                }
                 return new LinkedList<>();
+            }
             else if (response.contains("ok"))
+            {
+                synchronized (synchronizeUsers)
+                {
+                    connectedUserHandles.put(userId, (FunctionInvoker.IMessageSender) fullInfo.get(FunctionInvoker.messageFunction));
+                }
                 return Collections.singletonList(FunctionInvoker.sayStr + "Great! Go ahead!");//response);
+            }
         } catch (Exception ex)
         {
             ex.printStackTrace();
         }
-        fullInfo.put(UserConversation.stateName,UserConversation.dialogFinish);
-        return Collections.singletonList(FunctionInvoker.sayStr+"Could not initialize crowd rule server.");
+        //fullInfo.put(UserConversation.stateName,UserConversation.dialogFinish);
+        return Collections.singletonList(FunctionInvoker.sayStr + "Could not initialize crowd rule server.");
     }
 
     public static List<String> forwardToCrowdRule(Map<String, Object> fullInfo, String userId, ASR.AsrRes userText)
@@ -135,11 +171,15 @@ public class crowdRule
 
         try
         {
-            if (contents.containsKey(userId)) //this shouldn't really happen
+            synchronized (synchronizeUsers)
             {
-                System.out.println("For some reason userId:" + userId +", had an entry.");
-                contents.remove(userId);
+                connectedUserHandles.put(userId, (FunctionInvoker.IMessageSender) fullInfo.get(FunctionInvoker.messageFunction));
             }
+//            if (contents.containsKey(userId)) //this shouldn't really happen
+//            {
+//                System.out.println("For some reason userId:" + userId +", had an entry.");
+//                contents.remove(userId);
+//            }
             Map<String, String> parameters = new HashMap<>();
             parameters.put("userId", userId);
             parameters.put("messageType", "userSays");
@@ -148,43 +188,57 @@ public class crowdRule
             List<String> responseForUser = Collections.singletonList(FunctionInvoker.sayStr + "Sorry, but there seems to be a problem...");
             if (callResponse.contains("ok"))
             {
-                //if response is ok
-                //create a listener:
-                //listens on userId so should work also with multiple users.
-                if (!notifiers.containsKey(userId))
-                    notifiers.put(userId, new Object());
-                if (!contents.containsKey(userId))
-                {
-                    synchronized (notifiers.get(userId))
-                    {
-                        notifiers.get(userId).wait(maxWaitForCrowd);
-                    }
-                }
-                if (contents.containsKey(userId))
-                {
-                    SayOrJSon sayOrJSon = contents.get(userId);
-                    contents.remove(userId);
-                    if (sayOrJSon.sayOrJSonType == SayOrJSon.SayOrJSonType.say)
-                    {
-                        responseForUser = Collections.singletonList(FunctionInvoker.sayStr + sayOrJSon.content);//FunctionInvoker.execJson + contents.get(userId);
-                    }
-                    else
-                    {
-                        responseForUser = new LinkedList<>();
-                        responseForUser.add(FunctionInvoker.execJson + sayOrJSon.content);
-                        responseForUser.add(FunctionInvoker.sayStr + "Rule added successfully!");
-                    }
-                }
-                else
-                {
-                    responseForUser = Collections.singletonList(FunctionInvoker.sayStr + "Sorry, but I got no answer...");
-                }
+                responseForUser = new LinkedList<>();
             }
             return responseForUser;
         } catch (Exception ex)
         {
             ex.printStackTrace();
-            return Collections.singletonList(FunctionInvoker.sayStr+"Connection with crowd rule server was lost.");
+            return Collections.singletonList(FunctionInvoker.sayStr + "Connection with crowd rule server was lost.");
         }
+    }
+
+    private static void sendMessageToUser(FunctionInvoker.IMessageSender messageSender, SayOrJSon sayOrJSon)
+    {
+        List<String> sendToUser;
+        if (sayOrJSon.sayOrJSonType == SayOrJSon.SayOrJSonType.say)
+        {
+            sendToUser = Collections.singletonList(FunctionInvoker.sayStr + sayOrJSon.content);//FunctionInvoker.execJson + contents.get(userId);
+        }
+        else
+        {
+            sendToUser = new LinkedList<>();
+            sendToUser.add(FunctionInvoker.execJson + sayOrJSon.content);
+            sendToUser.add(FunctionInvoker.sayStr + "Rule added successfully!");
+        }
+        messageSender.sendMessageToUser(sendToUser);
+        //                if (!notifiers.containsKey(userId))
+//                    notifiers.put(userId, new Object());
+//                if (!contents.containsKey(userId))
+//                {
+//                    synchronized (notifiers.get(userId))
+//                    {
+//                        notifiers.get(userId).wait(maxWaitForCrowd);
+//                    }
+//                }
+//                if (contents.containsKey(userId))
+//                {
+//                    SayOrJSon sayOrJSon = contents.get(userId);
+//                    contents.remove(userId);
+//                    if (sayOrJSon.sayOrJSonType == SayOrJSon.SayOrJSonType.say)
+//                    {
+//                        responseForUser = Collections.singletonList(FunctionInvoker.sayStr + sayOrJSon.content);//FunctionInvoker.execJson + contents.get(userId);
+//                    }
+//                    else
+//                    {
+//                        responseForUser = new LinkedList<>();
+//                        responseForUser.add(FunctionInvoker.execJson + sayOrJSon.content);
+//                        responseForUser.add(FunctionInvoker.sayStr + "Rule added successfully!");
+//                    }
+//                }
+//                else
+//                {
+//                    responseForUser = Collections.singletonList(FunctionInvoker.sayStr + "Sorry, but I got no answer...");
+//                }
     }
 }

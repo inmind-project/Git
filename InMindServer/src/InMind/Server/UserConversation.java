@@ -11,10 +11,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +35,7 @@ public class UserConversation
     static final String callFunName = "callfun";
     static final String callFunRepeat = "repeat";
     static final String dontRenewConnectionStr = "dontRenew";
+    static final String dontCloseConnectionStr = "dontClose";
 
 
     String dialogFileBase = "";
@@ -62,10 +60,11 @@ public class UserConversation
     }
 
 
+    public enum ToDoWithConnection {nothing, close, renew};
     /*
     returns whether to renew a connection.
      */
-    public boolean dealWithMessage(ASR.AsrRes asrRes, InMindLogic.MessageReceiver.MessageSender messageSender)
+    public ToDoWithConnection dealWithMessage(ASR.AsrRes asrRes, InMindLogic.MessageReceiver.MessageSender messageSender)
     {
         String userText = asrRes.text;
         boolean firstEnter = false;
@@ -110,7 +109,15 @@ public class UserConversation
                     toSend = tmpPrevMessages;
                 } else
                 {
-                    toSend = FunctionInvoker.toInvoke(dialogFileBase, funToCall, fullInfo, userId, asrRes); //TODO: add userId
+                    fullInfo.put(FunctionInvoker.messageFunction, new FunctionInvoker.IMessageSender()
+                    {
+                        @Override
+                        public void sendMessageToUser(List<String> s)
+                        {
+                            sendToUser(messageSender, s, true);
+                        }
+                    });
+                    toSend = FunctionInvoker.toInvoke(dialogFileBase, funToCall, fullInfo, userId, asrRes);
                 }
                 sendToUser(messageSender, toSend, true);
             }
@@ -127,12 +134,13 @@ public class UserConversation
             {
                 clearDialog();
             }
-
-
         }
 
-        boolean renewConnection = !dialogFileBase.isEmpty() && !fullInfo.containsKey(dontRenewConnectionStr);
-        return renewConnection;
+        if (dialogFileBase.isEmpty() || fullInfo.containsKey(dontRenewConnectionStr))
+            return ToDoWithConnection.close;
+        if (fullInfo.containsKey(dontCloseConnectionStr))
+            return ToDoWithConnection.nothing;
+        return ToDoWithConnection.renew;
     }
 
     private void sendToUser(InMindLogic.MessageReceiver.MessageSender messageSender, List<String> forUser, boolean saveMessage)

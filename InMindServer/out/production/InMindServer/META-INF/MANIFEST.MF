@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: InMind.Server.Main
-Class-Path: . ./lib/sphinx4.jar ./lib/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar ./lib/json-20141113.jar ./lib/activemq-all-5.11.1.jar ./lib/httpclient-4.5.1.jar ./lib/httpcore-4.4.3.jar ./lib/commons-logging-1.2.jar
-
-
