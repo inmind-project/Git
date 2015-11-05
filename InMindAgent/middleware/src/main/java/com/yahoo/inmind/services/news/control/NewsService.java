@@ -7,22 +7,22 @@ import android.os.IBinder;
 
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
-import com.yahoo.inmind.commons.control.Constants;
 import com.yahoo.inmind.comm.generic.model.MBRequest;
-import com.yahoo.inmind.commons.control.Util;
 import com.yahoo.inmind.comm.news.model.FilterByEmailEvent;
 import com.yahoo.inmind.comm.news.model.NewsResponseEvent;
 import com.yahoo.inmind.comm.news.model.NewsUpdateEvent;
+import com.yahoo.inmind.commons.control.Constants;
+import com.yahoo.inmind.commons.control.Util;
 import com.yahoo.inmind.services.generic.control.GenericService;
+import com.yahoo.inmind.services.news.control.reader.ReaderController;
 import com.yahoo.inmind.services.news.model.events.ExpandArticleEvent;
 import com.yahoo.inmind.services.news.model.events.GoToArticleEvent;
 import com.yahoo.inmind.services.news.model.events.RequestFetchNewsEvent;
-import com.yahoo.inmind.services.news.model.vo.NewsArticleVector;
-import com.yahoo.inmind.services.news.control.reader.ReaderController;
 import com.yahoo.inmind.services.news.model.slingstone.ModelDistribution;
 import com.yahoo.inmind.services.news.model.slingstone.UserProfile;
 import com.yahoo.inmind.services.news.model.vo.FilterVO;
 import com.yahoo.inmind.services.news.model.vo.NewsArticle;
+import com.yahoo.inmind.services.news.model.vo.NewsArticleVector;
 import com.yahoo.inmind.services.news.view.browser.BaseBrowser;
 import com.yahoo.inmind.services.news.view.browser.LoginBrowser;
 import com.yahoo.inmind.services.news.view.reader.ReaderMainActivity;
@@ -63,7 +63,7 @@ public class NewsService extends GenericService {
     // ****************************** SERVICE'S LIFE CYCLE *****************************************
 
     public NewsService() {
-        super("NewsService", null);
+        super( null );
     }
 
     public static void setRefreshTime(long refreshTime) {
@@ -101,7 +101,7 @@ public class NewsService extends GenericService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        clean();
+        release();
         executorService.shutdown();
         pool.shutdown();
     }
@@ -127,7 +127,7 @@ public class NewsService extends GenericService {
 
     // ****************************** SERVICE CALLS ************************************************
 
-    public void clean() {
+    public void release() {
         if (timer != null) {
             timer.purge();
             timer.cancel();
@@ -238,7 +238,7 @@ public class NewsService extends GenericService {
     }
 
     public void filterNewsByEmail(MBRequest request) {
-        mb.send(new FilterByEmailEvent(request));
+        mb.send(NewsService.this, new FilterByEmailEvent(request));
     }
 
     public void onEventAsync(FilterByEmailEvent event) {
@@ -295,7 +295,7 @@ public class NewsService extends GenericService {
         if (reader.isInitialized) {
             RequestFetchNewsEvent event = new RequestFetchNewsEvent(request.hashCode());
             event.setArticleId((Integer) request.get(Constants.BUNDLE_ARTICLE_ID));
-            mb.send(event);
+            mb.send(NewsService.this, event);
         } else {
             ReaderController.createNewsFuture();
             pool.submit(new NewsAsyncFunction(request));
@@ -409,7 +409,7 @@ public class NewsService extends GenericService {
                 event.setIdx(position);
             }
         }
-        mb.send(event);
+        mb.send(NewsService.this, event);
     }
 
     public void expandArticle(MBRequest mbRequest) {
@@ -420,7 +420,7 @@ public class NewsService extends GenericService {
         } else {
             event.setIdx(reader.getCurrentArticle());
         }
-        mb.send(event);
+        mb.send(NewsService.this, event);
     }
 
     public Integer getArticle(MBRequest mbRequest) {

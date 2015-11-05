@@ -12,11 +12,11 @@ import com.aware.utils.Aware_Plugin;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.ActivityRecognition;
-import com.yahoo.inmind.comm.generic.control.MessageBroker;
 import com.yahoo.inmind.comm.ar.model.ActivityRecognitionEvent;
-import com.yahoo.inmind.services.generic.control.AwareServiceWrapper;
-import com.yahoo.inmind.services.activity.view.ActivityRecognitionSettings;
+import com.yahoo.inmind.comm.generic.control.MessageBroker;
 import com.yahoo.inmind.commons.control.UtilServiceAPIs;
+import com.yahoo.inmind.services.activity.view.ActivityRecognitionSettings;
+import com.yahoo.inmind.services.generic.control.AwareServiceWrapper;
 
 
 public class Plugin extends Aware_Plugin implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -45,26 +45,33 @@ public class Plugin extends Aware_Plugin implements GoogleApiClient.ConnectionCa
 				ActivityRecognitionEvent event = new ActivityRecognitionEvent();
 				event.setActivityType(Plugin.activityType);
 				event.setConfidence(Plugin.confidence);
-				MessageBroker.getInstance(getApplicationContext()).send(event);
+				MessageBroker.getInstance(getApplicationContext()).send(Plugin.this, event);
 			}
 		};
 
-		AwareServiceWrapper.setSetting(getApplicationContext(), ActivityRecognitionSettings.STATUS_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, true);
-		if( AwareServiceWrapper.getSetting(getApplicationContext(), ActivityRecognitionSettings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION).length() == 0 ) {
-			AwareServiceWrapper.setSetting(getApplicationContext(), ActivityRecognitionSettings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, 60);
+		AwareServiceWrapper.setSetting(getApplicationContext(),
+				ActivityRecognitionSettings.STATUS_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, true);
+		if( AwareServiceWrapper.getSetting(getApplicationContext(),
+                ActivityRecognitionSettings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION).length() == 0 ) {
+			AwareServiceWrapper.setSetting(getApplicationContext(),
+                    ActivityRecognitionSettings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, 60);
 		}
 
 		gARIntent = new Intent(this, ActivityRecognitionService.class);
-		gARPending = PendingIntent.getService(getApplicationContext(), 0, gARIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		gARPending = PendingIntent.getService(getApplicationContext(), 0, gARIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
         gARClient = new GoogleApiClient.Builder(this)
                 .addApi(ActivityRecognition.API)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
 
-		AwareServiceWrapper.setSetting(this, ActivityRecognitionSettings.STATUS_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, true);
-		if( AwareServiceWrapper.getSetting(this, ActivityRecognitionSettings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION).length() == 0 ) {
-			AwareServiceWrapper.setSetting(this, ActivityRecognitionSettings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, 60);
+		AwareServiceWrapper.setSetting(this,
+                ActivityRecognitionSettings.STATUS_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, true);
+		if( AwareServiceWrapper.getSetting(this,
+                ActivityRecognitionSettings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION).length() == 0 ) {
+			AwareServiceWrapper.setSetting(this,
+                    ActivityRecognitionSettings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, 60);
 		}
 	}
 
@@ -78,7 +85,10 @@ public class Plugin extends Aware_Plugin implements GoogleApiClient.ConnectionCa
 		} else {
 			gARClient.connect();
             if( gARClient.isConnected() ) {
-                ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(gARClient, Long.valueOf(AwareServiceWrapper.getSetting(getApplicationContext(), ActivityRecognitionSettings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION)) * 1000, gARPending);
+                ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(gARClient,
+                        Long.valueOf(AwareServiceWrapper.getSetting(getApplicationContext(),
+                                ActivityRecognitionSettings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION))
+                                * 1000, gARPending);
             }
 		}
 		return START_STICKY;
@@ -87,7 +97,8 @@ public class Plugin extends Aware_Plugin implements GoogleApiClient.ConnectionCa
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-        AwareServiceWrapper.setSetting(getApplicationContext(), ActivityRecognitionSettings.STATUS_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, false);
+        AwareServiceWrapper.setSetting(getApplicationContext(),
+                ActivityRecognitionSettings.STATUS_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, false);
 
 		//we might get here if phone doesn't support Google Services
 		if ( gARClient != null && gARClient.isConnected() ) {

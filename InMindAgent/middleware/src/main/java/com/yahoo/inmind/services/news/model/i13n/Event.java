@@ -1,11 +1,11 @@
 package com.yahoo.inmind.services.news.model.i13n;
 
-import java.util.Date;
+import com.yahoo.inmind.services.news.control.yi13n.LocationTracker;
+import com.yahoo.inmind.services.news.model.vo.ValueObject;
 
 import org.json.JSONObject;
 
-import com.yahoo.inmind.services.news.model.vo.ValueObject;
-import com.yahoo.inmind.services.news.control.yi13n.LocationTracker;
+import java.util.Date;
 
 public class Event extends ValueObject{
 	public String userid;	//The ID of the logged-in user. It will be a random number associated with the MainActivity serving as the session identifier.  

@@ -1,8 +1,8 @@
 package com.yahoo.inmind.services.news.model.i13n;
 
-import java.util.Date;
-
 import com.yahoo.inmind.services.news.model.vo.ValueObject;
+
+import java.util.Date;
 
 public class UUIDEvent extends ValueObject {
 	public String userid;

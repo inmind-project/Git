@@ -1,9 +1,9 @@
 package com.yahoo.inmind.services.news.view.pluggableview;
 
-import com.yahoo.inmind.services.news.view.adapter.NewsAdapter;
-
 import android.app.Fragment;
 import android.view.View;
+
+import com.yahoo.inmind.services.news.view.adapter.NewsAdapter;
 
 /**
  * Implement this interface for different kind of AdapterViews (a kind of abstract ListView). 

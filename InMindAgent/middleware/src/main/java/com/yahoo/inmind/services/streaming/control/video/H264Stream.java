@@ -20,17 +20,6 @@
 
 package com.yahoo.inmind.services.streaming.control.video;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-
-import com.yahoo.inmind.services.streaming.control.SessionBuilder;
-import com.yahoo.inmind.services.streaming.control.exceptions.ConfNotSupportedException;
-import com.yahoo.inmind.services.streaming.control.exceptions.StorageUnavailableException;
-import com.yahoo.inmind.services.streaming.control.hw.EncoderDebugger;
-import com.yahoo.inmind.services.streaming.control.mp4.MP4Config;
-import com.yahoo.inmind.services.streaming.control.rtp.H264Packetizer;
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences.Editor;
 import android.graphics.ImageFormat;
@@ -40,6 +29,19 @@ import android.os.Environment;
 import android.service.textservice.SpellCheckerService.Session;
 import android.util.Base64;
 import android.util.Log;
+
+import com.yahoo.inmind.commons.control.Util;
+import com.yahoo.inmind.services.streaming.control.SessionBuilder;
+import com.yahoo.inmind.services.streaming.control.exceptions.ConfNotSupportedException;
+import com.yahoo.inmind.services.streaming.control.exceptions.StorageUnavailableException;
+import com.yahoo.inmind.services.streaming.control.hw.EncoderDebugger;
+import com.yahoo.inmind.services.streaming.control.mp4.MP4Config;
+import com.yahoo.inmind.services.streaming.control.rtp.H264Packetizer;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A class for streaming H.264 from the camera of an android device using RTP.
@@ -127,7 +129,8 @@ public class H264Stream extends VideoStream {
 		try {
 			if (mQuality.resX>=640) {
 				// Using the MediaCodec API with the buffer method for high resolutions is too slow
-				mMode = MODE_MEDIARECORDER_API;
+				// we don't need this validation anymore because it throws a InvalidSurfaceException
+				// mMode = MODE_MEDIARECORDER_API;
 			}
 			EncoderDebugger debugger = EncoderDebugger.debug(mSettings, mQuality.resX, mQuality.resY);
 			return new MP4Config(debugger.getB64SPS(), debugger.getB64PPS());
@@ -181,12 +184,7 @@ public class H264Stream extends VideoStream {
 			mPreviewStarted = false;
 		}
 
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		Util.sleep(100);
 
 		unlockCamera();
 
@@ -227,7 +225,7 @@ public class H264Stream extends VideoStream {
 
 			if (mLock.tryAcquire(6,TimeUnit.SECONDS)) {
 				Log.d(TAG,"MediaRecorder callback was called :)");
-				Thread.sleep(400);
+				Util.sleep(400);
 			} else {
 				Log.d(TAG,"MediaRecorder callback was not called after 6 seconds... :(");
 			}

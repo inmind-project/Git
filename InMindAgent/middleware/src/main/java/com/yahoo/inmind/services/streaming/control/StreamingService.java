@@ -1,7 +1,6 @@
 package com.yahoo.inmind.services.streaming.control;
 
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 
 import com.yahoo.inmind.comm.streaming.model.StreamingErrorEvent;
 import com.yahoo.inmind.comm.streaming.model.StreamingEvent;
@@ -9,10 +8,10 @@ import com.yahoo.inmind.commons.control.Constants;
 import com.yahoo.inmind.commons.control.Util;
 import com.yahoo.inmind.services.generic.control.GenericService;
 import com.yahoo.inmind.services.streaming.control.audio.AudioQuality;
-import com.yahoo.inmind.services.streaming.view.StreamingSurfaceView;
 import com.yahoo.inmind.services.streaming.control.rtsp.RtspClient;
 import com.yahoo.inmind.services.streaming.control.video.VideoQuality;
 import com.yahoo.inmind.services.streaming.model.StreamingSubscriptionVO;
+import com.yahoo.inmind.services.streaming.view.StreamingSurfaceView;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,6 +29,7 @@ public class StreamingService extends GenericService implements
     private StreamingSurfaceView mStreamingSurfaceView;
 
     public StreamingService(){
+        super(null);
     }
 
     public void subscribe( StreamingSubscriptionVO subscriptionVO ){
@@ -153,7 +153,8 @@ public class StreamingService extends GenericService implements
 
     @Override
     public void onBitrateUpdate( long bitrate ) {
-        mb.send(StreamingEvent.build()
+        mb.send(StreamingService.this,
+                StreamingEvent.build()
                 .setType( Constants.STREAMING_BITRATE_UPDATE )
                 .setBitRate( bitrate / 1000 ) );
     }
@@ -185,12 +186,13 @@ public class StreamingService extends GenericService implements
                 break;
         }
         error.setMessage( e.getMessage() );
-        mb.send( error );
+        mb.send(StreamingService.this, error );
     }
 
     @Override
     public void onPreviewStarted() {
-        mb.send(StreamingEvent.build()
+        mb.send(StreamingService.this,
+                StreamingEvent.build()
                 .setType(Constants.STREAMING_PREVIEW_STARTED)
                 .setCamera(mSession.getCamera()));
 
@@ -198,17 +200,17 @@ public class StreamingService extends GenericService implements
 
     @Override
     public void onSessionConfigured() {
-        mb.send(StreamingEvent.build().setType(Constants.STREAMING_SESSION_CONFIGURED));
+        mb.send(StreamingService.this, StreamingEvent.build().setType(Constants.STREAMING_SESSION_CONFIGURED));
     }
 
     @Override
     public void onSessionStarted() {
-        mb.send( StreamingEvent.build().setType(Constants.STREAMING_SESSION_STARTED) );
+        mb.send(StreamingService.this, StreamingEvent.build().setType(Constants.STREAMING_SESSION_STARTED) );
     }
 
     @Override
     public void onSessionStopped() {
-        mb.send( StreamingEvent.build().setType( Constants.STREAMING_SESSION_STOPPED ) );
+        mb.send(StreamingService.this, StreamingEvent.build().setType( Constants.STREAMING_SESSION_STOPPED ) );
     }
 
     @Override
@@ -224,7 +226,7 @@ public class StreamingService extends GenericService implements
                 errorEvent.setMessage("Wrong credentials to connect with remote streaming server");
                 break;
         }
-        mb.send(errorEvent);
+        mb.send(StreamingService.this, errorEvent);
     }
 
     public void setVideoQuality(String videoQuality) {
@@ -241,13 +243,13 @@ public class StreamingService extends GenericService implements
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        mb.send(StreamingEvent.build().setType(Constants.STREAMING_SURFACE_CHANGED));
+        mb.send(StreamingService.this, StreamingEvent.build().setType(Constants.STREAMING_SURFACE_CHANGED));
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         startPreview();
-        mb.send(StreamingEvent.build().setType(Constants.STREAMING_SURFACE_CREATED));
+        mb.send(StreamingService.this, StreamingEvent.build().setType(Constants.STREAMING_SURFACE_CREATED));
     }
 
     @Override
@@ -255,7 +257,7 @@ public class StreamingService extends GenericService implements
         if( mStreamingSurfaceView != null ) {
             stopStreaming(mStreamingSurfaceView.getDestination());
         }
-        mb.send(StreamingEvent.build().setType(Constants.STREAMING_SURFACE_DESTROYED));
+        mb.send(StreamingService.this, StreamingEvent.build().setType(Constants.STREAMING_SURFACE_DESTROYED));
     }
 
     public void startPreview() {

@@ -1,8 +1,5 @@
 package com.yahoo.inmind.services.news.control.util;
 
-import java.security.MessageDigest;
-import java.util.UUID;
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -13,7 +10,9 @@ import android.provider.Settings.Secure;
 
 import com.yahoo.inmind.services.news.control.reader.ReaderController;
 
+import java.security.MessageDigest;
 import java.util.Formatter;
+import java.util.UUID;
 
 
 //This class is borrowed from YI13N's YQLProxy

@@ -14,10 +14,6 @@ import com.yahoo.inmind.comm.accelerometer.model.AccelerometerEvent;
 import com.yahoo.inmind.sensors.generic.control.SensorObserver;
 import com.yahoo.inmind.services.generic.control.AwareServiceWrapper;
 
-
-/**
- * Created by mertcan on 24.6.2015.
- */
 public class AccelerometerObserver extends SensorObserver {
     private Float accelerationX;
     private Float accelerationY;
@@ -84,7 +80,8 @@ public class AccelerometerObserver extends SensorObserver {
     }
 
     private void notifySubscribers(){
-        mb.send(AccelerometerEvent.build().setAccelerationX(accelerationX).setAccelerationY(accelerationY)
+        mb.send(AccelerometerObserver.this,
+                AccelerometerEvent.build().setAccelerationX(accelerationX).setAccelerationY(accelerationY)
                 .setAccelerationZ(accelerationZ).setAccuracy(accuracy).setTimestamp(timestamp));
     }
 
@@ -101,5 +98,14 @@ public class AccelerometerObserver extends SensorObserver {
      */
     public void setFrequency(Long frequency) {
         AwareServiceWrapper.setSetting( mContext, Aware_Preferences.FREQUENCY_ACCELEROMETER, frequency );
+    }
+
+    public AccelerometerEvent getAccEvent() {
+        return AccelerometerEvent.build()
+                .setAccelerationX( accelerationX )
+                .setAccelerationY( accelerationY )
+                .setAccelerationZ( accelerationZ )
+                .setAccuracy( accuracy )
+                .setTimestamp( timestamp );
     }
 }

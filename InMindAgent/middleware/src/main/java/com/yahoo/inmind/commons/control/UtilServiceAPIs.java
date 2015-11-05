@@ -13,9 +13,9 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
-import com.yahoo.inmind.comm.generic.control.MessageBroker;
 import com.yahoo.inmind.comm.generic.control.GooglePlayServicesEvent;
-import com.yahoo.inmind.services.generic.control.ServiceLocator;
+import com.yahoo.inmind.comm.generic.control.MessageBroker;
+import com.yahoo.inmind.services.generic.control.ResourceLocator;
 
 import java.util.Arrays;
 
@@ -99,7 +99,9 @@ public class UtilServiceAPIs {
             result = false;
         }
         if( !result ){
-            MessageBroker.getInstance(context).send( GooglePlayServicesEvent.build()
+            MessageBroker.getInstance(context).send(
+                    context,
+                    GooglePlayServicesEvent.build()
                     .setError(true)
                     .setNotification( "Google Play Services required: after installing, close and " +
                             "relaunch this app." ) );
@@ -134,7 +136,7 @@ public class UtilServiceAPIs {
 
     private static <T extends Context> T validateActivity(T activity, String message){
         if( activity == null ){
-            activity = (T) ServiceLocator.getExistingInstance().getTopActivity();
+            activity = (T) ResourceLocator.getExistingInstance().getTopActivity();
         }
         if( activity == null ){
             throw new IllegalStateException( message + " . Caller Activity or Context " +

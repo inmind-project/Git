@@ -1,20 +1,8 @@
 package com.yahoo.inmind.services.news.control.util;
 
-import com.yahoo.inmind.services.news.model.vo.NewsArticleVector;
 import com.yahoo.inmind.services.news.control.reader.ReaderController;
 import com.yahoo.inmind.services.news.model.vo.JsonItem;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.StringTokenizer;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import com.yahoo.inmind.services.news.model.vo.NewsArticleVector;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -30,6 +18,18 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class JsonUtil {
 	private static final String YAHOO_COM = "yahoo.com";

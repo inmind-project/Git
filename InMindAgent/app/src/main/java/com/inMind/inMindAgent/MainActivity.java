@@ -54,6 +54,7 @@ public class MainActivity extends ActionBarActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.d("Main", "onCreate");
 
 
         userNotifierHandler = new Handler(new Handler.Callback()
@@ -242,6 +243,7 @@ public class MainActivity extends ActionBarActivity
         // System.out.println("minBufSize: " + minBufSize);
 
         // attach a Message. set msg.arg to 1 and msg.obj to string for toast.
+        Log.d("Main", "onCreate-End");
     }
 
 

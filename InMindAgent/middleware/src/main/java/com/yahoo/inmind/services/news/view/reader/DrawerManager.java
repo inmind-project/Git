@@ -1,8 +1,5 @@
 package com.yahoo.inmind.services.news.view.reader;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -20,16 +17,19 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 
 import com.yahoo.inmind.middleware.R;
-import com.yahoo.inmind.services.news.control.reader.ReaderController;
 import com.yahoo.inmind.services.news.control.cache.ImgLruCacher;
-import com.yahoo.inmind.services.news.model.i13n.Event;
 import com.yahoo.inmind.services.news.control.i13n.I13N;
+import com.yahoo.inmind.services.news.control.reader.ReaderController;
+import com.yahoo.inmind.services.news.model.i13n.Event;
 import com.yahoo.inmind.services.news.model.slingstone.SlingstoneSrc;
 import com.yahoo.inmind.services.news.view.browser.BaseBrowser;
 import com.yahoo.inmind.services.news.view.browser.LoginBrowser;
 import com.yahoo.inmind.services.news.view.handler.DataHandler;
 import com.yahoo.inmind.services.news.view.handler.NewsHandler;
 import com.yahoo.inmind.services.news.view.slingstone.SlingstoneRenderer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DrawerManager {
 	protected ArrayList<DrawerItem> mItems = new ArrayList<DrawerItem>();

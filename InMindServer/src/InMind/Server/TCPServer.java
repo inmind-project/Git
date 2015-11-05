@@ -17,7 +17,9 @@ public class TCPServer extends Thread
     private OnMessageReceived messageListener;
 
     static final String clientConnected = "Client Connected";
+    static final int readTimeout = 1000;
 
+    static final Object serverLock = new Object();
     static ServerSocket serverSocket = null; //TODO: protect from multithread access
 
     Socket client = null;
@@ -69,7 +71,14 @@ public class TCPServer extends Thread
             //this while it's like a listener for messages
             while (running)
             {
-                String message = in.readLine();
+                String message = null;
+                try
+                {
+                    message = in.readLine();
+                }
+                catch (Exception ignored) //probably timeout exception, which is ok.
+                {
+                }
 
                 if (message != null && messageListener != null)
                 {
@@ -105,19 +114,37 @@ public class TCPServer extends Thread
 
         //create a server socket. A server socket waits for requests to come in over the network.
         if (serverSocket == null)
-            serverSocket = new ServerSocket(Consts.serverPort);
+        {
+            synchronized (serverLock)
+            {
+                if (serverSocket == null)
+                {
+                    serverSocket = new ServerSocket(Consts.serverPort);
+                    serverSocket.setSoTimeout(readTimeout);
+                }
+            }
+        }
 
-        //create client socket... the method accept() listens for a connection to be made to this socket and accepts it.
-        client = serverSocket.accept();
+        while (client == null)
+        {
+            synchronized (serverLock)
+            {
+                //create client socket... the method accept() listens for a connection to be made to this socket and accepts it.
+                try
+                {
+                    client = serverSocket.accept();
+                } catch (Exception ignored)
+                {
+                }
+            }
+        }
         System.out.println("S: Accepted...");
-        if (client == null)
-            throw new IOException("Error, client is null");
     }
 
     //Declare the interface.
     public interface OnMessageReceived
     {
-        public void messageReceived(String message);
+        void messageReceived(String message);
     }
 
     public void abandonClient()

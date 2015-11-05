@@ -8,9 +8,9 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 
 import com.yahoo.inmind.middleware.R;
+import com.yahoo.inmind.services.news.control.i13n.I13N;
 import com.yahoo.inmind.services.news.control.reader.ReaderController;
 import com.yahoo.inmind.services.news.model.i13n.Event;
-import com.yahoo.inmind.services.news.control.i13n.I13N;
 
 public class SettingsActivity extends ActionBarActivity { //PreferencesActivity
 	boolean bI13nOriginallyEnabled = false;

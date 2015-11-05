@@ -1,7 +1,5 @@
 package com.yahoo.inmind.services.news.view.adapter;
 
-import java.util.ArrayList;
-
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +9,8 @@ import com.yahoo.inmind.services.news.model.vo.JsonItem;
 import com.yahoo.inmind.services.news.model.vo.NewsArticle;
 import com.yahoo.inmind.services.news.view.reader.DrawerItem;
 import com.yahoo.inmind.services.news.view.slingstone.Renderer;
+
+import java.util.ArrayList;
 
 
 public class NewsAdapter extends BaseAdapter {

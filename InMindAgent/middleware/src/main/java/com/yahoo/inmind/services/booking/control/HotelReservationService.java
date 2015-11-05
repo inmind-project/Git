@@ -2,14 +2,14 @@ package com.yahoo.inmind.services.booking.control;
 
 import android.util.JsonReader;
 
+import com.yahoo.inmind.comm.hotel.model.HotelReservationEvent;
 import com.yahoo.inmind.commons.control.Constants;
 import com.yahoo.inmind.commons.control.Util;
-import com.yahoo.inmind.comm.hotel.model.HotelReservationEvent;
-import com.yahoo.inmind.services.generic.control.GenericService;
+import com.yahoo.inmind.commons.control.UtilServiceAPIs;
 import com.yahoo.inmind.services.booking.model.Criteria;
 import com.yahoo.inmind.services.booking.model.HotelSearchCriteria;
 import com.yahoo.inmind.services.booking.model.HotelVO;
-import com.yahoo.inmind.commons.control.UtilServiceAPIs;
+import com.yahoo.inmind.services.generic.control.GenericService;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
@@ -30,7 +30,7 @@ public class HotelReservationService extends GenericService implements Booking {
     private HotelSearchCriteria searchCriteria = new HotelSearchCriteria();
 
     public HotelReservationService(){
-        super("HotelReservationService", null);
+        super(null);
         if( actions.isEmpty() ) {
             this.actions.add(Constants.ACTION_HOTEL_RESERVATION);
         }
@@ -61,11 +61,6 @@ public class HotelReservationService extends GenericService implements Booking {
         searchCriteria = (HotelSearchCriteria) criteria;
         hotels = new ArrayList<>();
         if(checkInputs()){
-            Calendar calStart = Calendar.getInstance();
-            calStart.setTime(searchCriteria.getStartDate());
-            Calendar calEnd = Calendar.getInstance();
-            calEnd.setTime(searchCriteria.getEndDate());
-
             String urlString = String.format( URL +
                             "%s&dest=%s" +
                             "&rooms=%s" +
@@ -81,12 +76,8 @@ public class HotelReservationService extends GenericService implements Booking {
                     searchCriteria.getRooms(),
                     searchCriteria.getChildren(),
                     searchCriteria.getAdults(),
-                    Util.getFormattedNumber( calStart.get(Calendar.MONTH) + 1)
-                            +"/"+Util.getFormattedNumber( calStart.get(Calendar.DAY_OF_MONTH) )
-                            +"/"+calStart.get(Calendar.YEAR),
-                    Util.getFormattedNumber( calEnd.get(Calendar.MONTH) + 1)
-                            +"/"+Util.getFormattedNumber( calEnd.get(Calendar.DAY_OF_MONTH) )
-                            +"/"+calEnd.get(Calendar.YEAR),
+                    Util.getDate(searchCriteria.getStartDate(), "MM/dd/yyyy"),
+                    Util.getDate( searchCriteria.getEndDate(), "MM/dd/yyyy" ),
                     searchCriteria.getResultLimit(),
                     searchCriteria.getSortBy() );
             hotels = searchHotelShopping(urlString);
@@ -115,11 +106,13 @@ public class HotelReservationService extends GenericService implements Booking {
                             reader.close();
                         }
                     } catch (MalformedURLException e) {
-                        mb.send( HotelReservationEvent.build().setErrorMessage(e.getMessage()) );
+                        mb.send( HotelReservationService.this, HotelReservationEvent.build()
+                                .setErrorMessage(e.getMessage()) );
                         e.printStackTrace();
                         return;
                     } catch (Exception e) {
-                        mb.send( HotelReservationEvent.build().setErrorMessage(e.getMessage()));
+                        mb.send( HotelReservationService.this, HotelReservationEvent.build()
+                                .setErrorMessage(e.getMessage()));
                         e.printStackTrace();
                     } finally {
                         urlConnection.disconnect();
@@ -155,9 +148,10 @@ public class HotelReservationService extends GenericService implements Booking {
         hotels.clear();
         Util.readJsonToObject(reader, "", mappings, new HotelVO(), hotels, errors);
         if( errors.isEmpty() ) {
-            mb.send(HotelReservationEvent.build().setHotels(hotels));
+            mb.send(HotelReservationService.this, HotelReservationEvent.build().setHotels(hotels));
         } else{
-            mb.send( HotelReservationEvent.build().setErrorMessage(Arrays.toString(errors.toArray() )));
+            mb.send(HotelReservationService.this, HotelReservationEvent.build()
+                    .setErrorMessage(Arrays.toString(errors.toArray() )));
         }
     }
 

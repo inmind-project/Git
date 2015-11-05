@@ -10,8 +10,8 @@ import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
-import com.yahoo.inmind.commons.control.Constants;
 import com.yahoo.inmind.comm.generic.model.MBRequest;
+import com.yahoo.inmind.commons.control.Constants;
 import com.yahoo.inmind.orchestration.control.BNController;
 import com.yahoo.inmind.services.news.model.vo.NewsArticleVector;
 

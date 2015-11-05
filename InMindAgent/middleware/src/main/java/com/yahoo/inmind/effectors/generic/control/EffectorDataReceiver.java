@@ -3,12 +3,11 @@ package com.yahoo.inmind.effectors.generic.control;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.yahoo.inmind.comm.generic.control.MessageBroker;
 import com.yahoo.inmind.commons.control.Constants;
 import com.yahoo.inmind.effectors.alarm.control.AlarmEffector;
-import com.yahoo.inmind.services.generic.control.ServiceLocator;
+import com.yahoo.inmind.services.generic.control.ResourceLocator;
 
 /**
  * Created by oscarr on 9/29/15.
@@ -16,22 +15,21 @@ import com.yahoo.inmind.services.generic.control.ServiceLocator;
 public class EffectorDataReceiver extends BroadcastReceiver {
     private MessageBroker mb;
     private Context mContext;
-    private ServiceLocator serviceLocator;
+    private ResourceLocator resourceLocator;
 
     public EffectorDataReceiver(Context context) {
         mContext = context;
     }
 
-    public EffectorDataReceiver() {
-        Log.e("", "INSIDE EffectorDataReceiver");
-    }
+    // This is required by the AndroidManifest
+    public EffectorDataReceiver() {}
 
     private void initialize( Context context ){
         if( mb == null ){
             mb = MessageBroker.getInstance( context );
         }
-        if( serviceLocator == null ){
-            serviceLocator = ServiceLocator.getInstance( context );
+        if( resourceLocator == null ){
+            resourceLocator = ResourceLocator.getInstance(context);
         }
     }
 
@@ -39,7 +37,7 @@ public class EffectorDataReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         initialize( context );
         if (intent.getAction().equals( Constants.ACTION_SET_ALARM )) {
-            serviceLocator.getEffector( AlarmEffector.class ).setAlarm( intent );
+            resourceLocator.lookupEffector( AlarmEffector.class ).setAlarm( intent );
         }
     }
 }

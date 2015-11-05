@@ -3,7 +3,12 @@ package com.yahoo.inmind.comm.generic.model;
 import android.os.Bundle;
 import android.os.Parcelable;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -12,18 +17,17 @@ import java.util.Iterator;
  * This class is used for interchanging data with the Message Broker
  */
 public class MBRequest {
-    private HashMap<String, Object> map;
+    private Multimap<String, Object> map;
     private double[] values;
     private int requestId;
 
     private MBRequest(int id) {
-        this.map = new HashMap();
+        this.map = ArrayListMultimap.create();
         this.requestId = id;
     }
 
     private MBRequest(int id, double... args){
-        this.requestId = id;
-        this.map = new HashMap();
+        this(id);
         values = args;
     }
 
@@ -36,38 +40,69 @@ public class MBRequest {
     }
 
 
-    public MBRequest put( String name, Object value ){
-        map.put( name, value );
+    /**
+     * MBRequest works like a HashMap that allows duplicated keys (Multimap). When a duplicated key
+     * is given, the values are inserted into a Collection.
+     * @param key
+     * @param value
+     * @return
+     */
+    public MBRequest put( String key, Object value ){
+        ArrayList list = new ArrayList( map.get(key) );
+        if( !list.contains( value )  ) {
+            map.put(key, value);
+        }
         return this;
     }
 
-    public Object get( String name ){
-        return map.get( name );
+    /**
+     * MBRequest works like a HashMap that allows duplicated keys (Multimap). When a duplicated key
+     * is given, the rturned value will be a Collection, otherwise a single object
+     * @param key
+     * @return
+     */
+    public Object get( String key ){
+        ArrayList list = new ArrayList( map.get( key ) );
+        if( list != null && !list.isEmpty() ){
+            if( list.size() == 1 ) {
+                return list.get(0);
+            }else{
+                return list;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * It returns all the values for a specified key
+     * @param key
+     * @return
+     */
+    public Collection getAll( String key ){
+        return map.get( key );
     }
 
     public Bundle convertToBundle(){
         Bundle bundle = new Bundle();
-        Iterator<String> it = map.keySet().iterator();
-        while( it.hasNext() ){
-            String key = it.next();
-            Object value = map.get( key );
-            if( value instanceof Boolean ){
-                bundle.putBoolean( key, (Boolean) value );
-            } else if( value instanceof String ){
+        for (String key : map.keySet()) {
+            Object value = map.get(key);
+            if (value instanceof Boolean) {
+                bundle.putBoolean(key, (Boolean) value);
+            } else if (value instanceof String) {
                 bundle.putString(key, (String) value);
-            } else if( value instanceof Serializable){
+            } else if (value instanceof Serializable) {
                 bundle.putSerializable(key, (Serializable) value);
-            } else if( value instanceof Integer){
+            } else if (value instanceof Integer) {
                 bundle.putInt(key, (Integer) value);
-            } else if( value instanceof Float){
+            } else if (value instanceof Float) {
                 bundle.putFloat(key, (Float) value);
-            } else if( value instanceof Double){
+            } else if (value instanceof Double) {
                 bundle.putDouble(key, (Double) value);
-            } else if( value instanceof Short){
+            } else if (value instanceof Short) {
                 bundle.putShort(key, (Short) value);
-            } else if( value instanceof Long){
+            } else if (value instanceof Long) {
                 bundle.putLong(key, (Long) value);
-            } else if( value instanceof Parcelable){
+            } else if (value instanceof Parcelable) {
                 bundle.putParcelable(key, (Parcelable) value);
             }
         }
@@ -89,14 +124,6 @@ public class MBRequest {
 
     public int getRequestId() {
         return requestId;
-    }
-
-    public HashMap<String, Object> getMap() {
-        return map;
-    }
-
-    public void setMap(HashMap<String, Object> map) {
-        this.map = map;
     }
 
     public double[] getValues() {

@@ -1,9 +1,9 @@
 package com.yahoo.inmind.services.news.model.vo;
 
+import android.util.Log;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-
-import android.util.Log;
 
 public class ValueObject {
 	

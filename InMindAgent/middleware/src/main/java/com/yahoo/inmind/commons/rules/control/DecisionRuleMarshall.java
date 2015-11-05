@@ -21,25 +21,14 @@ import java.lang.reflect.Type;
 public class DecisionRuleMarshall implements JsonDeserializer<Object> {
 
     @Override
-    //TODO: finish it
     public Object deserialize(JsonElement jsonElement, Type typeOfT, JsonDeserializationContext context)
             throws JsonParseException {
 
         if( typeOfT.equals( PropositionalStatement.class) ) {
             JsonObject jsonObj = jsonElement.getAsJsonObject();
             String type = jsonObj.get("componentName").getAsString();
-            Class<? extends PropositionalStatement> clazz = null;
-            if (type.equals(Constants.CALENDAR)) {
-                clazz = CalendarProposition.class;
-            } else if (type.equals(Constants.NEWS)) {
-                clazz = FilterVO.class;
-            } else if (type.equals(Constants.WEATHER)) {
-                clazz = WeatherProposition.class;
-            } else if (type.equals(Constants.PHONECALL)) {
-                clazz = PhoneCallProposition.class;
-            } else if (type.equals(Constants.ACCELEROMETER)) {
-                clazz = AccelerometerProposition.class;
-            }
+            Class<? extends PropositionalStatement> clazz =
+                    DecisionRuleValidator.getInstance().extractProposition( type );
 
             if (clazz == null) {
                 return null;

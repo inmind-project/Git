@@ -9,11 +9,9 @@ import android.media.MediaFormat;
 import android.media.MediaRecorder;
 import android.util.Log;
 
-import com.yahoo.inmind.commons.control.Constants;
-import com.yahoo.inmind.commons.control.FileUploader;
 import com.yahoo.inmind.comm.generic.control.MessageBroker;
 import com.yahoo.inmind.comm.streaming.model.AudioRecordEvent;
-import com.yahoo.inmind.comm.generic.model.MBRequest;
+import com.yahoo.inmind.commons.control.Util;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -30,6 +28,8 @@ public class AudioController extends Thread{
     private static final String TAG = "AudioController";
     private boolean recording;
     private boolean stopped = false;
+    private boolean packetizeAudio = false; // do we ant to packetize the audio stream? e.g. ACC, MP3..
+    private boolean firstTime = true; //first time there are no data in the buffer, so skip this content
 
     private static AudioConfig currentRecorder = null;
     private static MessageBroker mb;
@@ -63,14 +63,14 @@ public class AudioController extends Thread{
     public static AudioController getInstance( Integer sampleRateInHz, Integer channelConfig,
                                                Integer audioEncoding, Integer bufferElements2Rec,
                                                Integer bytesPerElement, MessageBroker mb,
-                                               Object subscriber, String fileExtension, String mimeType ) {
+                                               Object subscriber ) {
         if (instance == null) {
             instance = new AudioController( mb );
         }
         // add the subscriber to the waiting list
         if( configurations.containsKey( subscriber ) == false ){
             AudioConfig config = new AudioConfig( sampleRateInHz, channelConfig, audioEncoding,
-                    bufferElements2Rec, bytesPerElement, subscriber, fileExtension, mimeType );
+                    bufferElements2Rec, bytesPerElement, subscriber );
             configurations.put( subscriber, config );
             if( currentRecorder == null ){
                 currentRecorder = config;
@@ -100,7 +100,6 @@ public class AudioController extends Thread{
 
     @Override
     public void run(){
-
         try{
             /*
              * Loops until something outside of this thread stops it.
@@ -110,19 +109,16 @@ public class AudioController extends Thread{
                 initializeRecordObj();
                 while( recording && currentRecorder != null ) {
                     currentRecorder.recordAndSend();
-
-//                    recording = false;
-//                    stopped = true;
                 }
             }
         } catch(Throwable x){
-            Log.w("Audio", "Error reading voice audio", x);
+            Log.e("Audio", "Error reading voice audio", x);
         }
     }
 
 
     /**
-     * Frees the thread's resources after the loop completes so that it can be run again
+     * Releases the thread's resources after the loop completes so that it can be run again
      */
     public void releaseController(){
         stopped = true;
@@ -194,8 +190,6 @@ public class AudioController extends Thread{
         private int sampleRateInHz = 44100;
         private int channelConfig = AudioFormat.CHANNEL_IN_MONO;
         private int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
-        private String fileExtension = "acc"; //acc
-        private String mimeType = MediaFormat.MIMETYPE_AUDIO_AAC; //"audio/mp4a-latm";
         private int sizeInBytes;
         private short[] buffer;
         private boolean flagRecord = true;
@@ -205,12 +199,10 @@ public class AudioController extends Thread{
         private MediaCodec codec;
         private final long timeout = 10000;
         private int bufferSize = bufferElements2Rec * bytesPerElement;
-        private boolean firstTime = true;
-
+        private String mimeType = MediaFormat.MIMETYPE_AUDIO_AAC; //"audio/mp4a-latm";
 
         AudioConfig(Integer sampleRate, Integer channelConfig, Integer audioEncoding,
-                    Integer bufferElements2Rec, Integer bytesPerElement, Object subscriber,
-                    String fileExtension, String mimeType) {
+                    Integer bufferElements2Rec, Integer bytesPerElement, Object subscriber) {
             this.subscriber = subscriber;
             if( sampleRate != null ) {
                 this.sampleRateInHz = sampleRate;
@@ -234,38 +226,34 @@ public class AudioController extends Thread{
             if( bytesPerElement != null && bytesPerElement > 1){
                 this.bytesPerElement = bytesPerElement;
             }
-            if( fileExtension != null && !fileExtension.equals("") ){
-                this.fileExtension = fileExtension;
-            }
-            if( mimeType != null && !mimeType.equals("") ){
-                this.mimeType = mimeType;
-            }
 
             bufferSize = this.bufferElements2Rec * this.bytesPerElement;
             recorder = new AudioRecord( MediaRecorder.AudioSource.MIC,
                 this.sampleRateInHz,
                 this.channelConfig,
                 this.audioEncoding,
-                this.bufferElements2Rec * this.bytesPerElement);
+                    bufferSize);
             buffer =  new short[bufferElements2Rec];
 
 
-            try {
-                audioFormat = new MediaFormat();
-                audioFormat.setString(MediaFormat.KEY_MIME, this.mimeType);
-                audioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE,
-                        MediaCodecInfo.CodecProfileLevel.AACObjectLC);
-                audioFormat.setInteger(MediaFormat.KEY_SAMPLE_RATE, this.sampleRateInHz);
-                audioFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT,
-                        channelConfig == AudioFormat.CHANNEL_IN_MONO? 1 : 2);
-                int bitRate =  64 * 1024; //64000;
-                audioFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate );
-                //audioFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, sampleRate); //bufferSize
-                codec = MediaCodec.createByCodecName( getEncoderNamesForType( this.mimeType ).get(0) ); //"OMX.google.aac.encoder");
-                codec.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
-                codec.start();
-            }catch (Exception e){
-                e.printStackTrace();
+            if( instance.packetizeAudio ) {
+                try {
+                    audioFormat = new MediaFormat();
+                    audioFormat.setString(MediaFormat.KEY_MIME, this.mimeType);
+                    audioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE,
+                            MediaCodecInfo.CodecProfileLevel.AACObjectLC);
+                    audioFormat.setInteger(MediaFormat.KEY_SAMPLE_RATE, this.sampleRateInHz);
+                    audioFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT,
+                            channelConfig == AudioFormat.CHANNEL_IN_MONO ? 1 : 2);
+                    int bitRate = 64 * 1024; //64000;
+                    audioFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
+                    //audioFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, sampleRate); //bufferSize
+                    codec = MediaCodec.createByCodecName(getEncoderNamesForType(this.mimeType).get(0)); //"OMX.google.aac.encoder");
+                    codec.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+                    codec.start();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -293,47 +281,27 @@ public class AudioController extends Thread{
          */
         public synchronized void recordAndSend() {
             if( flagRecord ) {
-                sizeInBytes =  recorder.read(buffer, 0, bufferElements2Rec); //bufferSize);
-                if( !firstTime ) {
-                    byte[] bData = AudioController.instance.short2byte(buffer); //Arrays.copyOf( buffer, buffer.length );
-                    if( subscriber instanceof String && ((String) subscriber).startsWith("http") ){
-                        try {
-
-    //                            EncoderTest.dataInputAudio = bData;
-    //                            EncoderTest test = new EncoderTest();
-    //                            test.testAACEncoders();
-    //                            bData = EncoderTest.dataOutputAudio;
-                            bData = compressAndEncodeBytes( bData );
-                            MBRequest request = MBRequest.build(Constants.MSG_UPLOAD_TO_SERVER)
-                                    .put(Constants.HTTP_REQUEST_SERVER_URL, subscriber)
-                                    .put(Constants.HTTP_REQUEST_BODY, bData)
-                                    .put(Constants.HTTP_RESOURCE_NAME, "voice_" + System.currentTimeMillis())
-                                    .put(Constants.HTTP_MIME_TYPE, mimeType)
-                                    .put(Constants.HTTP_FILE_EXTENSION, fileExtension);
-                            FileUploader.upload(request);
-                        }catch(Exception e){
-                            e.printStackTrace();
-                        }
-                    } else {
-                        bData = compressAndEncodeBytes( bData );
-                        AudioRecordEvent event = new AudioRecordEvent();
-                        event.setBuffer(bData);
-                        event.setSizeInBytes(sizeInBytes);
-                        event.setMinBufferSize(bufferElements2Rec * bytesPerElement );
-                        event.setSampleRate(sampleRateInHz);
-                        event.setChannelConfig(channelConfig);
-                        event.setAudioEncoding(audioEncoding);
-                        if (isNewConfiguration) {
-                            isNewConfiguration = false;
-                            event.setNewConfiguration(true);
-                        }
-                        AudioController.instance.mb.send(event);
-
-                        /*** check it **/
-                        //MediaRecorder.OutputFormat.AAC_ADTS;
+                sizeInBytes =  recorder.read(buffer, 0, bufferElements2Rec);
+                byte[] bData = instance.short2byte(buffer);
+                // if you need to encode and packetize in a specific format (e.g., AAC):
+                if( instance.packetizeAudio ) {
+                    bData = compressAndEncodeBytes(bData);
+                }
+                if( !instance.firstTime ) {
+                    AudioRecordEvent event = new AudioRecordEvent();
+                    event.setBuffer(bData);
+                    event.setSizeInBytes(sizeInBytes);
+                    event.setMinBufferSize(bufferSize);
+                    event.setSampleRate(sampleRateInHz);
+                    event.setChannelConfig(channelConfig);
+                    event.setAudioEncoding(audioEncoding);
+                    if (isNewConfiguration) {
+                        isNewConfiguration = false;
+                        event.setNewConfiguration(true);
                     }
+                    mb.send(AudioController.instance, event);
                 }else{
-                    firstTime = false;
+                    instance.firstTime = false;
                 }
             }
         }
@@ -353,12 +321,6 @@ public class AudioController extends Thread{
                     index = codec.dequeueInputBuffer(timeout /* timeoutUs */);
                     if (index != MediaCodec.INFO_TRY_AGAIN_LATER) {
                         if (numBytesSubmitted >= bufferSize) {
-//                            codec.queueInputBuffer(
-//                                    index,
-//                                    0 /* offset */,
-//                                    0 /* size */,
-//                                    0 /* timeUs */,
-//                                    MediaCodec.BUFFER_FLAG_END_OF_STREAM);
                             doneSubmittingInput = true;
                         } else {
                             int size = queueInputBuffer(codec, index, bData);
@@ -382,7 +344,7 @@ public class AudioController extends Thread{
 //                Log.e(TAG, "desiredRatio = " + desiredRatio
 //                        + ", actualRatio = " + actualRatio);
             }
-            //addADTStoPacket( bytesEncoded );
+            addADTStoPacket(bytesEncoded);
             codec.flush(); // we need this to avoid INFO_TRY_AGAIN_LATER
             return getByteTobyte( bytesEncoded );
         }
@@ -390,12 +352,12 @@ public class AudioController extends Thread{
         private ArrayList<Byte> dequeueOutputBuffer(MediaCodec codec, MediaCodec.BufferInfo info) {
             int index = codec.dequeueOutputBuffer(info, timeout /* timeoutUs */); //timeout
             if (index >= 0) {
-                ByteBuffer outBuf = codec.getOutputBuffer( index );
+                ByteBuffer outBuf = Util.getOutputBuffer( codec, index );
                 byte[] data = null;
                 if( info.flags != MediaCodec.BUFFER_FLAG_CODEC_CONFIG ){
                     data = new byte[info.size];
                     outBuf.get(data);
-                    data = addADTStoPacket( data );
+//                    data = addADTStoPacket( data );
                 }
                 outBuf.clear();
                 codec.releaseOutputBuffer(index, false /* render */);
@@ -409,6 +371,61 @@ public class AudioController extends Thread{
 //                Log.e(TAG, "INFO_TRY_AGAIN_LATER");
             }
             return new ArrayList<>();
+        }
+
+        /**
+         *  Add ADTS header at the beginning of each and every AAC packet.
+         *  This is needed as MediaCodec encoder generates a packet of raw
+         *  AAC data.
+         *
+         *  Note the packetLen must count in the ADTS header itself.
+         **/
+        private void addADTStoPacket(ArrayList<Byte> packet) {
+            int profile = audioFormat.getInteger(MediaFormat.KEY_AAC_PROFILE);
+            int freqIdx = getFrequency(audioFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE));
+            int chanCfg = audioFormat.getInteger( MediaFormat.KEY_CHANNEL_COUNT );  //1 CPE
+            int packetLen = 7 + packet.size();
+
+            // fill in ADTS data
+            packet.add( 0, (byte) 0xFF );
+            packet.add( 1, (byte)0xF9 );
+            packet.add( 2, (byte)(((profile-1)<<6) + (freqIdx<<2) +(chanCfg>>2)) );
+            packet.add( 3, (byte)(((chanCfg&3)<<6) + (packetLen>>11)) );
+            packet.add( 4, (byte)((packetLen&0x7FF) >> 3) );
+            packet.add(5, (byte) (((packetLen & 7) << 5) + 0x1F));
+            packet.add(6, (byte) 0xFC);
+        }
+
+        private int getFrequency( final int sampleRate ){
+            switch ( sampleRate ){
+                case 96000:
+                    return 0;
+                case 88200:
+                    return 1;
+                case 64000:
+                    return 2;
+                case 48000:
+                    return 3;
+                case 44100:
+                    return 4;
+                case 32000:
+                    return 5;
+                case 24000:
+                    return 6;
+                case 22050:
+                    return 7;
+                case 16000:
+                    return 8;
+                case 12000:
+                    return 9;
+                case 11025:
+                    return 10;
+                case 8000:
+                    return 11;
+                case 7350:
+                    return 12;
+            }
+            return 0;
         }
 
 
@@ -435,7 +452,7 @@ public class AudioController extends Thread{
 
 
         private int queueInputBuffer(MediaCodec codec, int index, byte[] bData) {
-            ByteBuffer buffer = codec.getInputBuffer( index );
+            ByteBuffer buffer = Util.getInputBuffer( codec, index );
             buffer.clear();
             //int size = buffer.limit();
             int size = bData.length;
@@ -471,96 +488,6 @@ public class AudioController extends Thread{
             return names;
         }
 
-
-        /**
-         *  Add ADTS header at the beginning of each and every AAC packet.
-         *  This is needed as MediaCodec encoder generates a packet of raw
-         *  AAC data.
-         *
-         *  Note the packetLen must count in the ADTS header itself.
-         **/
-        private void addADTStoPacket(ArrayList<Byte> packet) {
-            int profile = audioFormat.getInteger( MediaFormat.KEY_AAC_PROFILE );
-            int freqIdx = getFrequency( audioFormat.getInteger( MediaFormat.KEY_SAMPLE_RATE ) );
-            int chanCfg = audioFormat.getInteger( MediaFormat.KEY_CHANNEL_COUNT );  //1 CPE
-            int packetLen = 7 + packet.size();
-
-            // fill in ADTS data
-            packet.add( 0, (byte) 0xFF );
-            packet.add( 1, (byte)0xF9 );
-            packet.add( 2, (byte)(((profile-1)<<6) + (freqIdx<<2) +(chanCfg>>2)) );
-            packet.add( 3, (byte)(((chanCfg&3)<<6) + (packetLen>>11)) );
-            packet.add( 4, (byte)((packetLen&0x7FF) >> 3) );
-            packet.add( 5, (byte)(((packetLen&7)<<5) + 0x1F) );
-            packet.add( 6, (byte)0xFC );
-        }
-
-        private byte[] addADTStoPacket(byte[] packet) {
-            int profile = audioFormat.getInteger( MediaFormat.KEY_AAC_PROFILE );
-            int freqIdx = getFrequency( audioFormat.getInteger( MediaFormat.KEY_SAMPLE_RATE ) );
-            int chanCfg = audioFormat.getInteger( MediaFormat.KEY_CHANNEL_COUNT );  //1 CPE
-            int packetLen = 7 + packet.length;
-            byte[] data = new byte[packetLen];
-
-            // fill in ADTS data
-            data[0] = (byte) 0xFF ;
-            data[1] = (byte)0xF9 ;
-            data[2] = (byte)(((profile-1)<<6) + (freqIdx<<2) +(chanCfg>>2)) ;
-            data[3] = (byte)(((chanCfg&3)<<6) + (packetLen>>11)) ;
-            data[4] = (byte)((packetLen&0x7FF) >> 3) ;
-            data[5] = (byte)(((packetLen&7)<<5) + 0x1F) ;
-            data[6] = (byte)0xFC ;
-            return data;
-        }
-
-
-        private int getFrequency( final int sampleRate ){
-            switch ( sampleRate ){
-                case 96000:
-                    return 0;
-                case 88200:
-                    return 1;
-                case 64000:
-                    return 2;
-                case 48000:
-                    return 3;
-                case 44100:
-                    return 4;
-                case 32000:
-                    return 5;
-                case 24000:
-                    return 6;
-                case 22050:
-                    return 7;
-                case 16000:
-                    return 8;
-                case 12000:
-                    return 9;
-                case 11025:
-                    return 10;
-                case 8000:
-                    return 11;
-                case 7350:
-                    return 12;
-            }
-            return 0;
-        }
-
-        private void addADTStoPacket(byte[] packet, int packetLen) {
-            int profile = audioFormat.getInteger( MediaFormat.KEY_AAC_PROFILE );
-            int freqIdx = audioFormat.getInteger( MediaFormat.KEY_SAMPLE_RATE );  //44.1KHz
-            int chanCfg = audioFormat.getInteger( MediaFormat.KEY_CHANNEL_COUNT );  //1 CPE
-
-            // fill in ADTS data
-            packet[0] = (byte)0xFF;
-            packet[1] = (byte)0xF9;
-            packet[2] = (byte)(((profile-1)<<6) + (freqIdx<<2) +(chanCfg>>2));
-            packet[3] = (byte)(((chanCfg&3)<<6) + (packetLen>>11));
-            packet[4] = (byte)((packetLen&0x7FF) >> 3);
-            packet[5] = (byte)(((packetLen&7)<<5) + 0x1F);
-            packet[6] = (byte)0xFC;
-        }
-
         public Object getSubscriber() {
             return subscriber;
         }
@@ -573,7 +500,7 @@ public class AudioController extends Thread{
                                     " Encoding: " + audioEncoding +
                                     " Buffer Elements: " + bufferElements2Rec +
                                     " Bytes per element: " + bytesPerElement);
-            AudioController.instance.mb.send(event);
+            AudioController.instance.mb.send(AudioController.instance, event);
         }
     }
 }

@@ -18,22 +18,23 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.common.util.concurrent.SettableFuture;
+import com.yahoo.inmind.comm.news.model.NewsResponseEvent;
 import com.yahoo.inmind.commons.control.Constants;
 import com.yahoo.inmind.commons.control.HttpController;
 import com.yahoo.inmind.commons.control.Util;
 import com.yahoo.inmind.middleware.R;
 import com.yahoo.inmind.services.news.control.cache.ImgLruCacher;
-import com.yahoo.inmind.services.news.model.events.RefreshNewsListEvent;
 import com.yahoo.inmind.services.news.control.i13n.I13N;
-import com.yahoo.inmind.services.news.model.vo.NewsArticleVector;
 import com.yahoo.inmind.services.news.control.share.ShareHelper;
 import com.yahoo.inmind.services.news.control.util.CookieStore;
 import com.yahoo.inmind.services.news.control.util.NetworkUtil;
+import com.yahoo.inmind.services.news.model.events.RefreshNewsListEvent;
 import com.yahoo.inmind.services.news.model.slingstone.ModelDistribution;
 import com.yahoo.inmind.services.news.model.slingstone.SlingstoneSrc;
 import com.yahoo.inmind.services.news.model.slingstone.UserProfile;
 import com.yahoo.inmind.services.news.model.vo.FilterVO;
 import com.yahoo.inmind.services.news.model.vo.NewsArticle;
+import com.yahoo.inmind.services.news.model.vo.NewsArticleVector;
 import com.yahoo.inmind.services.news.view.handler.DataHandler;
 import com.yahoo.inmind.services.news.view.handler.NewsHandler;
 import com.yahoo.inmind.services.news.view.handler.QueryNewsHandler;
@@ -56,7 +57,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-import de.greenrobot.event.EventBus;
+import com.yahoo.inmind.comm.generic.control.eventbus.EventBus;
 
 /**
  * Created by oscarr on 12/3/14.
@@ -656,27 +657,28 @@ public class ReaderController {
     }
 
     public ArrayList applyANDFilters(ArrayList list){//, boolean clone
-        synchronized ( list ) {
-            if (list == null) {
-                return list;
-            }
+        if (list == null) {
+            return list;
+        }
 //            if (clone) {
 //                list = Util.cloneList(list);
 //            }
-            if (filters != null && !filters.isEmpty() && !list.isEmpty()) {
-                Iterator<NewsArticle> it = list.iterator();
-                while (it.hasNext()) {
-                    NewsArticle item = it.next();
-                    for (FilterVO filter : filters) {
-                        if ( (Boolean) filter.validate( item ) ) {
-                            //item.setVisible(false);
-                            it.remove();
-                        }
+        if (filters != null && !filters.isEmpty() && !list.isEmpty()) {
+            Iterator<NewsArticle> it = list.iterator();
+            ArrayList<NewsArticle> removeThis = new ArrayList();
+            while (it.hasNext()) {
+                NewsArticle item = it.next();
+                for (FilterVO filter : filters) {
+                    if ( (Boolean) filter.validate( item ) ) {
+                        removeThis.add( item );
                     }
                 }
             }
-            return list;
+            for( NewsArticle article : removeThis ){
+                list.remove( article );
+            }
         }
+        return list;
     }
 
 
@@ -924,8 +926,13 @@ public class ReaderController {
     public static void sendRefreshNewsEvent() {
         RefreshNewsListEvent event = new RefreshNewsListEvent();
         NewsArticleVector vector  = NewsArticleVector.getArticlesPerView();
-        event.setArticleList( vector );
+        event.setArticleList(vector);
+        NewsResponseEvent event1 = new NewsResponseEvent();
+        event1.setNews( vector );
+
         EventBus.getDefault().post(event);
-        loadImages();
+        if( activity != null ) {
+            loadImages();
+        }
     }
 }

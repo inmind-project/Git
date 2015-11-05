@@ -20,15 +20,15 @@
 
 package com.yahoo.inmind.services.streaming.control.audio;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
-
-import com.yahoo.inmind.services.streaming.control.SessionBuilder;
-import com.yahoo.inmind.services.streaming.control.rtp.AMRNBPacketizer;
 import android.media.MediaRecorder;
 import android.service.textservice.SpellCheckerService.Session;
 
 import com.yahoo.inmind.services.streaming.control.MediaStream;
+import com.yahoo.inmind.services.streaming.control.SessionBuilder;
+import com.yahoo.inmind.services.streaming.control.rtp.AMRNBPacketizer;
+
+import java.io.IOException;
+import java.lang.reflect.Field;
 
 /**
  * A class for streaming AAC from the camera of an android device using RTP.

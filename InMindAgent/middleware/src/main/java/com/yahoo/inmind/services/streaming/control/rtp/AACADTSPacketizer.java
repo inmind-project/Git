@@ -20,11 +20,12 @@
 
 package com.yahoo.inmind.services.streaming.control.rtp;
 
-import java.io.IOException;
-
-import com.yahoo.inmind.services.streaming.control.audio.AACStream;
 import android.os.SystemClock;
 import android.util.Log;
+
+import com.yahoo.inmind.services.streaming.control.audio.AACStream;
+
+import java.io.IOException;
 
 /**
  *   

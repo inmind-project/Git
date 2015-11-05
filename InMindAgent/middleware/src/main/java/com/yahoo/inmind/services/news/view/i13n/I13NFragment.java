@@ -3,9 +3,9 @@ package com.yahoo.inmind.services.news.view.i13n;
 import android.app.Fragment;
 import android.view.View;
 
-import com.yahoo.inmind.services.news.model.i13n.Event;
 import com.yahoo.inmind.services.news.control.i13n.I13N;
 import com.yahoo.inmind.services.news.control.reader.ReaderController;
+import com.yahoo.inmind.services.news.model.i13n.Event;
 
 public class I13NFragment extends Fragment{
 	

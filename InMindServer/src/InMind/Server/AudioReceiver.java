@@ -1,6 +1,5 @@
 package InMind.Server;
 
-import javax.sound.sampled.SourceDataLine;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketTimeoutException;
@@ -14,7 +13,7 @@ class AudioReceiver
     static public final int udpBufferSize = 4096;
 
 
-    static SourceDataLine sourceDataLine;
+    //static SourceDataLine sourceDataLine;
 
     StreamingAlerts streamingAlerts = null;
     boolean receivedAudioAlready = false;

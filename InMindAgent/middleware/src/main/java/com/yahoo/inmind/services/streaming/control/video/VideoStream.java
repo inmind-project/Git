@@ -20,21 +20,6 @@
 
 package com.yahoo.inmind.services.streaming.control.video;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-
-import com.yahoo.inmind.services.streaming.control.MediaStream;
-import com.yahoo.inmind.services.streaming.control.Stream;
-import com.yahoo.inmind.services.streaming.control.exceptions.CameraInUseException;
-import com.yahoo.inmind.services.streaming.control.exceptions.ConfNotSupportedException;
-import com.yahoo.inmind.services.streaming.control.exceptions.InvalidSurfaceException;
-import com.yahoo.inmind.services.streaming.view.StreamingSurfaceView;
-import com.yahoo.inmind.services.streaming.control.hw.EncoderDebugger;
-import com.yahoo.inmind.services.streaming.control.hw.NV21Convertor;
-import com.yahoo.inmind.services.streaming.control.rtp.MediaCodecInputStream;
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -52,6 +37,22 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
+
+import com.yahoo.inmind.services.streaming.control.MediaStream;
+import com.yahoo.inmind.services.streaming.control.Stream;
+import com.yahoo.inmind.services.streaming.control.exceptions.CameraInUseException;
+import com.yahoo.inmind.services.streaming.control.exceptions.ConfNotSupportedException;
+import com.yahoo.inmind.services.streaming.control.exceptions.InvalidSurfaceException;
+import com.yahoo.inmind.services.streaming.control.hw.EncoderDebugger;
+import com.yahoo.inmind.services.streaming.control.hw.NV21Convertor;
+import com.yahoo.inmind.services.streaming.control.rtp.MediaCodecInputStream;
+import com.yahoo.inmind.services.streaming.view.StreamingSurfaceView;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 /** 
  * Don't use this class directly.
@@ -590,7 +591,6 @@ public abstract class VideoStream extends MediaStream {
 			});
 
 			try {
-
 				// If the phone has a flash, we turn it on/off according to mFlashEnabled
 				// setRecordingHint(true) is a very nice optimisation if you plane to only use the Camera for recording
 				Parameters parameters = mCamera.getParameters();
@@ -598,6 +598,7 @@ public abstract class VideoStream extends MediaStream {
 					parameters.setFlashMode(mFlashEnabled?Parameters.FLASH_MODE_TORCH:Parameters.FLASH_MODE_OFF);
 				}
 				parameters.setRecordingHint(true);
+				parameters.set("cam_mode", 1); //http://stackoverflow.com/questions/26990816/mediarecorder-issue-on-android-lollipop
 				mCamera.setParameters(parameters);
 				mCamera.setDisplayOrientation(mOrientation);
 

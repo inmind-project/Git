@@ -1,9 +1,5 @@
 package com.yahoo.inmind.services.news.model.source;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.concurrent.RejectedExecutionException;
-
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -12,6 +8,10 @@ import android.util.Log;
 
 import com.yahoo.inmind.services.news.control.reader.ReaderController;
 import com.yahoo.inmind.services.news.view.handler.NewsHandler;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.concurrent.RejectedExecutionException;
 
 public class AsyncSource<T> extends ProfiledSource {
     private ArrayList<BackgroundLoadTask> tasks;

@@ -3,10 +3,10 @@ package com.yahoo.inmind.services.news.view.handler;
 import android.os.Bundle;
 import android.os.Message;
 
+import com.yahoo.inmind.services.news.control.reader.ReaderController;
 import com.yahoo.inmind.services.news.model.source.ProfiledSource;
 import com.yahoo.inmind.services.news.view.pluggableview.PluggableAdapterView;
 import com.yahoo.inmind.services.news.view.reader.DrawerItem;
-import com.yahoo.inmind.services.news.control.reader.ReaderController;
 
 /**
  * Created by oscarr on 12/10/14.

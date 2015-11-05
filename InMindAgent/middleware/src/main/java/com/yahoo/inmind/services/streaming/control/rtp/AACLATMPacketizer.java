@@ -20,11 +20,11 @@
 
 package com.yahoo.inmind.services.streaming.control.rtp;
 
-import java.io.IOException;
-
 import android.annotation.SuppressLint;
 import android.media.MediaCodec.BufferInfo;
 import android.util.Log;
+
+import java.io.IOException;
 
 /**
  * RFC 3640.  

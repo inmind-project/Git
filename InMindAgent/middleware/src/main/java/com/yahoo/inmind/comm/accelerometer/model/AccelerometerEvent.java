@@ -19,58 +19,58 @@ public class AccelerometerEvent extends BaseEvent {
      * "sensor_vendor"
      * "sensor_version"
      */
-    private float accelerationX;
-    private float accelerationY;
-    private float accelerationZ;
-    private int accuracy;
-    private long timestamp;
+    private Float accelerationX;
+    private Float accelerationY;
+    private Float accelerationZ;
+    private Integer accuracy;
+    private Long timestamp;
 
     private AccelerometerEvent(){ super(); }
     public static AccelerometerEvent build(){
         return new AccelerometerEvent();
     }
 
-    public float getAccelerationX() {
+    public Float getAccelerationX() {
         return accelerationX;
     }
 
-    public AccelerometerEvent setAccelerationX(float accelerationX) {
+    public AccelerometerEvent setAccelerationX(Float accelerationX) {
         this.accelerationX = accelerationX;
         return this;
     }
 
-    public float getAccelerationY() {
+    public Float getAccelerationY() {
         return accelerationY;
     }
 
-    public AccelerometerEvent setAccelerationY(float accelerationY) {
+    public AccelerometerEvent setAccelerationY(Float accelerationY) {
         this.accelerationY = accelerationY;
         return this;
     }
 
-    public float getAccelerationZ() {
+    public Float getAccelerationZ() {
         return accelerationZ;
     }
 
-    public AccelerometerEvent setAccelerationZ(float accelerationZ) {
+    public AccelerometerEvent setAccelerationZ(Float accelerationZ) {
         this.accelerationZ = accelerationZ;
         return this;
     }
 
-    public int getAccuracy() {
+    public Integer getAccuracy() {
         return accuracy;
     }
 
-    public AccelerometerEvent setAccuracy(int accuracy) {
+    public AccelerometerEvent setAccuracy(Integer accuracy) {
         this.accuracy = accuracy;
         return this;
     }
 
-    public long getTimestamp() {
+    public Long getTimestamp() {
         return timestamp;
     }
 
-    public AccelerometerEvent setTimestamp(long timestamp) {
+    public AccelerometerEvent setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
         return this;
     }

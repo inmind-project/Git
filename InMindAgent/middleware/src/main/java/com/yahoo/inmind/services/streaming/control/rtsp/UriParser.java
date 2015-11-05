@@ -20,12 +20,7 @@
 
 package com.yahoo.inmind.services.streaming.control.rtsp;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.URI;
-import java.net.UnknownHostException;
-import java.util.Iterator;
-import java.util.List;
+import android.hardware.Camera.CameraInfo;
 
 import com.yahoo.inmind.services.streaming.control.MediaStream;
 import com.yahoo.inmind.services.streaming.control.Session;
@@ -36,7 +31,12 @@ import com.yahoo.inmind.services.streaming.control.video.VideoQuality;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtilsHC4;
 
-import android.hardware.Camera.CameraInfo;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.URI;
+import java.net.UnknownHostException;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class parses URIs received by the RTSP server and configures a Session accordingly.

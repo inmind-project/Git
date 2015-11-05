@@ -39,7 +39,7 @@ public class NewsResponseEvent extends BaseEvent {
     }
 
     public NewsArticleVector getNews() {
-        if( getNews() == null || getNews().isEmpty() ){
+        if( news == null || news.isEmpty() ){
             String json = getJsonRepresentation();
             if( json != null ) {
                 // convert json string to object representation

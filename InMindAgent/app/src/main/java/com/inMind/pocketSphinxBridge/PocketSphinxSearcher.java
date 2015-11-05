@@ -4,10 +4,11 @@ import static edu.cmu.pocketsphinx.SpeechRecognizerSetup.defaultSetup;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
+
 import edu.cmu.pocketsphinx.Assets;
 import edu.cmu.pocketsphinx.Hypothesis;
 import edu.cmu.pocketsphinx.RecognitionListener;
@@ -39,7 +40,9 @@ public class PocketSphinxSearcher {
 	        String text = hypothesis.getHypstr();
 	        if (text.equals(keyPhrase) && sphinxRes!= null)
 	        {
-	        	recognizer.stop();
+	        	recognizer.stop(); //must stop and start to restart. otherwise will keep getting text.equals(keyPhrase)
+                recognizer.startListening(KWS_SEARCH);
+                Log.d("Sphinx", "keyword detected.");
 	            sphinxRes.keyDetected();
 	        }
 		}
@@ -68,13 +71,17 @@ public class PocketSphinxSearcher {
     //private static final String KEYPHRASE = "in mind agent";//"isteveni";
 
     private SpeechRecognizer recognizer;
-    private HashMap<String, Integer> captions;
+    //private HashMap<String, Integer> captions;
     SphinxRes sphinxRes;
     String keyPhrase;
     Context context;
 
-    public PocketSphinxSearcher(Context contextvar, String keyPhrase, SphinxRes sphinxRes) {
+    final Object initializedLock = new Object();
+    boolean wasInitialized = false;
+    boolean startedInitializing = false;
 
+    public PocketSphinxSearcher(Context contextvar, String keyPhrase, SphinxRes sphinxRes)
+    {
     	this.sphinxRes = sphinxRes;
     	this.keyPhrase = keyPhrase;
     	this.context = contextvar;
@@ -82,34 +89,67 @@ public class PocketSphinxSearcher {
     
     public void startListeningForKeyword()
     {
-        // Recognizer initialization is a time-consuming and it involves IO,
-        // so we execute it in async task
+        if (wasInitialized)
+        {
+            recognizer.startListening(KWS_SEARCH);
+        }
+        else
+        {
+            initializeAndListen();
+        }
+    }
 
-        new AsyncTask<Void, Void, Exception>() {
-            @Override
-            protected Exception doInBackground(Void... params) {
-                try {
-                    Assets assets = new Assets(context);
-                    File assetDir = assets.syncAssets();
-                    setupRecognizer(assetDir);
-                } catch (IOException e) {
-                    return e;
-                }
-                return null;
-            }
+    public void initializeAndListen()
+    {
+        if (!wasInitialized && !startedInitializing)
+        {
+            synchronized (initializedLock)
+            {
+                if (!startedInitializing)
+                {
+                    startedInitializing = true;
+                    // Recognizer initialization is a time-consuming and it involves IO,
+                    // so we execute it in async task
 
-            @Override
-            protected void onPostExecute(Exception result) {
-                if (result != null) {
-                } else {
-                	recognizer.startListening(KWS_SEARCH);
+                    new AsyncTask<Void, Void, Exception>()
+                    {
+                        @Override
+                        protected Exception doInBackground(Void... params)
+                        {
+                            try
+                            {
+                                Assets assets = new Assets(context);
+                                File assetDir = assets.syncAssets();
+                                setupRecognizer(assetDir);
+                            }
+                            catch (IOException e)
+                            {
+                                return e;
+                            }
+                            return null;
+                        }
+
+                        @Override
+                        protected void onPostExecute(Exception result)
+                        {
+                            if (result != null)
+                            {
+                            }
+                            else
+                            {
+                                recognizer.startListening(KWS_SEARCH);
+                                wasInitialized = true;
+                            }
+                        }
+                    }.execute();
                 }
             }
-        }.execute();    	
+        }
     }
 
 
-    private void setupRecognizer(File assetsDir) {
+    private void setupRecognizer(File assetsDir)
+    {
         File modelsDir = new File(assetsDir, "models");
         recognizer = defaultSetup()
                 .setAcousticModel(new File(modelsDir, "hmm/en-us-semi"))
@@ -120,7 +160,6 @@ public class PocketSphinxSearcher {
 
         // Create keyword-activation search.
         recognizer.addKeyphraseSearch(KWS_SEARCH, keyPhrase);
-
     }
 
     public void stopListening()

@@ -2,10 +2,11 @@ package com.yahoo.inmind.services.news.control.yi13n;
 /**
  * Borrowed from YI13N
  * */
+
 import android.location.Location;
 
-import org.json.JSONObject;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 public class LocationContext {
 	// Keys used for storage as well as sending to YQL in the _loc object for the event

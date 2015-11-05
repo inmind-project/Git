@@ -20,14 +20,15 @@
 
 package com.yahoo.inmind.services.streaming.control.audio;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import com.yahoo.inmind.services.streaming.control.MediaStream;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
+
+import com.yahoo.inmind.services.streaming.control.MediaStream;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /** 
  * Don't use this class directly.

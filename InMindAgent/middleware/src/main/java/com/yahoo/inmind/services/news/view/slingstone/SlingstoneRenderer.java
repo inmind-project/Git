@@ -18,17 +18,17 @@ import android.widget.TextView;
 import com.yahoo.inmind.commons.control.Util;
 import com.yahoo.inmind.middleware.R;
 import com.yahoo.inmind.services.news.control.cache.ImgLruCacher;
-import com.yahoo.inmind.services.news.model.events.NewsUIRenderEvent;
 import com.yahoo.inmind.services.news.control.reader.ReaderController;
 import com.yahoo.inmind.services.news.control.share.ShareHelper;
 import com.yahoo.inmind.services.news.control.util.WebImgUtil;
+import com.yahoo.inmind.services.news.model.events.NewsUIRenderEvent;
 import com.yahoo.inmind.services.news.model.vo.JsonItem;
 import com.yahoo.inmind.services.news.model.vo.NewsArticle;
 import com.yahoo.inmind.services.news.view.browser.BaseBrowser;
 
 import java.lang.ref.WeakReference;
 
-import de.greenrobot.event.EventBus;
+import com.yahoo.inmind.comm.generic.control.eventbus.EventBus;
 
 public class SlingstoneRenderer extends Renderer {
     private WebImgUtil mImgUtil;

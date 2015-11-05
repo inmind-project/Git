@@ -7,7 +7,6 @@ import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.os.AsyncTask;
 
-
 import com.yahoo.inmind.comm.generic.model.MBRequest;
 
 import java.io.ByteArrayOutputStream;

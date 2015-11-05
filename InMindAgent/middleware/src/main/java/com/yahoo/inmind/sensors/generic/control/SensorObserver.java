@@ -7,7 +7,6 @@ import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Handler;
 
-import com.aware.Aware_Preferences;
 import com.yahoo.inmind.comm.generic.control.MessageBroker;
 import com.yahoo.inmind.services.generic.control.AwareServiceWrapper;
 

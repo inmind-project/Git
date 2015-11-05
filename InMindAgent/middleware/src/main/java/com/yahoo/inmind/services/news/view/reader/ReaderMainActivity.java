@@ -1,8 +1,5 @@
 package com.yahoo.inmind.services.news.view.reader;
 
-import java.util.LinkedList;
-import java.util.Queue;
-
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -17,11 +14,14 @@ import android.widget.Toast;
 import com.yahoo.inmind.commons.control.Constants;
 import com.yahoo.inmind.middleware.R;
 import com.yahoo.inmind.services.news.control.reader.ReaderController;
+import com.yahoo.inmind.services.news.control.util.MemUtil;
+import com.yahoo.inmind.services.news.model.vo.NewsArticleVector;
 import com.yahoo.inmind.services.news.view.browser.LoginBrowser;
 import com.yahoo.inmind.services.news.view.handler.NewsHandler;
 import com.yahoo.inmind.services.news.view.i13n.I13NActivity;
-import com.yahoo.inmind.services.news.model.vo.NewsArticleVector;
-import com.yahoo.inmind.services.news.control.util.MemUtil;
+
+import java.util.LinkedList;
+import java.util.Queue;
 
 
 public class ReaderMainActivity extends I13NActivity{

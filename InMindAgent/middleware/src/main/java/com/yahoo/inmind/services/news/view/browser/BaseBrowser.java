@@ -1,7 +1,5 @@
 package com.yahoo.inmind.services.news.view.browser;
 
-import java.lang.reflect.Field;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,19 +10,21 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
+import com.yahoo.inmind.services.news.control.i13n.I13N;
 import com.yahoo.inmind.services.news.control.reader.ReaderController;
 import com.yahoo.inmind.services.news.model.i13n.Event;
-import com.yahoo.inmind.services.news.control.i13n.I13N;
 import com.yahoo.inmind.services.news.view.reader.BackableActivity;
+
+import java.lang.reflect.Field;
 
 
 public class BaseBrowser extends BackableActivity {
 	WebView mWv;
-	String cookieStr;
 	private WebViewClient mWebviewClient;
 	private WebChromeClient mWebChromeClient;
 	public static final String LAUCH_BROWSER_URL = "url";
 	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

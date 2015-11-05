@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Build;
 import android.os.Bundle;
+
 import de.greenrobot.event.EventBus;
 
 public class ErrorDialogFragments {

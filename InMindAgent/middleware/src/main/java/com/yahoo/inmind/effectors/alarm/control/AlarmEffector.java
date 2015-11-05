@@ -13,11 +13,11 @@ import android.provider.AlarmClock;
 import com.yahoo.inmind.commons.control.Constants;
 import com.yahoo.inmind.commons.control.Util;
 import com.yahoo.inmind.commons.rules.model.DecisionRule;
+import com.yahoo.inmind.effectors.alarm.model.AlarmVO;
 import com.yahoo.inmind.effectors.generic.control.EffectorDataReceiver;
 import com.yahoo.inmind.effectors.generic.control.EffectorObserver;
-import com.yahoo.inmind.effectors.alarm.model.AlarmVO;
-import com.yahoo.inmind.services.generic.control.ServiceLocator;
 import com.yahoo.inmind.services.calendar.model.CalendarEventVO;
+import com.yahoo.inmind.services.generic.control.ResourceLocator;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -52,8 +52,8 @@ public class AlarmEffector extends EffectorObserver {
     }
 
     public void setAlarm( Intent intent ){
-        DecisionRule decisionRule = ServiceLocator.getInstance(context).getDecisionRule(intent.
-                getIntExtra(Constants.DECISION_RULE_ELEMENT, 0));
+        DecisionRule decisionRule = ResourceLocator.getInstance(context).getDecisionRule(intent.
+                getStringExtra(Constants.DECISION_RULE_ID));
         Intent i = new Intent( AlarmClock.ACTION_SET_ALARM );
 //        i.putExtra(AlarmClock.EXTRA_HOUR, 9);
 //        i.putExtra(AlarmClock.EXTRA_MINUTES, 37);

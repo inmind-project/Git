@@ -3,10 +3,10 @@ package com.yahoo.inmind.services.news.view.reader;
 import android.content.Intent;
 
 import com.yahoo.inmind.services.news.model.source.AsyncSource;
-import com.yahoo.inmind.services.news.model.vo.JsonItem;
 import com.yahoo.inmind.services.news.model.source.Source;
-import com.yahoo.inmind.services.news.view.slingstone.Renderer;
+import com.yahoo.inmind.services.news.model.vo.JsonItem;
 import com.yahoo.inmind.services.news.view.handler.NewsHandler;
+import com.yahoo.inmind.services.news.view.slingstone.Renderer;
 
 import java.util.ArrayList;
 

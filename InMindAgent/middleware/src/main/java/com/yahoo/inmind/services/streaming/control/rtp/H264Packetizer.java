@@ -20,10 +20,10 @@
 
 package com.yahoo.inmind.services.streaming.control.rtp;
 
-import java.io.IOException;
-
 import android.annotation.SuppressLint;
 import android.util.Log;
+
+import java.io.IOException;
 
 /**
  * 

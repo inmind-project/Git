@@ -10,6 +10,10 @@ import java.util.ArrayList;
  */
 public class FilterVO extends PropositionalStatement {
 
+    public FilterVO(){
+        componentName = Constants.NEWS;
+    }
+
     public FilterVO(String attribute, String operator, String value) {
         super(attribute, operator, value);
         componentName = Constants.NEWS;
@@ -51,6 +55,11 @@ public class FilterVO extends PropositionalStatement {
             return !validateStrings( (String) convertAttribute(this.attribute, article) );
         }
         return false;
+    }
+
+    @Override
+    public ArrayList validate() {
+        return getList( null );
     }
 
     public Object convertAttribute( String attribute, NewsArticle item ){

@@ -4,11 +4,6 @@
 
 package com.yahoo.inmind.services.activity.control;
 
-import java.util.HashMap;
-
-import com.aware.*;
-import com.aware.utils.DatabaseHelper;
-
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -21,6 +16,11 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.BaseColumns;
 import android.util.Log;
+
+import com.aware.Aware;
+import com.aware.utils.DatabaseHelper;
+
+import java.util.HashMap;
 
 /**
  * Google's Activity Recognition Context Provider. Stored in SDcard in

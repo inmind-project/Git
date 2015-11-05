@@ -1,17 +1,17 @@
 package com.yahoo.inmind.services.news.model.source;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import org.json.simple.JSONObject;
-
 import android.os.Handler;
 import android.os.Message;
 
 import com.yahoo.inmind.services.news.model.slingstone.UserProfile;
 import com.yahoo.inmind.services.news.model.vo.JsonItem;
+
+import org.json.simple.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public abstract class ProfiledSource extends Source{	
 	protected UserProfile mProfile;

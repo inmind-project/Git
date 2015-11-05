@@ -20,12 +20,12 @@
 
 package com.yahoo.inmind.services.streaming.control.rtcp;
 
+import android.os.SystemClock;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-
-import android.os.SystemClock;
 
 /**
  * Implementation of Sender Report RTCP packets.

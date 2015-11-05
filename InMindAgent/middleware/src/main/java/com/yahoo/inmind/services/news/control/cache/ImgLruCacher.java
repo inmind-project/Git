@@ -1,13 +1,13 @@
 package com.yahoo.inmind.services.news.control.cache;
 
-import java.io.File;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;
 
 import com.yahoo.inmind.services.news.control.util.WebImgUtil;
+
+import java.io.File;
 
 public class ImgLruCacher {
 	private static final int CACHE_SIZE = 8*1024*1024;

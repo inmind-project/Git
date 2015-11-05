@@ -20,8 +20,6 @@
 
 package com.yahoo.inmind.services.streaming.view;
 
-import java.util.concurrent.Semaphore;
-
 import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.graphics.SurfaceTexture.OnFrameAvailableListener;
@@ -29,6 +27,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
+
+import java.util.concurrent.Semaphore;
 
 public class StreamingSurfaceView extends android.view.SurfaceView implements Runnable,
 		OnFrameAvailableListener, SurfaceHolder.Callback {

@@ -20,11 +20,9 @@
 
 package com.yahoo.inmind.services.streaming.control;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.concurrent.CountDownLatch;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 
 import com.yahoo.inmind.commons.control.Util;
 import com.yahoo.inmind.services.streaming.control.audio.AudioQuality;
@@ -33,13 +31,16 @@ import com.yahoo.inmind.services.streaming.control.exceptions.CameraInUseExcepti
 import com.yahoo.inmind.services.streaming.control.exceptions.ConfNotSupportedException;
 import com.yahoo.inmind.services.streaming.control.exceptions.InvalidSurfaceException;
 import com.yahoo.inmind.services.streaming.control.exceptions.StorageUnavailableException;
-import com.yahoo.inmind.services.streaming.view.StreamingSurfaceView;
 import com.yahoo.inmind.services.streaming.control.rtsp.RtspClient;
 import com.yahoo.inmind.services.streaming.control.video.VideoQuality;
 import com.yahoo.inmind.services.streaming.control.video.VideoStream;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
+import com.yahoo.inmind.services.streaming.view.StreamingSurfaceView;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * You should instantiate this class with the {@link SessionBuilder}.<br />

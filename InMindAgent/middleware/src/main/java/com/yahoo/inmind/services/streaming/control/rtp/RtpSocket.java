@@ -20,16 +20,18 @@
 
 package com.yahoo.inmind.services.streaming.control.rtp;
 
+import android.os.SystemClock;
+import android.util.Log;
+
+import com.yahoo.inmind.commons.control.Util;
+import com.yahoo.inmind.services.streaming.control.rtcp.SenderReport;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-
-import com.yahoo.inmind.services.streaming.control.rtcp.SenderReport;
-import android.os.SystemClock;
-import android.util.Log;
 
 /**
  * A basic implementation of an RTP socket.
@@ -247,7 +249,7 @@ public class RtpSocket implements Runnable {
 		Statistics stats = new Statistics(50,3000);
 		try {
 			// Caches mCacheSize milliseconds of the stream in the FIFO.
-			Thread.sleep(mCacheSize);
+			Util.sleep(mCacheSize);
 			long delta = 0;
 			while (mBufferCommitted.tryAcquire(4,TimeUnit.SECONDS)) {
 				if (mOldTimestamp != 0) {
@@ -258,7 +260,7 @@ public class RtpSocket implements Runnable {
 						long d = stats.average()/1000000;
 						//Log.d(TAG,"delay: "+d+" d: "+(mTimestamps[mBufferOut]-mOldTimestamp)/1000000);
 						// We ensure that packets are sent at a constant and suitable rate no matter how the RtpSocket is used.
-						if (mCacheSize>0) Thread.sleep(d);
+						if (mCacheSize>0) Util.sleep(d);
 					} else if ((mTimestamps[mBufferOut]-mOldTimestamp)<0) {
 						Log.e(TAG, "TS: "+mTimestamps[mBufferOut]+" OLD: "+mOldTimestamp);
 					}

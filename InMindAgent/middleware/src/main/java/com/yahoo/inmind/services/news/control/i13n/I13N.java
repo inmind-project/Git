@@ -10,7 +10,7 @@ import android.os.Message;
 import android.util.Base64;
 import android.util.Log;
 
-
+import com.yahoo.inmind.commons.control.Util;
 import com.yahoo.inmind.services.news.control.reader.ReaderController;
 import com.yahoo.inmind.services.news.control.util.Crypto;
 import com.yahoo.inmind.services.news.control.util.DevUtil;
@@ -292,11 +292,7 @@ public class I13N {
 					//Wait for all messages to be pushed
 					for (int i = 0 ; i < BatchIDManager.list.size() ; i++){
 						while (logHandler.hasMessages(LOG_LATEST_BASE + i)){
-							try {
-								Thread.sleep(100);
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
+							Util.sleep(100);
 						}
 					}
 					logInternal(new Event("App", "PushToBackground"));

@@ -20,20 +20,21 @@
 
 package com.yahoo.inmind.services.streaming.control;
 
-import java.io.IOException;
+import android.content.Context;
+import android.hardware.Camera.CameraInfo;
+import android.preference.PreferenceManager;
 
 import com.yahoo.inmind.services.streaming.control.audio.AACStream;
 import com.yahoo.inmind.services.streaming.control.audio.AMRNBStream;
 import com.yahoo.inmind.services.streaming.control.audio.AudioQuality;
 import com.yahoo.inmind.services.streaming.control.audio.AudioStream;
-import com.yahoo.inmind.services.streaming.view.StreamingSurfaceView;
 import com.yahoo.inmind.services.streaming.control.video.H263Stream;
 import com.yahoo.inmind.services.streaming.control.video.H264Stream;
 import com.yahoo.inmind.services.streaming.control.video.VideoQuality;
 import com.yahoo.inmind.services.streaming.control.video.VideoStream;
-import android.content.Context;
-import android.hardware.Camera.CameraInfo;
-import android.preference.PreferenceManager;
+import com.yahoo.inmind.services.streaming.view.StreamingSurfaceView;
+
+import java.io.IOException;
 
 /**
  * Call {@link #getInstance()} to get access to the SessionBuilder.

@@ -1,5 +1,12 @@
 package com.yahoo.inmind.services.news.control.util;
 
+import android.content.res.AssetManager;
+import android.util.Log;
+
+import com.yahoo.inmind.services.news.control.reader.ReaderController;
+
+import org.apache.commons.codec.binary.Base64;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -23,13 +30,6 @@ import java.security.spec.X509EncodedKeySpec;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.SecretKeySpec;
-
-import org.apache.commons.codec.binary.Base64;
-
-import android.content.res.AssetManager;
-import android.util.Log;
-
-import com.yahoo.inmind.services.news.control.reader.ReaderController;
 
 
 public class Crypto {

@@ -12,9 +12,9 @@ import android.view.ViewGroup;
 import com.yahoo.inmind.services.news.control.reader.ReaderController;
 import com.yahoo.inmind.services.news.view.adapter.NewsAdapter;
 import com.yahoo.inmind.services.news.view.handler.DataHandler;
-import com.yahoo.inmind.services.news.view.pluggableview.PluggableAdapterView;
 import com.yahoo.inmind.services.news.view.handler.NewsHandler;
 import com.yahoo.inmind.services.news.view.i13n.I13NFragment;
+import com.yahoo.inmind.services.news.view.pluggableview.PluggableAdapterView;
 
 
 @SuppressLint("ValidFragment")

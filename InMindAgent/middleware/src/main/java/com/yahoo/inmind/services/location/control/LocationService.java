@@ -1,6 +1,5 @@
 package com.yahoo.inmind.services.location.control;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -10,20 +9,17 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Xml;
 
-import com.aware.Aware_Preferences;
 import com.aware.Locations;
 import com.aware.providers.Locations_Provider;
 import com.aware.providers.Locations_Provider.Locations_Data;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.reflect.TypeToken;
 import com.yahoo.inmind.comm.location.model.LocationEvent;
 import com.yahoo.inmind.commons.control.Constants;
 import com.yahoo.inmind.commons.control.Util;
 import com.yahoo.inmind.commons.control.UtilServiceAPIs;
-import com.yahoo.inmind.services.generic.control.AwareServiceWrapper;
 import com.yahoo.inmind.services.generic.control.GenericService;
 import com.yahoo.inmind.services.location.model.LocationVO;
 import com.yahoo.inmind.services.location.model.WoeidVO;
@@ -68,36 +64,34 @@ public class LocationService extends GenericService implements
 
 
     public LocationService() {
-        super("LocationService", LocationService.class.getPackage().getName() );
+        super(LocationService.class.getPackage().getName() );
         if( actions.isEmpty() ) {
             this.actions.add(Locations.ACTION_AWARE_LOCATIONS);
         }
-        Intent locationPlugin = new Intent( mContext, Plugin.class);
-        locationPlugin.putExtra("update",true);
-        mContext.startService(locationPlugin);
-        String languageToLoad = "en"; // your language
-        Locale locale = new Locale(languageToLoad);
-        Locale.setDefault( locale );
-        Configuration config = new Configuration();
-        config.locale = locale;
-        mContext.getResources().updateConfiguration(config, mContext.getResources().getDisplayMetrics());
-        geocoder = new Geocoder(mContext, Locale.getDefault());
-
-        Type type = new TypeToken<HashMap<String, LocationVO>>(){}.getType();
-        locations = Util.readObjectFromJsonFile( DIRECTORY, LOCATIONS_FILE_NAME, type );
-        if( locations == null ){
-            locations = new HashMap<>();
+        try {
+            Type type = new TypeToken<HashMap<String, LocationVO>>() {}.getType();
+            locations = Util.readObjectFromJsonFile(DIRECTORY, LOCATIONS_FILE_NAME, type);
+            if (locations == null) {
+                locations = new HashMap<>();
+            }
+            type = new TypeToken<ArrayList<LocationVO>>() {}.getType();
+            historyLocations = Util.readObjectFromJsonFile(DIRECTORY, HISTORY_LOCATIONS_FILE_NAME, type);
+            if (historyLocations == null) {
+                historyLocations = new ArrayList<>();
+            }
+            Intent locationPlugin = new Intent(mContext, Plugin.class);
+            locationPlugin.putExtra("update", true);
+            mContext.startService(locationPlugin);
+            String languageToLoad = "en"; // your language
+            Locale locale = new Locale(languageToLoad);
+            Locale.setDefault(locale);
+            Configuration config = new Configuration();
+            config.locale = locale;
+            mContext.getResources().updateConfiguration(config, mContext.getResources().getDisplayMetrics());
+            geocoder = new Geocoder(mContext, Locale.getDefault());
+        }catch(Exception e){
+            e.printStackTrace();
         }
-        type = new TypeToken<ArrayList<LocationVO>>(){}.getType();
-        historyLocations = Util.readObjectFromJsonFile( DIRECTORY, HISTORY_LOCATIONS_FILE_NAME, type );
-        if( historyLocations == null ){
-            historyLocations = new ArrayList<>();
-        }
-    }
-
-    @Override
-    public void start(){
-        super.start();
     }
 
     public LocationVO obtainCurrentLocation() {
@@ -127,7 +121,8 @@ public class LocationService extends GenericService implements
                 }
             }
             if( mCurrentLocation == null ){
-                mb.send(LocationEvent.build().setErrorMessage("Location (GPS and Networks) " +
+                mb.send(LocationService.this,
+                        LocationEvent.build().setErrorMessage("Location (GPS and Networks) " +
                         "is disabled"));
             }
         }
@@ -145,8 +140,6 @@ public class LocationService extends GenericService implements
             locations.put( locationVO.getKey() , locationVO);
         }
     }
-
-
 
 
     private void addLocationToHistory( ){
@@ -198,24 +191,24 @@ public class LocationService extends GenericService implements
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if( intent != null && intent.hasExtra(FusedLocationProviderApi.KEY_LOCATION_CHANGED) ) {
-            Location bestLocation = (Location) intent.getExtras().get(FusedLocationProviderApi
-                    .KEY_LOCATION_CHANGED);
-            if( bestLocation == null ) return;
-            ContentValues rowData = new ContentValues();
-            rowData.put(Locations_Data.TIMESTAMP, System.currentTimeMillis());
-            rowData.put(Locations_Data.DEVICE_ID, AwareServiceWrapper.getSetting(this,
-                    Aware_Preferences.DEVICE_ID));
-            rowData.put(Locations_Data.LATITUDE, bestLocation.getLatitude());
-            rowData.put(Locations_Data.LONGITUDE, bestLocation.getLongitude());
-            rowData.put(Locations_Data.BEARING, bestLocation.getBearing());
-            rowData.put(Locations_Data.SPEED, bestLocation.getSpeed());
-            rowData.put(Locations_Data.ALTITUDE, bestLocation.getAltitude());
-            rowData.put(Locations_Data.PROVIDER, bestLocation.getProvider());
-            rowData.put(Locations_Data.ACCURACY, bestLocation.getAccuracy());
-            getContentResolver().insert(Locations_Data.CONTENT_URI, rowData);
-            mb.send( fillEvent( bestLocation ) );
-        }
+//        if( intent != null && intent.hasExtra(FusedLocationProviderApi.KEY_LOCATION_CHANGED) ) {
+//            Location bestLocation = (Location) intent.getExtras().get(FusedLocationProviderApi
+//                    .KEY_LOCATION_CHANGED);
+//            if( bestLocation == null ) return;
+//            ContentValues rowData = new ContentValues();
+//            rowData.put(Locations_Data.TIMESTAMP, System.currentTimeMillis());
+//            rowData.put(Locations_Data.DEVICE_ID, AwareServiceWrapper.getSetting(this,
+//                    Aware_Preferences.DEVICE_ID));
+//            rowData.put(Locations_Data.LATITUDE, bestLocation.getLatitude());
+//            rowData.put(Locations_Data.LONGITUDE, bestLocation.getLongitude());
+//            rowData.put(Locations_Data.BEARING, bestLocation.getBearing());
+//            rowData.put(Locations_Data.SPEED, bestLocation.getSpeed());
+//            rowData.put(Locations_Data.ALTITUDE, bestLocation.getAltitude());
+//            rowData.put(Locations_Data.PROVIDER, bestLocation.getProvider());
+//            rowData.put(Locations_Data.ACCURACY, bestLocation.getAccuracy());
+//            getContentResolver().insert(Locations_Data.CONTENT_URI, rowData);
+//            mb.send( fillEvent( bestLocation ) );
+//        }
     }
 
     public LocationEvent fillEvent( Location bestLocation ) {
@@ -272,8 +265,7 @@ public class LocationService extends GenericService implements
     }
 
     public void getCurrentLocationByGoogleFused( ){
-        Location mLastLocation = LocationServices.FusedLocationApi
-                .getLastLocation(Plugin.mLocationClient);
+        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(Plugin.mLocationClient);
         if (mLastLocation != null) {
             double latitude =  mLastLocation.getLatitude();
             double longitude = mLastLocation.getLongitude();
@@ -350,7 +342,8 @@ public class LocationService extends GenericService implements
             }
         }
         if ( locationVO.getCountry() == null || locationVO.getCountry().equals("")) {
-            mb.send(LocationEvent.build().setErrorMessage("Couldn't find your location, try later"));
+            mb.send(LocationService.this,
+                    LocationEvent.build().setErrorMessage("Couldn't find your location, try later"));
         }
 
         if( isCurrentLocation ) {
@@ -485,7 +478,8 @@ public class LocationService extends GenericService implements
         // or the subarea
         if( locationVO == null || ( locationVO.getSubArea() == null && locationVO.getCity() == null
                 && locationVO.getLatitude() == null && locationVO.getLongitude() == null) ){
-            mb.send( LocationEvent.build().setErrorMessage("Place is not valid (it is null or empty)"));
+            mb.send(LocationService.this,
+                    LocationEvent.build().setErrorMessage("Place is not valid (it is null or empty)"));
             return null;
         }
         try {

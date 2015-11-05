@@ -10,9 +10,9 @@ import com.aware.Aware_Preferences;
 import com.aware.Battery;
 import com.aware.Locations;
 import com.google.android.gms.location.LocationRequest;
-import com.yahoo.inmind.commons.control.Constants;
-import com.yahoo.inmind.comm.generic.model.MBRequest;
 import com.yahoo.inmind.comm.battery.model.BatterySensorEvent;
+import com.yahoo.inmind.comm.generic.model.MBRequest;
+import com.yahoo.inmind.commons.control.Constants;
 import com.yahoo.inmind.services.activity.control.ActivityRecognitionService;
 import com.yahoo.inmind.services.location.control.LocationService;
 import com.yahoo.inmind.services.location.view.LocationSettings;
@@ -23,7 +23,7 @@ import com.yahoo.inmind.services.location.view.LocationSettings;
 public class AwareServiceWrapper extends GenericService {
 
     public AwareServiceWrapper(){
-        super("AwareServiceWrapper", null);
+        super(null);
         Intent awareIntent = new Intent(mContext, Aware.class);
         mContext.startService(awareIntent);
         if( actions.isEmpty() ) {
@@ -57,7 +57,7 @@ public class AwareServiceWrapper extends GenericService {
 
     public static void setSetting(Context context, String key, Object value) {
         Aware.setSetting(context, getPreference( key ), value);
-        context.sendBroadcast( new Intent(Aware.ACTION_AWARE_REFRESH) );
+//        context.sendBroadcast( new Intent(Aware.ACTION_AWARE_REFRESH) );
     }
 
     private static String getPreference(String plugin){
@@ -80,7 +80,9 @@ public class AwareServiceWrapper extends GenericService {
     }
 
     public static void stopPlugin(Context mContext, String packageName) {
-        Aware.stopPlugin( mContext, packageName );
+        if( mContext != null ) {
+            Aware.stopPlugin(mContext, packageName);
+        }
     }
 
     //TODO: finish it
@@ -109,19 +111,19 @@ public class AwareServiceWrapper extends GenericService {
                 || event.getAction().equals(Battery.ACTION_AWARE_BATTERY_CHARGING_USB)){
             Log.e("battery", "Charging");
             AwareServiceWrapper.setSetting(mContext, LocationSettings.ACCURACY_GOOGLE_FUSED_LOCATION, LocationRequest.PRIORITY_HIGH_ACCURACY);
-            mContext.sendBroadcast(new Intent(Aware.ACTION_AWARE_REFRESH));
+//            mContext.sendBroadcast(new Intent(Aware.ACTION_AWARE_REFRESH));
         }else if(event.getAction().equals(Battery.ACTION_AWARE_BATTERY_DISCHARGING)){
             Log.e("battery","Discharging");
             AwareServiceWrapper.setSetting(mContext, LocationSettings.ACCURACY_GOOGLE_FUSED_LOCATION, LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-            mContext.sendBroadcast(new Intent(Aware.ACTION_AWARE_REFRESH));
+//            mContext.sendBroadcast(new Intent(Aware.ACTION_AWARE_REFRESH));
         }else if(event.getAction().equals(Battery.ACTION_AWARE_BATTERY_CHARGING)){
             Log.e("battery","Low");
             AwareServiceWrapper.setSetting(mContext, LocationSettings.ACCURACY_GOOGLE_FUSED_LOCATION, LocationRequest.PRIORITY_LOW_POWER);
-            mContext.sendBroadcast(new Intent(Aware.ACTION_AWARE_REFRESH));
+//            mContext.sendBroadcast(new Intent(Aware.ACTION_AWARE_REFRESH));
         }else if(event.getAction().equals(Battery.ACTION_AWARE_PHONE_SHUTDOWN)){
             Log.e("battery","No power");
             AwareServiceWrapper.setSetting(mContext, LocationSettings.ACCURACY_GOOGLE_FUSED_LOCATION, LocationRequest.PRIORITY_NO_POWER);
-            mContext.sendBroadcast(new Intent(Aware.ACTION_AWARE_REFRESH));
+//            mContext.sendBroadcast(new Intent(Aware.ACTION_AWARE_REFRESH));
         }
     }
 

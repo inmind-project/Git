@@ -1,6 +1,7 @@
 package com.yahoo.inmind.comm.weather.model;
 
 import com.yahoo.inmind.comm.generic.model.BaseEvent;
+import com.yahoo.inmind.commons.control.Util;
 import com.yahoo.inmind.services.weather.model.DayWeatherVO;
 import com.yahoo.inmind.services.weather.model.HourWeatherVO;
 
@@ -37,7 +38,7 @@ public class WeatherEvent extends BaseEvent {
     }
 
     public List<DayWeatherVO> getDailyWeather() {
-        return dailyWeather;
+        return  Util.clone( dailyWeather );
     }
 
     public WeatherEvent setDailyWeather(List<DayWeatherVO> dailyWeather) {
@@ -46,11 +47,11 @@ public class WeatherEvent extends BaseEvent {
     }
 
     public List<HourWeatherVO> getHourlyWeather() {
-        return hourlyWeather;
+        return  Util.clone( hourlyWeather );
     }
 
     public WeatherEvent setHourlyWeather(List<HourWeatherVO> hourlyWeather) {
-        this.hourlyWeather = hourlyWeather;
+        this.hourlyWeather = Util.clone( hourlyWeather );
         return this;
     }
 

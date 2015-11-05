@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.ViewTreeObserver.OnScrollChangedListener;
 import android.widget.ListView;
 
-import com.yahoo.inmind.services.news.model.i13n.Event;
 import com.yahoo.inmind.services.news.control.i13n.I13N;
+import com.yahoo.inmind.services.news.model.i13n.Event;
 
 public class I13NListView extends ListView {
 	String pkgName = null;

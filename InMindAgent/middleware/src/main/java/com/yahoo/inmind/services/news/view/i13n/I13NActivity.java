@@ -3,8 +3,8 @@ package com.yahoo.inmind.services.news.view.i13n;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 
-import com.yahoo.inmind.services.news.model.i13n.Event;
 import com.yahoo.inmind.services.news.control.i13n.I13N;
+import com.yahoo.inmind.services.news.model.i13n.Event;
 
 public abstract class I13NActivity extends ActionBarActivity {
 	private I13N mI13n;

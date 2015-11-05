@@ -15,19 +15,18 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.yahoo.inmind.services.generic.control.AwareServiceWrapper;
-import com.yahoo.inmind.services.generic.control.ServiceLocator;
-import com.yahoo.inmind.services.location.view.LocationSettings;
 import com.yahoo.inmind.commons.control.UtilServiceAPIs;
-
-import java.lang.Integer;import java.lang.Long;import java.lang.Override;import java.lang.String;
+import com.yahoo.inmind.services.generic.control.AwareServiceWrapper;
+import com.yahoo.inmind.services.generic.control.ResourceLocator;
+import com.yahoo.inmind.services.location.view.LocationSettings;
 
 /**
  * Fused location service for Aware framework
  * Requires Google Services API available on the device.
  * @author denzil
  */
-public class Plugin extends Aware_Plugin implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class Plugin extends Aware_Plugin implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     /**
      * This plugin's package name
@@ -97,7 +96,7 @@ public class Plugin extends Aware_Plugin implements GoogleApiClient.ConnectionCa
     
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        LocationService service = ServiceLocator.getInstance(getApplicationContext()).getService(LocationService.class);
+        LocationService service = ResourceLocator.getInstance(getApplicationContext()).lookupService(LocationService.class);
         if( service != null ){
             service.getCurrentLocationByGoogleFused();
         }

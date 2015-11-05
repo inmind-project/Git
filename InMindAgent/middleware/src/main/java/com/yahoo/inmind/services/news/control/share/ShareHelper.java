@@ -1,7 +1,5 @@
 package com.yahoo.inmind.services.news.control.share;
 
-import java.util.List;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -12,9 +10,11 @@ import android.net.Uri;
 
 import com.yahoo.inmind.middleware.R;
 import com.yahoo.inmind.services.news.control.i13n.I13N;
-import com.yahoo.inmind.services.news.model.vo.NewsArticleVector;
 import com.yahoo.inmind.services.news.control.reader.ReaderController;
 import com.yahoo.inmind.services.news.model.i13n.Event;
+import com.yahoo.inmind.services.news.model.vo.NewsArticleVector;
+
+import java.util.List;
 
 
 /**

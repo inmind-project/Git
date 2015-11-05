@@ -20,9 +20,9 @@
 
 package com.yahoo.inmind.services.streaming.control.hw;
 
-import java.nio.ByteBuffer;
-
 import android.media.MediaCodecInfo;
+
+import java.nio.ByteBuffer;
 
 /**
  * Converts from NV21 to YUV420 semi planar or planar.

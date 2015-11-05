@@ -11,17 +11,22 @@ import com.yahoo.inmind.comm.generic.control.MessageBroker;
 import com.yahoo.inmind.commons.control.Constants;
 import com.yahoo.inmind.commons.control.Util;
 import com.yahoo.inmind.commons.rules.model.DecisionRule;
+import com.yahoo.inmind.commons.rules.model.PropositionalStatement;
 import com.yahoo.inmind.effectors.alarm.control.AlarmEffector;
 import com.yahoo.inmind.effectors.generic.control.EffectorDataReceiver;
 import com.yahoo.inmind.sensors.accelerometer.model.AccelerometerProposition;
-import com.yahoo.inmind.services.calendar.control.CalendarService;
-import com.yahoo.inmind.services.generic.control.ServiceLocator;
+import com.yahoo.inmind.sensors.phonecall.model.PhoneCallProposition;
+import com.yahoo.inmind.services.calendar.control.CalendarProposition;
 import com.yahoo.inmind.services.calendar.model.CalendarEventVO;
+import com.yahoo.inmind.services.generic.control.ResourceLocator;
+import com.yahoo.inmind.services.news.model.vo.FilterVO;
+import com.yahoo.inmind.services.weather.control.WeatherProposition;
 
+import java.nio.channels.DatagramChannel;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by oscarr on 10/1/15.
@@ -30,7 +35,7 @@ public class DecisionRuleValidator {
 
     private static DecisionRuleValidator instance;
     private static AlarmManager alarmManager;
-    private static ServiceLocator serviceLocator;
+    private static ResourceLocator resourceLocator;
     private Context context;
 
     public static DecisionRuleValidator getInstance() {
@@ -42,8 +47,8 @@ public class DecisionRuleValidator {
 
     private DecisionRuleValidator() {
         context = MessageBroker.getContext();
-        if( serviceLocator == null ){
-            serviceLocator = ServiceLocator.getInstance(context);
+        if( resourceLocator == null ){
+            resourceLocator = ResourceLocator.getInstance(context);
         }
         if( alarmManager == null ){
             alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -56,46 +61,40 @@ public class DecisionRuleValidator {
      * We need to implement and AND operator.
      */
     //TODO: finish it
-    public boolean validateRule(DecisionRule decisionRule){
-        if( serviceLocator.getDecisionRule(decisionRule.hashCode()) == null ) {
-            serviceLocator.addDecisionRule(decisionRule);
+    public void validateRule(DecisionRule decisionRule){
+        if( resourceLocator.getDecisionRule(decisionRule.getRuleID()) == null ) {
+            resourceLocator.addDecisionRule(decisionRule);
         }
 
+        ArrayList triggeredConditions = new ArrayList();
         for(DecisionRule.ConditionElement conditionElement : decisionRule.getConditions() ){
-
+            ArrayList tempList = conditionElement.getProposition().validate();
+            if( tempList.isEmpty() ) {
+                decisionRule.setPropositionFlag(conditionElement.getProposition(), false, triggeredConditions );
+            }else{
+                triggeredConditions.addAll(tempList);
+                decisionRule.setPropositionFlag(conditionElement.getProposition(), true, triggeredConditions );
+            }
         }
-
-
-
-        boolean triggerRule = true;
-//        List<CalendarEventVO> events = serviceLocator.getService(CalendarService.class).getEvents();
-//        for (CalendarEventVO eventVO : events) {
-//            //check the conditions
-//            for (DecisionRule.ConditionElement conditionElement : decisionRule.extractConditions(Constants.CALENDAR) ) {
-//                if (!(Boolean) conditionElement.getProposition().validate(eventVO)) {
-//                    triggerRule = false;
-//                    break;
-//                }
-//            }
-//        }
-//        if( triggerRule ) {
-//            //scheduleActions( null );
-//        }
-        return triggerRule;
     }
 
     /**
-     * When a rule is registered then its conditions can be validated in order to determine wheter
+     * When a rule is registered then its conditions can be validated in order to determine whether
      * to trigger its actions or not
      * @param decisionRule
      */
     public void registerRule(DecisionRule decisionRule){
-        serviceLocator.addDecisionRule(decisionRule);
+        resourceLocator.addDecisionRule(decisionRule);
         validateRule(decisionRule);
     }
 
     public void unregisterRule(DecisionRule decisionRule){
-        serviceLocator.removeDecisionRule(decisionRule);
+        resourceLocator.removeDecisionRule(decisionRule);
+    }
+
+    public void unregisterRule(String decisionRuleId){
+        DecisionRule decisionRule = resourceLocator.getDecisionRule( decisionRuleId );
+        resourceLocator.removeDecisionRule(decisionRule);
     }
 
     public boolean validateCalendarEvent( CalendarEventVO calendarEventVO, DecisionRule decisionRule){
@@ -124,12 +123,9 @@ public class DecisionRuleValidator {
 
     private void triggerAction( DecisionRule.ActionElement actionElement, Date date, Object element ){
         if( actionElement.getComponentName().equals( Constants.ALARM )){
-            serviceLocator.getEffector( AlarmEffector.class ).setAlarm( (CalendarEventVO) element, date );
+            resourceLocator.lookupEffector( AlarmEffector.class ).setAlarm( (CalendarEventVO) element, date );
         }
     }
-
-
-
 
     private void scheduleActions( DecisionRule decisionRule, String action, Date date, String uuid ){
         Intent intentAlarm = new Intent(context, EffectorDataReceiver.class);
@@ -204,23 +200,29 @@ public class DecisionRuleValidator {
     }
 
     //TODO: finish it
-    public void triggerActions(DecisionRule decisionRule) {
+    public void triggerActions(DecisionRule decisionRule, ArrayList triggeredConditions ) {
         for( DecisionRule.ActionElement action : decisionRule.getActions() ){
             if( action.getComponentName().equals( Constants.ALARM ) ){
-                triggerAlarmAction( action );
+                triggerAlarmAction( action, triggeredConditions );
             }else if( action.getComponentName().equals( Constants.TOAST) ){
                 triggerToastMsgAction( action );
             }
         }
     }
 
-    private void triggerAlarmAction(DecisionRule.ActionElement actionElement){
-        serviceLocator.getEffector( AlarmEffector.class ).playRingtone(
-                ((Number) actionElement.getAttributes().get(Constants.ALARM_RINGTONE_TYPE)).intValue());
+    private void triggerAlarmAction(DecisionRule.ActionElement actionElement, ArrayList triggeredConditions ){
+        if( triggeredConditions == null || triggeredConditions.isEmpty() ) {
+            resourceLocator.lookupEffector(AlarmEffector.class).playRingtone(
+                    ((Number) actionElement.getAttributes().get(Constants.ALARM_RINGTONE_TYPE)).intValue());
+        }else{
+            //do something with the CalendarEvents??
+            resourceLocator.lookupEffector(AlarmEffector.class).playRingtone(
+                    ((Number) actionElement.getAttributes().get(Constants.ALARM_RINGTONE_TYPE)).intValue());
+        }
     }
 
     private void triggerToastMsgAction(final DecisionRule.ActionElement actionElement){
-        final Activity currentActivity = serviceLocator.getTopActivity();
+        final Activity currentActivity = resourceLocator.getTopActivity();
         currentActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -228,5 +230,22 @@ public class DecisionRuleValidator {
                                 .get(Constants.TOAST_MESSAGE), Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    //TODO: finish it
+    public Class<? extends PropositionalStatement> extractProposition(String type) {
+        Class<? extends PropositionalStatement> clazz = null;
+        if (type.equals(Constants.CALENDAR)) {
+            clazz = CalendarProposition.class;
+        } else if (type.equals(Constants.NEWS)) {
+            clazz = FilterVO.class;
+        } else if (type.equals(Constants.WEATHER)) {
+            clazz = WeatherProposition.class;
+        } else if (type.equals(Constants.PHONECALL)) {
+            clazz = PhoneCallProposition.class;
+        } else if (type.equals(Constants.ACCELEROMETER)) {
+            clazz = AccelerometerProposition.class;
+        }
+        return clazz;
     }
 }

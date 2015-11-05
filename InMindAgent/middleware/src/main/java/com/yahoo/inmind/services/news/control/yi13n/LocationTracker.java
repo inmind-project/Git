@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
 
+import com.yahoo.inmind.commons.control.Util;
 import com.yahoo.inmind.services.news.control.reader.ReaderController;
 import com.yahoo.inmind.services.news.model.i13n.Event;
 
@@ -68,11 +69,7 @@ public class LocationTracker {
 						//if (runThread)
 						//	Log.e("inmind", "waiting for okToTrack() && locationManager != null && locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)");
 						if(!trackingRunning){ // only sleep if we're not location tracking
-							try{
-								Thread.sleep(SLEEP_TIME);
-							}catch(Exception e){
-								e.printStackTrace();
-							}
+							Util.sleep(SLEEP_TIME);
 						}
 					}
 				}

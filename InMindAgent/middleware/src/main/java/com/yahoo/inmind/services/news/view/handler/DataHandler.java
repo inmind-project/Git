@@ -6,10 +6,10 @@ import android.os.Message;
 import android.widget.Toast;
 
 import com.yahoo.inmind.middleware.R;
+import com.yahoo.inmind.services.news.control.reader.ReaderController;
 import com.yahoo.inmind.services.news.model.source.ProfiledSource;
 import com.yahoo.inmind.services.news.view.reader.DrawerItem;
 import com.yahoo.inmind.services.news.view.reader.NewsListFragment;
-import com.yahoo.inmind.services.news.control.reader.ReaderController;
 
 public class DataHandler extends Handler {
 

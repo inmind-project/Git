@@ -41,10 +41,16 @@ public class CalendarService extends GenericService {
     private static final String CALENDAR_ID = "primary";
 
     public CalendarService(){
-        super("CalendarService", null);
+        super(null);
         if( actions.isEmpty() ) {
             this.actions.add(Constants.ACTION_CALENDAR);
         }
+    }
+
+    @Override
+    public void doAfterBind(){
+        super.doAfterBind();
+        processEvents( Constants.CALENDAR_GET_EVENTS, null );
     }
 
     public synchronized void initializeCalendar(){
@@ -71,7 +77,8 @@ public class CalendarService extends GenericService {
                 return calendar.events().insert(CALENDAR_ID, eventData).execute();
             }
         }else {
-            mb.send(CalendarNotificationEvent.build()
+            mb.send(CalendarService.this,
+                    CalendarNotificationEvent.build()
                     .setNotification("Calendar Event is null")
                     .setIsError(true));
         }
@@ -88,18 +95,14 @@ public class CalendarService extends GenericService {
     private synchronized TreeMap<String, Event> getDataFromApi(Date fromDate, int numberOfMonths)
             throws IOException {
         DateTime from = new DateTime( fromDate == null? new Date(System.currentTimeMillis()) : fromDate );
-        return getDataFromApi( from, numberOfMonths );
+        return getDataFromApi(from, numberOfMonths);
     }
 
     public List<CalendarEventVO> getEvents() {
-        if (events == null){
-            try {
-                processEvents(Constants.CALENDAR_GET_EVENTS, null).join();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (events != null){
+            return convertEvents(new ArrayList<>(events.values()));
         }
-        return convertEvents(new ArrayList<>(events.values()));
+        return null;
     }
 
     /**
@@ -271,7 +274,8 @@ public class CalendarService extends GenericService {
                 String message = event.getDescription() + "\nSummary: " + event.getSummary()
                         + "\nFrom: " + event.getStart().getDateTime().toString() + " to "
                         + event.getEnd().getDateTime().toString();
-                mb.send(CalendarNotificationEvent.build()
+                mb.send(CalendarService.this,
+                        CalendarNotificationEvent.build()
                         .setNotification("Conflict with the event:\n" + message)
                         .setIsError(true));
 
@@ -322,7 +326,8 @@ public class CalendarService extends GenericService {
                                 if (queryEvents) {
                                     events = getDataFromApi(fromDate, numberOfMonths);
                                 }
-                                mb.send(CalendarNotificationEvent.build()
+                                mb.send(CalendarService.this,
+                                        CalendarNotificationEvent.build()
                                         .setNotification(Constants.CALENDAR_AFTER_QUERY_EVENTS)
                                         .setEvents(convertEvents(new ArrayList<>(events.values()))));
                                 break;
@@ -330,7 +335,8 @@ public class CalendarService extends GenericService {
                                 resultEvent = createAndInsertEvent(eventData);
                                 if (resultEvent != null) {
                                     events.put(getEventKey(resultEvent), resultEvent);
-                                    mb.send(CalendarNotificationEvent.build()
+                                    mb.send(CalendarService.this,
+                                            CalendarNotificationEvent.build()
                                             .setNotification(Constants.CALENDAR_AFTER_CREATE_EVENT)
                                             .setEvents(convertEvents(new ArrayList<>(events.values())))
                                             .setNewOrModifiedEvent( convertToEventVO( resultEvent )));
@@ -343,7 +349,8 @@ public class CalendarService extends GenericService {
                                         events.remove(getEventKey(eventVO));
                                     }
                                 }
-                                mb.send(CalendarNotificationEvent.build()
+                                mb.send(CalendarService.this,
+                                        CalendarNotificationEvent.build()
                                         .setNotification(Constants.CALENDAR_AFTER_DELETE_EVENTS)
                                         .setEvents(convertEvents(new ArrayList<>(events.values()))));
                                 break;
@@ -353,12 +360,14 @@ public class CalendarService extends GenericService {
                                 if (resultEvent != null) {
                                     events.remove(getEventKey(resultEvent));
                                     events.put(getEventKey(resultEvent), resultEvent);
-                                    mb.send(CalendarNotificationEvent.build()
+                                    mb.send(CalendarService.this,
+                                            CalendarNotificationEvent.build()
                                             .setNotification(Constants.CALENDAR_AFTER_UPDATE_EVENT)
                                             .setEvents(convertEvents(new ArrayList<>(events.values())))
                                             .setNewOrModifiedEvent(convertToEventVO(resultEvent )));
                                 } else {
-                                    mb.send(CalendarNotificationEvent.build()
+                                    mb.send(CalendarService.this,
+                                            CalendarNotificationEvent.build()
                                             .setNotification("Calendar Event is null")
                                             .setIsError(true));
                                 }
@@ -367,21 +376,25 @@ public class CalendarService extends GenericService {
                             case Constants.CALENDAR_DELETE_ALL_EVENTS:
                                 deleteAllEvents();
                                 events.clear();
-                                mb.send(CalendarNotificationEvent.build()
+                                mb.send(CalendarService.this,
+                                        CalendarNotificationEvent.build()
                                         .setNotification(Constants.CALENDAR_AFTER_DELETE_ALL_EVENTS));
                                 break;
                         }
                     } catch (final GooglePlayServicesAvailabilityIOException availabilityException) {
-                        mb.send(CalendarNotificationEvent.build()
+                        mb.send(CalendarService.this,
+                                CalendarNotificationEvent.build()
                                 .setNotification(Constants.CALENDAR_AVAILABILITY_EXCEPTION)
                                 .setParams(availabilityException.getConnectionStatusCode()));
                     } catch (UserRecoverableAuthIOException userRecoverableException) {
-                        mb.send(CalendarNotificationEvent.build()
+                        mb.send(CalendarService.this,
+                                CalendarNotificationEvent.build()
                                 .setNotification(Constants.CALENDAR_USER_RECOVERABLE_EXCEPTION)
                                 .setParams(userRecoverableException.getIntent()));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        mb.send(CalendarNotificationEvent.build()
+                        mb.send(CalendarService.this,
+                                CalendarNotificationEvent.build()
                                 .setNotification("The following error occurred: " + e.getMessage()));
                     }
                 }
@@ -395,33 +408,27 @@ public class CalendarService extends GenericService {
     }
 
 
-    @Override
-    public void doAfterBind() {
-    }
-
     public synchronized void getCalendarEvents() {
-        try {
-            if (UtilServiceAPIs.credential != null) {
-                if (UtilServiceAPIs.credential.getSelectedAccountName() == null
-                        && !UtilServiceAPIs.chooseAccountInProcess) {
-                    UtilServiceAPIs.chooseAccount( null );
-                    getCalendarEvents();
-                } else {
-                    if (UtilServiceAPIs.isAccountSelected) {
-                        if (UtilServiceAPIs.isDeviceOnline( null )) {
-                            processEvents((Constants.CALENDAR_GET_EVENTS), null);
-                        } else {
-                            mb.send(CalendarNotificationEvent.build()
-                                    .setNotification("No network connection available."));
-                        }
+
+        if (UtilServiceAPIs.credential != null) {
+            if (UtilServiceAPIs.credential.getSelectedAccountName() == null
+                    && !UtilServiceAPIs.chooseAccountInProcess) {
+                UtilServiceAPIs.chooseAccount( null );
+                getCalendarEvents();
+            } else {
+                if (UtilServiceAPIs.isAccountSelected) {
+                    if (UtilServiceAPIs.isDeviceOnline( null )) {
+                        processEvents((Constants.CALENDAR_GET_EVENTS), null);
                     } else {
-                        Thread.sleep(1000);
-                        getCalendarEvents();
+                        mb.send(CalendarService.this,
+                                CalendarNotificationEvent.build()
+                                .setNotification("No network connection available."));
                     }
+                } else {
+                    Util.sleep(1000);
+                    getCalendarEvents();
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -444,4 +451,7 @@ public class CalendarService extends GenericService {
         super.onDestroy();
     }
 
+    public void pruebita(final int a, final int b){
+
+    }
 }

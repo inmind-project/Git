@@ -28,7 +28,7 @@ import java.util.List;
 public class ActivityRecognitionService extends GenericService {
 
     public ActivityRecognitionService(){
-        super("ActivityRecognitionService", ActivityRecognitionService.class.getPackage().getName());
+        super(ActivityRecognitionService.class.getPackage().getName());
         if( actions.isEmpty() ) {
             this.actions.add(Constants.ACTION_GOOGLE_ACTIVITY_RECOGNITION);
             this.actions.add(Locations.ACTION_AWARE_LOCATIONS);
@@ -68,14 +68,10 @@ public class ActivityRecognitionService extends GenericService {
 
             getContentResolver().insert(Provider.Google_Activity_Recognition_Data.CONTENT_URI, data);
 
-            if ( Plugin.DEBUG ) {
-            	Log.d(Plugin.TAG, "User is: " + activity_name + " (conf:" + Plugin.confidence + ")");
-            }
-
             ActivityRecognitionEvent event = new ActivityRecognitionEvent();
             event.setActivityType(Plugin.activityType);
             event.setConfidence(Plugin.confidence);
-            mb.send( event );
+            mb.send( ActivityRecognitionService.this, event );
         }
     }
 

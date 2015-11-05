@@ -20,14 +20,15 @@
 
 package com.yahoo.inmind.services.streaming.control.video;
 
-import java.io.IOException;
-
-import com.yahoo.inmind.services.streaming.control.SessionBuilder;
-import com.yahoo.inmind.services.streaming.control.rtp.H263Packetizer;
 import android.graphics.ImageFormat;
 import android.hardware.Camera.CameraInfo;
 import android.media.MediaRecorder;
 import android.service.textservice.SpellCheckerService.Session;
+
+import com.yahoo.inmind.services.streaming.control.SessionBuilder;
+import com.yahoo.inmind.services.streaming.control.rtp.H263Packetizer;
+
+import java.io.IOException;
 
 /**
  * A class for streaming H.263 from the camera of an android device using RTP.

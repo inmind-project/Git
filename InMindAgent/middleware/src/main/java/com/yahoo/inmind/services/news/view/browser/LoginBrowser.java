@@ -7,10 +7,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import com.yahoo.inmind.services.news.model.i13n.Event;
 import com.yahoo.inmind.services.news.control.i13n.I13N;
 import com.yahoo.inmind.services.news.control.reader.ReaderController;
 import com.yahoo.inmind.services.news.control.util.DevUtil;
+import com.yahoo.inmind.services.news.model.i13n.Event;
 
 public class LoginBrowser extends BaseBrowser {
 	private static final String server = "blondbeyond.corp.ne1.yahoo.com";

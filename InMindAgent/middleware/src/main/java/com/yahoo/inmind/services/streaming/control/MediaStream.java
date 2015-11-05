@@ -20,15 +20,6 @@
 
 package com.yahoo.inmind.services.streaming.control;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.Random;
-
-import com.yahoo.inmind.services.streaming.control.audio.AudioStream;
-import com.yahoo.inmind.services.streaming.control.rtp.AbstractPacketizer;
-import com.yahoo.inmind.services.streaming.control.audio.AudioQuality;
-import com.yahoo.inmind.services.streaming.control.rtp.RtpSocket;
-import com.yahoo.inmind.services.streaming.control.video.VideoStream;
 import android.annotation.SuppressLint;
 import android.media.MediaCodec;
 import android.media.MediaRecorder;
@@ -39,7 +30,16 @@ import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
+import com.yahoo.inmind.services.streaming.control.audio.AudioQuality;
+import com.yahoo.inmind.services.streaming.control.audio.AudioStream;
+import com.yahoo.inmind.services.streaming.control.rtp.AbstractPacketizer;
+import com.yahoo.inmind.services.streaming.control.rtp.RtpSocket;
 import com.yahoo.inmind.services.streaming.control.video.VideoQuality;
+import com.yahoo.inmind.services.streaming.control.video.VideoStream;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.Random;
 
 /**
  * A MediaRecorder that streams what it records using a packetizer from the rtp package.
@@ -317,6 +317,11 @@ public abstract class MediaStream implements Stream {
 		}
         try{
             parcelRead.close();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        try{
+            parcelWrite.close();
         }catch(Exception e){
             e.printStackTrace();
         }

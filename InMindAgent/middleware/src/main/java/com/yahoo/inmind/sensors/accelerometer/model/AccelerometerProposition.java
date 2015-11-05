@@ -6,6 +6,10 @@ import com.yahoo.inmind.comm.generic.model.MBRequest;
 import com.yahoo.inmind.commons.control.Constants;
 import com.yahoo.inmind.commons.rules.model.DecisionRule;
 import com.yahoo.inmind.commons.rules.model.PropositionalStatement;
+import com.yahoo.inmind.sensors.accelerometer.control.AccelerometerObserver;
+import com.yahoo.inmind.services.generic.control.ResourceLocator;
+
+import java.util.ArrayList;
 
 /**
  * Created by oscarr on 10/14/15.
@@ -17,6 +21,7 @@ public class AccelerometerProposition extends PropositionalStatement {
      */
     public AccelerometerProposition(){
         super();
+        componentName = Constants.ACCELEROMETER;
     }
 
     public AccelerometerProposition(String attribute, String operator, String value){
@@ -28,46 +33,70 @@ public class AccelerometerProposition extends PropositionalStatement {
     @Override
     public void subscribe(){
         super.subscribe();
-        MessageBroker mb = MessageBroker.getExistingInstance();
-        mb.subscribe(this);
-        initializeAccelerometer( mb );
+        startAccelerometer();
+    }
+
+    @Override
+    public void unsubscribe(){
+        stopAccelerometer();
+        super.unsubscribe();
+    }
+
+    @Override
+    public ArrayList validate() {
+        return getList(ResourceLocator.getExistingInstance().lookupSensor(AccelerometerObserver.class)
+                .getAccEvent());
     }
 
 
-    private void initializeAccelerometer(MessageBroker mb){
-        mb.send(MBRequest.build(Constants.MSG_SENSOR_SETTINGS)
+    private void startAccelerometer(){
+        mb.send(AccelerometerProposition.this,
+                MBRequest.build(Constants.MSG_SENSOR_SETTINGS)
                 .put(Constants.SENSOR_NAME, Constants.SENSOR_ACCELEROMETER)
                 .put(Constants.SENSOR_SETTING, Constants.SENSOR_START)
                 .put(Constants.ACCELEROMETER_FREQUENCY, 200000L )); //in microseconds
     }
 
+    private void stopAccelerometer(){
+        mb.send(AccelerometerProposition.this,
+                MBRequest.build(Constants.MSG_SENSOR_SETTINGS)
+                .put(Constants.SENSOR_NAME, Constants.SENSOR_ACCELEROMETER)
+                .put(Constants.SENSOR_SETTING, Constants.SENSOR_STOP));
+    }
+
     @Override
-    public Boolean validate(Object objValue) {
-        AccelerometerEvent event = (AccelerometerEvent) objValue;
-        double valueDouble, attributeDouble = 0;
-        if( attribute.equals(Constants.ACCELEROMETER_X_AXIS )){
-            attributeDouble = event.getAccelerationX();
-        }else if( attribute.equals(Constants.ACCELEROMETER_Y_AXIS )){
-            attributeDouble = event.getAccelerationY();
-        }else if( attribute.equals(Constants.ACCELEROMETER_Z_AXIS )){
-            attributeDouble = event.getAccelerationZ();
-        }else if( attribute.equals(Constants.ACCELEROMETER_VECTOR_SUM)){
-            attributeDouble = Math.sqrt( Math.pow( event.getAccelerationX(), 2) + Math.pow(
-                    event.getAccelerationY(), 2) + Math.pow( event.getAccelerationZ(), 2) );
+    public Object validate(Object objValue) {
+        try {
+            AccelerometerEvent event = (AccelerometerEvent) objValue;
+            double valueDouble, attributeDouble = 0;
+            if (attribute.equals(Constants.ACCELEROMETER_X_AXIS)) {
+                attributeDouble = event.getAccelerationX();
+            } else if (attribute.equals(Constants.ACCELEROMETER_Y_AXIS)) {
+                attributeDouble = event.getAccelerationY();
+            } else if (attribute.equals(Constants.ACCELEROMETER_Z_AXIS)) {
+                attributeDouble = event.getAccelerationZ();
+            } else if (attribute.equals(Constants.ACCELEROMETER_VECTOR_SUM)) {
+                attributeDouble = Math.sqrt(Math.pow(event.getAccelerationX(), 2) + Math.pow(
+                        event.getAccelerationY(), 2) + Math.pow(event.getAccelerationZ(), 2));
+            } else if (attribute.equals(Constants.ACCELEROMETER_ACCURACY)) {
+                attributeDouble = event.getAccuracy();
+            }
+            valueDouble = Double.valueOf(value);
+            if( validateNumbers(attributeDouble, valueDouble) ){
+                return event;
+            }
+        }catch(Exception e){
+            //do nothing
         }
-        else if( attribute.equals(Constants.ACCELEROMETER_ACCURACY )){
-            attributeDouble = event.getAccuracy();
-        }
-        valueDouble = Double.valueOf( value );
-        return validateNumbers( attributeDouble, valueDouble );
+        return null;
     }
 
 
     public void onEvent(AccelerometerEvent event){
         if( rules != null ){
-            boolean flag = validate( event );
+            Object result = validate( event );
             for (DecisionRule rule : rules) {
-                rule.setPropositionFlag( this, flag );
+                rule.setPropositionFlag( this, result != null, null );
             }
         }
     }

@@ -20,17 +20,6 @@
 
 package com.yahoo.inmind.services.streaming.control.audio;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.lang.reflect.Field;
-import java.net.InetAddress;
-import java.nio.ByteBuffer;
-
-import com.yahoo.inmind.services.streaming.control.SessionBuilder;
-import com.yahoo.inmind.services.streaming.control.rtp.AACADTSPacketizer;
-import com.yahoo.inmind.services.streaming.control.rtp.AACLATMPacketizer;
-import com.yahoo.inmind.services.streaming.control.rtp.MediaCodecInputStream;
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -44,6 +33,19 @@ import android.os.Build;
 import android.os.Environment;
 import android.service.textservice.SpellCheckerService.Session;
 import android.util.Log;
+
+import com.yahoo.inmind.commons.control.Util;
+import com.yahoo.inmind.services.streaming.control.SessionBuilder;
+import com.yahoo.inmind.services.streaming.control.rtp.AACADTSPacketizer;
+import com.yahoo.inmind.services.streaming.control.rtp.AACLATMPacketizer;
+import com.yahoo.inmind.services.streaming.control.rtp.MediaCodecInputStream;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.lang.reflect.Field;
+import java.net.InetAddress;
+import java.nio.ByteBuffer;
 
 /**
  * A class for streaming AAC from the camera of an android device using RTP.
@@ -327,9 +329,7 @@ public class AACStream extends AudioStream {
 
 		// We record for 1 sec
 		// TODO: use the MediaRecorder.OnInfoListener
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {}
+		Util.sleep(2000);
 
 		mMediaRecorder.stop();
 		mMediaRecorder.release();

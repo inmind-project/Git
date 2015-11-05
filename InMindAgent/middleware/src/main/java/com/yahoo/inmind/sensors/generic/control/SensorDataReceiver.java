@@ -8,7 +8,7 @@ import android.content.Intent;
 import com.aware.Accelerometer;
 import com.yahoo.inmind.comm.generic.control.MessageBroker;
 import com.yahoo.inmind.sensors.accelerometer.control.AccelerometerObserver;
-import com.yahoo.inmind.services.generic.control.ServiceLocator;
+import com.yahoo.inmind.services.generic.control.ResourceLocator;
 
 /**
  * Created by oscarr on 8/13/15.
@@ -16,7 +16,10 @@ import com.yahoo.inmind.services.generic.control.ServiceLocator;
 public class SensorDataReceiver extends BroadcastReceiver {
     private MessageBroker mb;
     private Context mContext;
-    private ServiceLocator serviceLocator;
+    private ResourceLocator resourceLocator;
+
+    // This is required by the AndroidManifest
+    public SensorDataReceiver(){}
 
     public SensorDataReceiver(Context context){
         mContext = context;
@@ -26,8 +29,8 @@ public class SensorDataReceiver extends BroadcastReceiver {
         if( mb == null ){
             mb = MessageBroker.getInstance( context );
         }
-        if( serviceLocator == null ){
-            serviceLocator = ServiceLocator.getInstance(context);
+        if( resourceLocator == null ){
+            resourceLocator = ResourceLocator.getInstance(context);
         }
     }
 
@@ -37,7 +40,7 @@ public class SensorDataReceiver extends BroadcastReceiver {
         initialize( context );
         if( intent.getAction().equals(Accelerometer.ACTION_AWARE_ACCELEROMETER)) {
             ContentValues data = intent.getParcelableExtra(Accelerometer.EXTRA_DATA);
-            serviceLocator.getSensor(AccelerometerObserver.class ).extractData( data );
+            resourceLocator.lookupSensor(AccelerometerObserver.class ).extractData( data );
         }
     }
 }

@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 
 import com.yahoo.inmind.comm.generic.control.MessageBroker;
 import com.yahoo.inmind.commons.control.Constants;
+import com.yahoo.inmind.commons.control.Util;
 import com.yahoo.inmind.commons.rules.model.DecisionRule;
 import com.yahoo.inmind.effectors.alarm.control.AlarmEffector;
 import com.yahoo.inmind.effectors.generic.control.EffectorDataReceiver;
@@ -85,28 +86,41 @@ public class ServiceLocator {
         return serviceLocator;
     }
 
+
+    /**
+     * This method has been replaced by lookupService
+     * @param service
+     * @param <T>
+     * @return
+     */
     @Nullable
-    public <T extends GenericService> T getService( Class<T> service ){
+    @Deprecated
+    public <T extends GenericService> T getService(Class<T> service){
+        return lookupService(service);
+    }
+
+
+    public <T extends GenericService> T lookupService( Class<T> service ){
         if( mServicesHash != null ) {
-            return (T) mServicesHash.get(service).getmService();
+            return (T) mServicesHash.get(service).getService();
         }
-        return null;
+        return Util.createInstance( service );
     }
 
     @Nullable
-    public  <T extends SensorObserver> T  getSensor( Class<T> sensor ){
+    public  <T extends SensorObserver> T lookupSensor(Class<T> sensor){
         if( mSensorsHash != null ) {
             return (T) mSensorsHash.get(sensor);
         }
-        return null;
+        return Util.createInstance( sensor );
     }
 
     @Nullable
-    public  <T extends EffectorObserver> T getEffector( Class<T> effector ){
+    public  <T extends EffectorObserver> T lookupEffector(Class<T> effector){
         if( mEffectorsHash != null ) {
             return (T) mEffectorsHash.get(effector);
         }
-        return null;
+        return Util.createInstance( effector );
     }
 
     @Nullable
@@ -121,22 +135,27 @@ public class ServiceLocator {
         mDecisionRulesHash.put(decisionRule.hashCode(), decisionRule);
     }
 
-    public boolean removeDecisionRule(DecisionRule decisionRule){
-        return mDecisionRulesHash.remove(decisionRule.hashCode()) == null;
+    public void removeDecisionRule(DecisionRule decisionRule){
+        mDecisionRulesHash.remove(decisionRule.hashCode());
+        decisionRule.destroy();
+        decisionRule = null;
     }
 
     /**
      * We add all the Middleware services here.
      */
     public void addServices(){
-//        mServicesHash.put( NewsService.class, new MiddServiceConnection() );
-//        mServicesHash.put( AwareServiceWrapper.class, new MiddServiceConnection() );
-//        mServicesHash.put( ActivityRecognitionService.class, new MiddServiceConnection() );
-//        mServicesHash.put( HotelReservationService.class, new MiddServiceConnection() );
-//        mServicesHash.put( LocationService.class, new MiddServiceConnection() );
-//        mServicesHash.put( WeatherService.class, new MiddServiceConnection() );
+        mServicesHash.put( NewsService.class, new MiddServiceConnection() );
+        mServicesHash.put( AwareServiceWrapper.class, new MiddServiceConnection() );
+        mServicesHash.put( ActivityRecognitionService.class, new MiddServiceConnection() );
+        mServicesHash.put( HotelReservationService.class, new MiddServiceConnection() );
+        mServicesHash.put( LocationService.class, new MiddServiceConnection() );
+        mServicesHash.put( WeatherService.class, new MiddServiceConnection() );
         mServicesHash.put( CalendarService.class, new MiddServiceConnection() );
         mServicesHash.put( StreamingService.class, new MiddServiceConnection() );
+
+        // add your service here:
+
     }
 
     //FIXME
@@ -163,14 +182,14 @@ public class ServiceLocator {
     //TODO: finish it
     public void startSensor(String name){
         if( name.equals(Constants.SENSOR_ACCELEROMETER )){
-            getSensor( AccelerometerObserver.class ).startListening();
+            lookupSensor(AccelerometerObserver.class).startListening();
         }
     }
 
     //TODO: finish it
     public void stopSensor(String name){
         if( name.equals(Constants.SENSOR_ACCELEROMETER )){
-            getSensor( AccelerometerObserver.class ).stopListening();
+            lookupSensor(AccelerometerObserver.class).stopListening();
         }
     }
 
@@ -257,13 +276,13 @@ public class ServiceLocator {
         actionsServiceReceiver = null;
         mClassActivitiesList = null;
         mActivitiesList = null;
-        GenericService.release();
         System.gc();
     }
 
     public void addActivity(Object subscriber) {
-        if( subscriber instanceof Activity){
-            mActivitiesList.add( (Activity) subscriber );
+        if( subscriber instanceof Activity && ( mActivitiesList.isEmpty() ||
+            !mActivitiesList.get( mActivitiesList.size() -1 ).equals( subscriber ) ) ){
+            mActivitiesList.add((Activity) subscriber);    
         }
     }
 
@@ -321,7 +340,7 @@ public class ServiceLocator {
         }
 
 
-        public GenericService getmService() {
+        public GenericService getService() {
             return mService;
         }
     }

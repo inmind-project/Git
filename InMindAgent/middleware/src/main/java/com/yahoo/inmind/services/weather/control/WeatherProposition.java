@@ -2,8 +2,11 @@ package com.yahoo.inmind.services.weather.control;
 
 import com.yahoo.inmind.commons.control.Constants;
 import com.yahoo.inmind.commons.rules.model.PropositionalStatement;
+import com.yahoo.inmind.services.generic.control.ResourceLocator;
 import com.yahoo.inmind.services.weather.model.DayWeatherVO;
 import com.yahoo.inmind.services.weather.model.HourWeatherVO;
+
+import java.util.ArrayList;
 
 /**
  * Created by oscarr on 9/15/15.
@@ -15,6 +18,10 @@ public class WeatherProposition extends PropositionalStatement {
     private int day = -1;
     private int hour = -1;
     private int minute = -1;
+
+    public WeatherProposition(){
+        componentName = Constants.WEATHER;
+    }
 
     public WeatherProposition(String attribute, String operator, String value) {
         super(attribute, operator, value);
@@ -97,6 +104,8 @@ public class WeatherProposition extends PropositionalStatement {
 
     @Override
     public Object validate(Object objValue) {
+        if( objValue == null )
+            return false;
         if( objValue instanceof HourWeatherVO){
             HourWeatherVO hourWeatherVO = (HourWeatherVO) objValue;
             if( attribute.equals( Constants.WEATHER_LOW_TEMP_ENG )
@@ -136,7 +145,11 @@ public class WeatherProposition extends PropositionalStatement {
         return false;
     }
 
-
+    @Override
+    public ArrayList validate() {
+        return getList(ResourceLocator.getExistingInstance().lookupService(WeatherService.class)
+                .getCurrentWeather());
+    }
 
     public Object convertAttribute( String attribute, HourWeatherVO hourWeatherVO ){
         if( attribute.equals( Constants.WEATHER_CONDITION ) ){

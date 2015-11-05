@@ -5,8 +5,8 @@ import android.os.Environment;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.yahoo.inmind.commons.control.Util;
-import com.yahoo.inmind.services.news.model.events.RequestFetchNewsEvent;
 import com.yahoo.inmind.services.news.control.reader.ReaderController;
+import com.yahoo.inmind.services.news.model.events.RequestFetchNewsEvent;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.greenrobot.event.EventBus;
+import com.yahoo.inmind.comm.generic.control.eventbus.EventBus;
 
 /**
  * Created by oscarr on 12/11/14.

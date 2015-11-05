@@ -71,7 +71,6 @@ public class LogicController
         if (tcpClient != null && audioStreamer != null && audioStreamer.isStreaming())
             return;
         //closeConnection(); //not closing, since sometimes remains open.
-        startStopRecNotifier.startStopRec(true);//say that is starting the recording. must be called before starting.
         sendMessageUsingTcp(uniqueId + Consts.commandChar + Consts.requestSendAudio + Consts.commandChar);
     }
 
@@ -158,6 +157,7 @@ public class LogicController
                 udpIpPort = 0;
                 try
                 {
+                    startStopRecNotifier.startStopRec(true);//say that is starting the recording. must be called before starting.
                     udpIpAddr = tcpIpAddr;
                     Log.d("ServerConnector", "found:" + found);
                     //String protocol = m.group(1);

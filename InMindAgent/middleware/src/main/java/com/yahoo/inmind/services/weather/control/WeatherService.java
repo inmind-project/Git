@@ -4,6 +4,7 @@ import android.util.JsonReader;
 
 import com.yahoo.inmind.comm.weather.model.WeatherEvent;
 import com.yahoo.inmind.commons.control.Constants;
+import com.yahoo.inmind.commons.control.ExecutableTask;
 import com.yahoo.inmind.commons.control.Util;
 import com.yahoo.inmind.commons.control.UtilServiceAPIs;
 import com.yahoo.inmind.services.generic.control.GenericService;
@@ -31,9 +32,8 @@ public class WeatherService extends GenericService {
 
     private ConcurrentHashMap<String, ForecastReport> forecastReports;
 
-
     public WeatherService() {
-        super("WeatherService", null);
+        super(null);
         if( actions.isEmpty() ) {
             this.actions.add(Constants.ACTION_WEATHER);
         }
@@ -44,13 +44,15 @@ public class WeatherService extends GenericService {
     public void doAfterBind() {
     }
 
-    public Thread findWeatherData(final LocationVO locationVO, final int forecastMode,
+    public void findWeatherData(final LocationVO locationVO, final int forecastMode,
                                   final long refreshTime, final boolean forceRefresh,
                                   final List<WeatherProposition> rules, final boolean isSendReponse) {
-        Thread t = new Thread(){
+        Util.printThread("1. findWeatherData");
+        Util.execute(new ExecutableTask() {
             @Override
             public void run() {
                 try {
+                    Util.printThread("2. findWeatherData.run");
                     LocationVO locationTemp = locationVO;
                     locationTemp = getPlaceLocation( locationTemp, true );
                     if( locationTemp != null ) {
@@ -66,56 +68,48 @@ public class WeatherService extends GenericService {
                                     forecastReport.hourlyWeatherList.clear();
                                     forecastReport.dailyWeatherList.clear();
                                 }
-                                queryDailyWeather(forceRefresh, forecastReport, isSendReponse).join();
-                                queryHourlyWeather(forceRefresh, forecastReport, isSendReponse).join();
+                                queryDailyWeather(forceRefresh, forecastReport, isSendReponse);
+                                queryHourlyWeather(forceRefresh, forecastReport, isSendReponse);
                             }
                         }
                     }
                 } catch (Exception e){
                     e.printStackTrace();
                 }
+                Util.printThread("Finishing");
             }
-        };
-        t.start();
-        return t;
+        }, !isSendReponse );
+        // when isSendResponse is false that means that we need to wait for another process to finish
+        // and therefore we need to execute the thread in serial mode (true).
     }
 
-    private Thread queryDailyWeather(final boolean forceRefresh, final ForecastReport forecastReport,
-                                    final boolean isSendReponse) {
-        Thread t = new Thread() {
-            public void run() {
-                try {
-                    if (forceRefresh || forecastReport.dailyWeatherList.isEmpty()) {
-                        findDailyWeather(forecastReport, isSendReponse);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        t.start();
-        return t;
+    private void queryDailyWeather( boolean forceRefresh, ForecastReport forecastReport,
+                                    boolean isSendReponse) {
+        Util.printThread("7. queryDailyWeather");
+       try {
+           if (forceRefresh || forecastReport.dailyWeatherList.isEmpty()) {
+               findDailyWeather(forecastReport, isSendReponse);
+           }
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
     }
 
-    private Thread queryHourlyWeather(final boolean forceRefresh, final ForecastReport forecastReport,
-                                     final boolean isSendReponse) {
-        Thread t = new Thread() {
-            public void run() {
-                try {
-                    if (forceRefresh || forecastReport.hourlyWeatherList.isEmpty()) {
-                        findHourlyWeather( forecastReport, isSendReponse);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+    private void queryHourlyWeather(boolean forceRefresh, ForecastReport forecastReport,
+                                     boolean isSendReponse) {
+        Util.printThread("5. queryHourlyWeather");
+        try {
+            if (forceRefresh || forecastReport.hourlyWeatherList.isEmpty()) {
+                findHourlyWeather(forecastReport, isSendReponse);
             }
-        };
-        t.start();
-        return t;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
     private void findDailyWeather(final ForecastReport forecastReport, final boolean isSendReponse) {
+        Util.printThread("8. findDailyWeather");
         HttpURLConnection urlConnection = null;
         try {
             URL url = new URL(UtilServiceAPIs.API_FORECAST_YQL_URL.replace("replace_place",
@@ -137,12 +131,13 @@ public class WeatherService extends GenericService {
 
 
     private void findHourlyWeather(final ForecastReport forecastReport, final boolean isSendReponse) {
+        Util.printThread("6. findHourlyWeather");
         HttpURLConnection urlConnection = null;
         try {
             LocationVO locationVO = forecastReport.locationVO;
             URL url = new URL(String.format(UtilServiceAPIs.API_WUNDERGROUND,
                     locationVO.getCountryCode().equals("US") ? locationVO.getStateCode()
-                            : locationVO.getCountryCode(), locationVO.getPlace() ));
+                            : locationVO.getCountryCode(), locationVO.getPlace()));
             urlConnection = (HttpURLConnection) url.openConnection();
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
             JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
@@ -163,19 +158,21 @@ public class WeatherService extends GenericService {
 
     private synchronized ForecastReport getForecastReport(String place, long refreshTime,
                                                           List<WeatherProposition> rules) {
+        Util.printThread("getForecastReport1");
         return getForecastReport( new LocationVO( place ), refreshTime, rules );
     }
 
 
     private synchronized ForecastReport getForecastReport(LocationVO locationVO, long refreshTime,
                                                           List<WeatherProposition> rules) {
-
+        Util.printThread("4. getForecastReport2");
         String place = locationVO.getSubArea() != null? locationVO.getSubArea()
                 : locationVO.getCity() != null? locationVO.getCity()
                 : locationVO.getWoeidVO() != null && locationVO.getWoeidVO().getName() != null?
                 locationVO.getWoeidVO().getName() : null;
         if( place == null ) {
-            mb.send(WeatherEvent.build().setIsError(true)
+            mb.send( WeatherService.this,
+                    WeatherEvent.build().setIsError(true)
                     .setErrorMessage("A place is required in order to get the forecast report."));
             return null;
         }
@@ -207,10 +204,11 @@ public class WeatherService extends GenericService {
 
     private void parseDailyWeather(JsonReader reader, ForecastReport forecastReport,
                                   boolean isSendReponse) throws Exception {
+        Util.printThread("parseDailyWeather");
         HashMap<String, String> mappings = new HashMap<>();
         mappings.put("low", "setLowTemp");
         mappings.put("high", "setHighTemp");
-        mappings.put("text", "setConditions");
+        mappings.put("text", "setCondition");
         mappings.put("date", "setDate");
         mappings.put("day", "setDayOfWeek");
         mappings.put("query", "");
@@ -227,6 +225,7 @@ public class WeatherService extends GenericService {
 
     private void parseHourlyWeather(JsonReader reader, ForecastReport forecastReport,
                                    boolean isSendReponse) throws Exception {
+        Util.printThread("parseHourlyWeather");
         HashMap<String, String> mappings = new HashMap<>();
         mappings.put("hourly_forecast", "");
         mappings.put("FCTTIME", "");
@@ -247,7 +246,7 @@ public class WeatherService extends GenericService {
         mappings.put("snow", "");
         mappings.put("snow.english", "setSnowEnglish");
         mappings.put("snow.metric", "setSnowMetric");
-        mappings.put("condition", "setConditions");
+        mappings.put("condition", "setCondition");
         mappings.put("humidity", "setHumidity");
         mappings.put("icon_url", "setIconUrl");
         mappings.put("response", "");
@@ -270,10 +269,11 @@ public class WeatherService extends GenericService {
      */
     private synchronized void sendResponse(ForecastReport forecastReport, ArrayList errors,
                                            boolean updateMap, boolean isSendReponse){
+        Util.printThread("sendResponse");
         if( errors == null || errors.isEmpty() ){
             //forecast mode has to be either DAILY or HOURLY, otherwise both lists (daily and hourly)
             //must be filled before sending the result
-            if( isSendReponse && (forecastReport.forecastMode >= 0 || ( forecastReport.forecastMode < 0
+            if( (forecastReport.forecastMode >= 0 || ( forecastReport.forecastMode < 0 //isSendReponse &&
                     && !forecastReport.hourlyWeatherList.isEmpty() &&
                     !forecastReport.dailyWeatherList.isEmpty()) )) {
                 if (updateMap) {
@@ -291,16 +291,20 @@ public class WeatherService extends GenericService {
                     event.setDailyWeather(forecastReport.dailyWeatherList);
                     event.setHourlyWeather(forecastReport.hourlyWeatherList);
                 }
-                mb.send(event);
+                Util.printThread("Response is sent");
+                mb.send(WeatherService.this, event);
             }
         }else{
-            mb.send( WeatherEvent.build()
+            Util.printThread("Error is sent");
+            mb.send( WeatherService.this,
+                     WeatherEvent.build()
                     .setIsError(true)
                     .setErrorMessage( Arrays.toString( errors.toArray()) ));
         }
     }
 
     private List validateRules(ForecastReport forecastReport) {
+        Util.printThread("validateRules");
         List results = new ArrayList();
         if( forecastReport.rules != null && !forecastReport.rules.isEmpty() ){
             for(WeatherProposition rule : forecastReport.rules) {
@@ -325,6 +329,7 @@ public class WeatherService extends GenericService {
 
 
     public int changeForecastMode(String place){
+        Util.printThread("changeForecastMode");
         if( place != null && !place.equals("") ){
             ForecastReport forecastReport = getForecastReport( place , -1, null);
             if( forecastReport != null ){
@@ -340,27 +345,30 @@ public class WeatherService extends GenericService {
     }
 
     public List<HourWeatherVO> getHourlyReport(String place){
+        Util.printThread("getHourlyReport");
         if( place != null && place.equals(Constants.LOCATION_CURRENT_PLACE) ){
             LocationVO locationVO = getPlaceLocation( place, false );
-            return locationVO == null ? null : getForecastReport(locationVO, -1, null).hourlyWeatherList;
+            return locationVO == null ? null : Util.clone( getForecastReport(locationVO, -1, null).hourlyWeatherList);
         }else {
             ForecastReport forecastReport = getForecastReport( place, -1, null);
-            return forecastReport == null? null : forecastReport.hourlyWeatherList;
+            return forecastReport == null? null : Util.clone( forecastReport.hourlyWeatherList );
         }
     }
 
     public List<DayWeatherVO> getDailyReport(String place){
+        Util.printThread("getDailyReport");
         if( place != null && place.equals( Constants.LOCATION_CURRENT_PLACE) ){
             LocationVO locationVO = getPlaceLocation( place, false );
-            return locationVO == null ? null : getForecastReport(locationVO, -1, null).dailyWeatherList;
+            return locationVO == null ? null : Util.clone(getForecastReport(locationVO, -1, null).dailyWeatherList);
         }else {
             ForecastReport forecastReport = getForecastReport( place, -1, null);
-            return forecastReport == null? null : forecastReport.dailyWeatherList;
+            return forecastReport == null? null : Util.clone(forecastReport.dailyWeatherList);
         }
     }
 
     @Override
     public void onDestroy(){
+        Util.printThread("onDestroy");
         for( ForecastReport forecastReport : forecastReports.values()){
             forecastReport.onDestroy();
         }
@@ -371,7 +379,8 @@ public class WeatherService extends GenericService {
 
 
     private void update( ForecastReport forecastReport ) throws Exception{
-        findWeatherData( new LocationVO(forecastReport.place), -1, -1, true, null, false).join();
+        Util.printThread("update");
+        findWeatherData( new LocationVO(forecastReport.place), -1, -1, true, null, false);
         List results = validateRules( forecastReport );
         if( !results.isEmpty() ){
             ForecastReport fr = new ForecastReport();
@@ -389,28 +398,47 @@ public class WeatherService extends GenericService {
         }
     }
 
-
-    public synchronized void unsubscribe(String place) {
-        if( place != null && !place.isEmpty() ){
-            if( place.equals(Constants.LOCATION_CURRENT_PLACE )) {
-                place = getPlaceLocation( place, false).getPlace();
+    public synchronized void unsubscribe(final String place) {
+        Util.printThread("unsubscribe");
+        Util.execute(new ExecutableTask() {
+            @Override
+            public void run() {
+                Util.printThread("unsubscibe.run");
+                String placeCopy = place;
+                if( placeCopy != null && !placeCopy.isEmpty() ){
+                    if( placeCopy.equals(Constants.LOCATION_CURRENT_PLACE )) {
+                        placeCopy = getPlaceLocation( placeCopy, false).getPlace();
+                    }
+                    ForecastReport forecastReport = forecastReports.get( placeCopy );
+                    if( forecastReport != null ) {
+                        forecastReport.onDestroy();
+                        forecastReports.remove(forecastReport.place);
+                    }
+                }
             }
-            ForecastReport forecastReport = forecastReports.get( place );
-            if( forecastReport != null ) {
-                forecastReport.onDestroy();
-                forecastReports.remove(forecastReport.place);
-            }
-        }
+        });
     }
 
     private LocationVO getPlaceLocation( String place, boolean checkWoeid){
-        return serviceLocator.getService( LocationService.class)
+        Util.printThread("getPlaceLocation1");
+        return resourceLocator.lookupService( LocationService.class)
                 .getPlaceLocation(place, checkWoeid);
     }
 
     private LocationVO getPlaceLocation( LocationVO locationVO, boolean checkWoeid){
-        return serviceLocator.getService( LocationService.class)
+        Util.printThread("3. getPlaceLocation2");
+        return resourceLocator.lookupService( LocationService.class)
                 .getPlaceLocation( locationVO, checkWoeid);
+    }
+
+    public HourWeatherVO getCurrentWeather() {
+        Util.printThread("getCurrentWeather");
+        List<HourWeatherVO> hourReport = forecastReports.get( Constants.LOCATION_CURRENT_PLACE )
+                .hourlyWeatherList;
+        if( hourReport != null && !hourReport.isEmpty() ){
+            return hourReport.get( hourReport.size() - 1 );
+        }
+        return null;
     }
 
     public class ForecastReport {

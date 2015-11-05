@@ -1,7 +1,8 @@
 package com.yahoo.inmind.commons.rules.model;
 
-import com.yahoo.inmind.commons.rules.control.Exclude;
+import com.yahoo.inmind.commons.control.Util;
 import com.yahoo.inmind.commons.rules.control.DecisionRuleValidator;
+import com.yahoo.inmind.commons.rules.control.Exclude;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +15,8 @@ public class DecisionRule {
     private ArrayList<ConditionElement> conditions;
     private String regularExpression;
     private ArrayList<ActionElement> actions;
+    private String ruleID;
+
     @Exclude
     private HashMap<String, HashMap<String, Object>> cacheMemory;
 
@@ -21,6 +24,17 @@ public class DecisionRule {
         conditions = new ArrayList<>();
         actions = new ArrayList<>();
         cacheMemory = new HashMap<>();
+    }
+
+    public String getRuleID() {
+        if( ruleID == null ){
+            Util.getUUID();
+        }
+        return ruleID;
+    }
+
+    public void setRuleID(String ruleID) {
+        this.ruleID = ruleID;
     }
 
     public ArrayList<ConditionElement> getConditions() {
@@ -80,7 +94,8 @@ public class DecisionRule {
         return cacheMemory;
     }
 
-    public void setPropositionFlag(PropositionalStatement propositionalStatement, boolean flag) {
+    public void setPropositionFlag(PropositionalStatement propositionalStatement, boolean flag,
+                                   ArrayList triggeredConditions) {
         //check whether all flags are true
         boolean checked = true;
 
@@ -95,8 +110,19 @@ public class DecisionRule {
 
         // if all conditions are true then trigger the actions
         if( checked ){
-            DecisionRuleValidator.getInstance().triggerActions( this );
+            DecisionRuleValidator.getInstance().triggerActions( this, triggeredConditions );
         }
+    }
+
+    public void destroy() {
+        for( ConditionElement conditionElement : conditions ){
+            conditionElement.destroy();
+        }
+        for( ActionElement actionElement : actions ){
+            actionElement.destroy();
+        }
+        conditions = null;
+        actions = null;
     }
 
     /***************************************** HELPER CLASSES *************************************/
@@ -135,6 +161,12 @@ public class DecisionRule {
         public void setFlag(boolean flag) {
             this.flag = flag;
         }
+
+
+        public void destroy() {
+            proposition.destroy();
+            proposition = null;
+        }
     }
 
     public class ActionElement{
@@ -160,6 +192,11 @@ public class DecisionRule {
 
         public void setAttributes(HashMap<String, Object> attributes) {
             this.attributes = attributes;
+        }
+
+        public void destroy() {
+            attributes.clear();
+            attributes = null;
         }
     }
 }

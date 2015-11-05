@@ -4,7 +4,6 @@ import com.yahoo.inmind.commons.control.Util;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by oscarr on 8/26/15.
@@ -138,7 +137,7 @@ public class CalendarEventVO{
 
     public String getUUID() {
         if( id == null ){
-            id = UUID.randomUUID().toString();
+            id = Util.getUUID();
         }
         return id;
     }

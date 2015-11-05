@@ -1,11 +1,8 @@
 package com.yahoo.inmind.orchestration.control;
 
-import android.util.Log;
-
 import com.yahoo.inmind.orchestration.model.Behavior;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 

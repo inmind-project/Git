@@ -1,9 +1,5 @@
 package com.yahoo.inmind.services.news.control.util;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-
 import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Debug;
@@ -12,6 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.yahoo.inmind.services.news.control.reader.ReaderController;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class MemUtil {
 	private static int mMaxCacheSize = 0;

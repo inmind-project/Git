@@ -1,12 +1,12 @@
 package com.yahoo.inmind.services.news.control.util;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.webkit.CookieManager;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CookieStore {
 	enum AccountType{

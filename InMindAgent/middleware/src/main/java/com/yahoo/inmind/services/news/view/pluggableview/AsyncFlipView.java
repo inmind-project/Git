@@ -9,11 +9,11 @@ import android.view.View;
 import android.widget.BaseAdapter;
 
 import com.aphidmobile.flip.FlipViewController;
-import com.yahoo.inmind.services.news.model.i13n.Event;
 import com.yahoo.inmind.services.news.control.i13n.I13N;
-import com.yahoo.inmind.services.news.view.adapter.NewsAdapter;
-import com.yahoo.inmind.services.news.model.vo.NewsArticle;
 import com.yahoo.inmind.services.news.control.reader.ReaderController;
+import com.yahoo.inmind.services.news.model.i13n.Event;
+import com.yahoo.inmind.services.news.model.vo.NewsArticle;
+import com.yahoo.inmind.services.news.view.adapter.NewsAdapter;
 
 public class AsyncFlipView extends FlipViewController implements PluggableAdapterView<NewsArticle>{
 	PositionChangedListener mPosChangedListener;

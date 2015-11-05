@@ -1,9 +1,7 @@
 package com.yahoo.inmind.orchestration.model;
 
-import android.util.Log;
-
-import java.util.Vector;
 import java.util.Collection;
+import java.util.Vector;
 
 /**
  * A competence module i can be described by a tuple (ci ai di zi). Where: 

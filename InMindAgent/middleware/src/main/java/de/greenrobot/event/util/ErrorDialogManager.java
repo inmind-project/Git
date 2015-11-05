@@ -2,7 +2,6 @@ package de.greenrobot.event.util;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Application;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -10,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
+
 import de.greenrobot.event.EventBus;
 
 /**
